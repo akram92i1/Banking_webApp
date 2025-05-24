@@ -1,0 +1,712 @@
+// Spring Boot Banking API Application
+// Main Application Class and Core Components
+
+// ============= MAIN APPLICATION =============
+
+package com.banking.api;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+@SpringBootApplication
+@EnableJpaRepositories
+@EnableTransactionManagement
+@EnableCaching
+public class BankingApiApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(BankingApiApplication.class, args);
+    }
+}
+
+// ============= CONFIGURATION =============
+
+package com.banking.api.config;
+
+import org.springframework.cache.CacheManager;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+@Configuration
+public class RedisConfig {
+    
+    @Bean
+    public RedisConnectionFactory redisConnectionFactory() {
+        return new LettuceConnectionFactory("redis", 6379);
+    }
+    
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate() {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactory());
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+        return template;
+    }
+    
+    @Bean
+    public CacheManager cacheManager() {
+        return RedisCacheManager.builder(redisConnectionFactory()).build();
+    }
+}
+
+package com.banking.api.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+    
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf().disable()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .authorizeHttpRequests(authz -> authz
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/public/**").permitAll()
+                .requestMatchers("/actuator/health").permitAll()
+                .anyRequest().authenticated()
+            );
+        return http.build();
+    }
+}
+
+// ============= ENTITIES =============
+
+package com.banking.api.entity;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+@Entity
+@Table(name = "users")
+@EntityListeners(AuditingEntityListener.class)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class User {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "user_id")
+    private UUID userId;
+    
+    @Column(unique = true, nullable = false, length = 50)
+    private String username;
+    
+    @Email
+    @Column(unique = true, nullable = false, length = 100)
+    private String email;
+    
+    @JsonIgnore
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
+    
+    @NotBlank
+    @Column(name = "first_name", nullable = false, length = 100)
+    private String firstName;
+    
+    @NotBlank
+    @Column(name = "last_name", nullable = false, length = 100)
+    private String lastName;
+    
+    private String phone;
+    
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
+    
+    @JsonIgnore
+    @Column(name = "ssn_hash")
+    private String ssnHash;
+    
+    @Column(columnDefinition = "jsonb")
+    private String address;
+    
+    @Enumerated(EnumType.STRING)
+    private UserRole role = UserRole.CUSTOMER;
+    
+    @Column(name = "is_active")
+    private Boolean isActive = true;
+    
+    @Column(name = "email_verified")
+    private Boolean emailVerified = false;
+    
+    @Column(name = "failed_login_attempts")
+    private Integer failedLoginAttempts = 0;
+    
+    @Column(name = "last_login_at")
+    private LocalDateTime lastLoginAt;
+    
+    @CreatedDate
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+    
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Account> accounts;
+}
+
+@Entity
+@Table(name = "accounts")
+@EntityListeners(AuditingEntityListener.class)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Account {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "account_id")
+    private UUID accountId;
+    
+    @Column(name = "account_number", unique = true, nullable = false, length = 20)
+    private String accountNumber;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bank_id", nullable = false)
+    private Bank bank;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "account_type", nullable = false)
+    private AccountType accountType;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "account_status")
+    private AccountStatus accountStatus = AccountStatus.ACTIVE;
+    
+    @DecimalMin(value = "0.0")
+    @Digits(integer = 13, fraction = 2)
+    private BigDecimal balance = BigDecimal.ZERO;
+    
+    @Column(name = "available_balance")
+    @Digits(integer = 13, fraction = 2)
+    private BigDecimal availableBalance = BigDecimal.ZERO;
+    
+    @Column(name = "credit_limit")
+    @Digits(integer = 13, fraction = 2)
+    private BigDecimal creditLimit = BigDecimal.ZERO;
+    
+    @CreatedDate
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+    
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+    
+    @OneToMany(mappedBy = "fromAccount", cascade = CascadeType.ALL)
+    private List<Transaction> outgoingTransactions;
+    
+    @OneToMany(mappedBy = "toAccount", cascade = CascadeType.ALL)
+    private List<Transaction> incomingTransactions;
+}
+
+@Entity
+@Table(name = "transactions")
+@EntityListeners(AuditingEntityListener.class)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Transaction {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "transaction_id")
+    private UUID transactionId;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "from_account_id")
+    private Account fromAccount;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "to_account_id")
+    private Account toAccount;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "transaction_type", nullable = false)
+    private TransactionType transactionType;
+    
+    @DecimalMin(value = "0.01")
+    @Digits(integer = 13, fraction = 2)
+    @Column(nullable = false)
+    private BigDecimal amount;
+    
+    private String currency = "USD";
+    private String description;
+    
+    @Column(name = "reference_number", unique = true)
+    private String referenceNumber;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "transaction_status")
+    private TransactionStatus transactionStatus = TransactionStatus.PENDING;
+    
+    @Column(name = "processed_at")
+    private LocalDateTime processedAt;
+    
+    @Column(name = "fee_amount")
+    @Digits(integer = 8, fraction = 2)
+    private BigDecimal feeAmount = BigDecimal.ZERO;
+    
+    @CreatedDate
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+    
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+}
+
+@Entity
+@Table(name = "banks")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Bank {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "bank_id")
+    private UUID bankId;
+    
+    @Column(name = "bank_name", nullable = false)
+    private String bankName;
+    
+    @Column(name = "routing_number", unique = true, nullable = false)
+    private String routingNumber;
+    
+    @Column(name = "swift_code")
+    private String swiftCode;
+    
+    @OneToMany(mappedBy = "bank", cascade = CascadeType.ALL)
+    private List<Account> accounts;
+}
+
+// ============= ENUMS =============
+
+package com.banking.api.entity;
+
+public enum AccountType {
+    CHECKING, SAVINGS, CREDIT, LOAN
+}
+
+public enum AccountStatus {
+    ACTIVE, INACTIVE, SUSPENDED, CLOSED
+}
+
+public enum TransactionType {
+    DEPOSIT, WITHDRAWAL, TRANSFER, PAYMENT, FEE
+}
+
+public enum TransactionStatus {
+    PENDING, COMPLETED, FAILED, CANCELLED
+}
+
+public enum UserRole {
+    CUSTOMER, EMPLOYEE, MANAGER, ADMIN
+}
+
+// ============= REPOSITORIES =============
+
+package com.banking.api.repository;
+
+import com.banking.api.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+import java.util.Optional;
+import java.util.UUID;
+
+@Repository
+public interface UserRepository extends JpaRepository<User, UUID> {
+    Optional<User> findByUsername(String username);
+    Optional<User> findByEmail(String email);
+    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
+}
+
+package com.banking.api.repository;
+
+import com.banking.api.entity.Account;
+import com.banking.api.entity.AccountStatus;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@Repository
+public interface AccountRepository extends JpaRepository<Account, UUID> {
+    List<Account> findByUserUserId(UUID userId);
+    Optional<Account> findByAccountNumber(String accountNumber);
+    List<Account> findByUserUserIdAndAccountStatus(UUID userId, AccountStatus status);
+    
+    @Query("SELECT a FROM Account a WHERE a.user.userId = :userId AND a.accountStatus = 'ACTIVE'")
+    List<Account> findActiveAccountsByUserId(UUID userId);
+}
+
+package com.banking.api.repository;
+
+import com.banking.api.entity.Transaction;
+import com.banking.api.entity.TransactionStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+@Repository
+public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
+    
+    @Query("SELECT t FROM Transaction t WHERE t.fromAccount.accountId = :accountId OR t.toAccount.accountId = :accountId ORDER BY t.createdAt DESC")
+    Page<Transaction> findByAccountId(UUID accountId, Pageable pageable);
+    
+    List<Transaction> findByTransactionStatusAndCreatedAtBefore(TransactionStatus status, LocalDateTime dateTime);
+    
+    @Query("SELECT t FROM Transaction t WHERE (t.fromAccount.user.userId = :userId OR t.toAccount.user.userId = :userId) AND t.createdAt >= :fromDate ORDER BY t.createdAt DESC")
+    List<Transaction> findUserTransactionsAfterDate(UUID userId, LocalDateTime fromDate);
+}
+
+// ============= SERVICES =============
+
+package com.banking.api.service;
+
+import com.banking.api.entity.User;
+import com.banking.api.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.Optional;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class UserService {
+    
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    
+    @Cacheable(value = "users", key = "#userId")
+    public Optional<User> findById(UUID userId) {
+        return userRepository.findById(userId);
+    }
+    
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+    
+    public User createUser(User user) {
+        user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
+        return userRepository.save(user);
+    }
+    
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+    
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+}
+
+package com.banking.api.service;
+
+import com.banking.api.entity.Account;
+import com.banking.api.entity.AccountStatus;
+import com.banking.api.repository.AccountRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class AccountService {
+    
+    private final AccountRepository accountRepository;
+    
+    @Cacheable(value = "accounts", key = "#accountId")
+    public Optional<Account> findById(UUID accountId) {
+        return accountRepository.findById(accountId);
+    }
+    
+    public List<Account> findByUserId(UUID userId) {
+        return accountRepository.findByUserUserId(userId);
+    }
+    
+    public List<Account> findActiveAccountsByUserId(UUID userId) {
+        return accountRepository.findActiveAccountsByUserId(userId);
+    }
+    
+    public Optional<Account> findByAccountNumber(String accountNumber) {
+        return accountRepository.findByAccountNumber(accountNumber);
+    }
+    
+    public Account createAccount(Account account) {
+        return accountRepository.save(account);
+    }
+    
+    public Account updateAccount(Account account) {
+        return accountRepository.save(account);
+    }
+}
+
+package com.banking.api.service;
+
+import com.banking.api.entity.*;
+import com.banking.api.repository.TransactionRepository;
+import com.banking.api.repository.AccountRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class TransactionService {
+    
+    private final TransactionRepository transactionRepository;
+    private final AccountRepository accountRepository;
+    
+    public Page<Transaction> getAccountTransactions(UUID accountId, Pageable pageable) {
+        return transactionRepository.findByAccountId(accountId, pageable);
+    }
+    
+    public Transaction transfer(UUID fromAccountId, UUID toAccountId, BigDecimal amount, String description) {
+        Account fromAccount = accountRepository.findById(fromAccountId)
+            .orElseThrow(() -> new RuntimeException("From account not found"));
+        Account toAccount = accountRepository.findById(toAccountId)
+            .orElseThrow(() -> new RuntimeException("To account not found"));
+        
+        // Validate sufficient balance
+        if (fromAccount.getAvailableBalance().compareTo(amount) < 0) {
+            throw new RuntimeException("Insufficient balance");
+        }
+        
+        // Create transaction
+        Transaction transaction = new Transaction();
+        transaction.setFromAccount(fromAccount);
+        transaction.setToAccount(toAccount);
+        transaction.setTransactionType(TransactionType.TRANSFER);
+        transaction.setAmount(amount);
+        transaction.setDescription(description);
+        transaction.setReferenceNumber(generateReferenceNumber());
+        transaction.setTransactionStatus(TransactionStatus.PENDING);
+        
+        Transaction savedTransaction = transactionRepository.save(transaction);
+        
+        // Update balances
+        fromAccount.setBalance(fromAccount.getBalance().subtract(amount));
+        fromAccount.setAvailableBalance(fromAccount.getAvailableBalance().subtract(amount));
+        toAccount.setBalance(toAccount.getBalance().add(amount));
+        toAccount.setAvailableBalance(toAccount.getAvailableBalance().add(amount));
+        
+        accountRepository.save(fromAccount);
+        accountRepository.save(toAccount);
+        
+        // Update transaction status
+        savedTransaction.setTransactionStatus(TransactionStatus.COMPLETED);
+        savedTransaction.setProcessedAt(LocalDateTime.now());
+        
+        return transactionRepository.save(savedTransaction);
+    }
+    
+    public Transaction deposit(UUID accountId, BigDecimal amount, String description) {
+        Account account = accountRepository.findById(accountId)
+            .orElseThrow(() -> new RuntimeException("Account not found"));
+        
+        Transaction transaction = new Transaction();
+        transaction.setToAccount(account);
+        transaction.setTransactionType(TransactionType.DEPOSIT);
+        transaction.setAmount(amount);
+        transaction.setDescription(description);
+        transaction.setReferenceNumber(generateReferenceNumber());
+        transaction.setTransactionStatus(TransactionStatus.COMPLETED);
+        transaction.setProcessedAt(LocalDateTime.now());
+        
+        Transaction savedTransaction = transactionRepository.save(transaction);
+        
+        // Update balance
+        account.setBalance(account.getBalance().add(amount));
+        account.setAvailableBalance(account.getAvailableBalance().add(amount));
+        accountRepository.save(account);
+        
+        return savedTransaction;
+    }
+    
+    private String generateReferenceNumber() {
+        return "TXN" + System.currentTimeMillis();
+    }
+}
+
+// ============= CONTROLLERS =============
+
+package com.banking.api.controller;
+
+import com.banking.api.entity.Account;
+import com.banking.api.service.AccountService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/accounts")
+@RequiredArgsConstructor
+public class AccountController {
+    
+    private final AccountService accountService;
+    
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Account>> getUserAccounts(@PathVariable UUID userId) {
+        List<Account> accounts = accountService.findByUserId(userId);
+        return ResponseEntity.ok(accounts);
+    }
+    
+    @GetMapping("/{accountId}")
+    public ResponseEntity<Account> getAccount(@PathVariable UUID accountId) {
+        return accountService.findById(accountId)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+    
+    @GetMapping("/user/{userId}/active")
+    public ResponseEntity<List<Account>> getActiveAccounts(@PathVariable UUID userId) {
+        List<Account> accounts = accountService.findActiveAccountsByUserId(userId);
+        return ResponseEntity.ok(accounts);
+    }
+}
+
+package com.banking.api.controller;
+
+import com.banking.api.entity.Transaction;
+import com.banking.api.service.TransactionService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.math.BigDecimal;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/transactions")
+@RequiredArgsConstructor
+public class TransactionController {
+    
+    private final TransactionService transactionService;
+    
+    @GetMapping("/account/{accountId}")
+    public ResponseEntity<Page<Transaction>> getAccountTransactions(
+            @PathVariable UUID accountId, 
+            Pageable pageable) {
+        Page<Transaction> transactions = transactionService.getAccountTransactions(accountId, pageable);
+        return ResponseEntity.ok(transactions);
+    }
+    
+    @PostMapping("/transfer")
+    public ResponseEntity<Transaction> transfer(
+            @RequestParam UUID fromAccountId,
+            @RequestParam UUID toAccountId,
+            @RequestParam BigDecimal amount,
+            @RequestParam(required = false) String description) {
+        try {
+            Transaction transaction = transactionService.transfer(fromAccountId, toAccountId, amount, description);
+            return ResponseEntity.ok(transaction);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    
+    @PostMapping("/deposit")
+    public ResponseEntity<Transaction> deposit(
+            @RequestParam UUID accountId,
+            @RequestParam BigDecimal amount,
+            @RequestParam(required = false) String description) {
+        try {
+            Transaction transaction = transactionService.deposit(accountId, amount, description);
+            return ResponseEntity.ok(transaction);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+}
+
+package com.banking.api.controller;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/actuator")
+public class HealthController {
+    
+    @GetMapping("/health")
+    public ResponseEntity<Map<String, String>> health() {
+        return ResponseEntity.ok(Map.of("status", "UP"));
+    }
+}
