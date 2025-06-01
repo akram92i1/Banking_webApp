@@ -20,7 +20,7 @@ This platform is designed with Docker and includes the following microservices:
 ---
 
 ## 📁 Project Structure
-
+```
 devops_project/
 │
 ├── auth-service/         # Authentication microservice (Node.js/Express or similar)
@@ -33,4 +33,5 @@ devops_project/
 ├── logging/              # ELK stack (Elasticsearch, Logstash, Kibana) configs
 ├── docker-compose.yml    # Docker Compose orchestration file
 └── README.md             # Project documentation
+```
 ---
