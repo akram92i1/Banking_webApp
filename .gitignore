@@ -1,0 +1,64 @@
+# Node.js dependencies
+auth-service/node_modules/
+frontend/node_modules/
+
+# Java build files
+banking-api/target/
+banking-api/.class# Node.js dependencies
+auth-service/node_modules/
+frontend/node_modules/
+finance_front_end/node_modules/
+
+# Java build files
+banking-api/target/
+banking-api/.classpath
+banking-api/.project
+banking-api/.settings/
+
+# Environment files
+*.env
+
+# Logs
+*.log
+logs/
+logging/logs/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Docker artifacts
+**/.docker/
+**/Dockerfile~
+
+# Misc
+*.swppath
+banking-api/.project
+banking-api/.settings/
+
+# Environment files
+*.env
+
+# Logs
+*.log
+logs/
+logging/logs/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Docker artifacts
+**/.docker/
+**/Dockerfile~
+
+# Misc
+*.swp
