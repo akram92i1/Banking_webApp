@@ -24,11 +24,11 @@ This platform is designed with Docker and includes the following microservices:
 devops_project/
 │
 ├── auth-service/         # Authentication microservice (Node.js/Express or similar)
-├── frontend/             # Frontend web application (React)
+├── finance_front_end/             # Frontend web application (React)
 ├── banking-api/          # Core banking API (Spring Boot)
-├── postgres/             # PostgreSQL database initialization/config
+├── databaseService/             # PostgreSQL database initialization/config
 ├── memcached/            # Memcached configuration (if needed)
-├── nginx/                # Nginx reverse proxy and load balancer config
+├── loadBalancer/                # Nginx reverse proxy and load balancer config
 ├── monitoring/           # Prometheus and Grafana configs
 ├── logging/              # ELK stack (Elasticsearch, Logstash, Kibana) configs
 ├── docker-compose.yml    # Docker Compose orchestration file
