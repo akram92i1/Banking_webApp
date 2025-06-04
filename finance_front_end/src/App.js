@@ -4,7 +4,8 @@ import Header from './components/Header';
 import Sidebar from './components/SideBar';
 import MyWalletTable from './components/MyWallet/MyWalletTable';
 import PageOverview from './components/Overview/PageOverview';
-
+import ProfileCard from './components/ProfileCard';
+import Settings from './components/Settings';
 function App() {
   return (
     <Router>
@@ -26,11 +27,13 @@ function App() {
               <Route path="/overview" element={<PageOverview />} />
               <Route path="/wallet" element={<MyWalletTable />} />
               <Route path="*" element={<Navigate to="/" />} /> {/* Catch-all */}
+              <Route path="/profile" element={<ProfileCard user={{avatarUrl:"https://avatar.iran.liara.run/public",profilename:"Akram", email:"tes@test.com",phone:"004534234",}} />}  />
+              <Route path="/settings" element={<Settings />} />
             </Routes>
           </div>
         </div>
       </div>
-    </Router>
+    </Router> 
   );
 }
 

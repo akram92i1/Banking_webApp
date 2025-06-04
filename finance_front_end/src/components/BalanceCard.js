@@ -5,7 +5,7 @@ export default function BalanceCard() {
       <div className="bg-green-50  rounded-xl p-6 relative overflow-hidden shadow-md">
         {/* Decorative Circle */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-red-500 rounded-full mix-blend-multiply opacity-70 -mr-12 -mt-12"></div>
-        <div className="absolute top-0 right-0 w-24 h-24 bg-orange-400 rounded-full mix-blend-multiply opacity-80 -mr-6 -mt-6"></div>
+        <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-400 rounded-full mix-blend-multiply opacity-80 -mr-6 -mt-6"></div>
   
         {/* Content */}
         <div className="relative z-10">

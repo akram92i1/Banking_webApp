@@ -15,12 +15,12 @@ export default function Sidebar() {
             <Link to="/wallet" className="flex items-center gap-3 text-gray-600 hover:text-black">
               <FaWallet /> My Wallet
             </Link>
-            <button className="flex items-center gap-3 text-gray-600 hover:text-black">
+            <Link to="/profile" className="flex items-center gap-3 text-gray-600 hover:text-black">
               <FaUser /> Profile
-            </button>
-            <button className="flex items-center gap-3 text-gray-600 hover:text-black">
+            </Link>
+            <Link to="/settings" className="flex items-center gap-3 text-gray-600 hover:text-black">
               <FaCog /> Settings
-            </button>
+            </Link>
             <button className="flex items-center gap-3 text-gray-600 hover:text-black">
               <FaQuestionCircle /> Help Center
             </button>
