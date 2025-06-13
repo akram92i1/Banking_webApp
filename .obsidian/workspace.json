@@ -1,20 +1,24 @@
 {
   "main": {
-    "id": "20436692dcdf9752",
+    "id": "0fe26c218d12c249",
     "type": "split",
     "children": [
       {
-        "id": "1fd6365bf1ab6b8a",
+        "id": "5807b5c7783854ed",
         "type": "tabs",
         "children": [
           {
-            "id": "6faa80cc45929640",
+            "id": "bbfc9d675e4165b4",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "type": "markdown",
+              "state": {
+                "file": "finance_front_end/node_modules/eslint-plugin-jest/README.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "README"
             }
           }
         ]
@@ -23,15 +27,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "6d6dde68fc67fbe6",
+    "id": "93a1e9d6429ea6fc",
     "type": "split",
     "children": [
       {
-        "id": "a2908d51ee6bf713",
+        "id": "36274e6da2b9f587",
         "type": "tabs",
         "children": [
           {
-            "id": "f7a941235886113d",
+            "id": "4dc196da66ccdc66",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -44,7 +48,7 @@
             }
           },
           {
-            "id": "4f349d73e5e43436",
+            "id": "3b2401e19df639df",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -61,7 +65,7 @@
             }
           },
           {
-            "id": "25d5e1f361aa6c94",
+            "id": "0f3d32b68edf63a0",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
@@ -74,23 +78,24 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "right": {
-    "id": "21ab8945d4547148",
+    "id": "c693738d76702600",
     "type": "split",
     "children": [
       {
-        "id": "d94a15d21ef2ca97",
+        "id": "b31775729986e099",
         "type": "tabs",
         "children": [
           {
-            "id": "3fc693a9e9986ecd",
+            "id": "830d5de6d01f33ef",
             "type": "leaf",
             "state": {
               "type": "backlink",
               "state": {
-                "file": "banking_schema_attributes.md",
+                "file": "finance_front_end/node_modules/eslint-plugin-jest/README.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,25 +105,25 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for banking_schema_attributes"
+              "title": "Backlinks for README"
             }
           },
           {
-            "id": "d9905520c2b5fda5",
+            "id": "f7ee59886b1d7c9e",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "banking_schema_attributes.md",
+                "file": "finance_front_end/node_modules/eslint-plugin-jest/README.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from banking_schema_attributes"
+              "title": "Outgoing links from README"
             }
           },
           {
-            "id": "8d7a5335981bcf09",
+            "id": "4134476e760122cb",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -133,18 +138,18 @@
             }
           },
           {
-            "id": "0cf67c9987edeaa6",
+            "id": "483b901802853f2e",
             "type": "leaf",
             "state": {
               "type": "outline",
               "state": {
-                "file": "banking_schema_attributes.md",
+                "file": "finance_front_end/node_modules/eslint-plugin-jest/README.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of banking_schema_attributes"
+              "title": "Outline of README"
             }
           }
         ]
@@ -164,10 +169,9 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "6faa80cc45929640",
+  "active": "bbfc9d675e4165b4",
   "lastOpenFiles": [
-    "DATA_INSERTION.md",
-    "banking_schema_attributes.md",
-    "Unconfirmed 216672.crdownload"
+    "finance_front_end/node_modules/is-docker/readme.md",
+    "README.md"
   ]
 }
