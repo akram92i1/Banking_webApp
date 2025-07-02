@@ -73,7 +73,8 @@ CREATE TABLE transactions (
     amount DECIMAL(15,2) NOT NULL,
     currency VARCHAR(3) DEFAULT 'USD',
     description TEXT,
-    reference_number VARCHAR(50) UNIQUE,
+    reference_number VARCHAR(50),
+    UNIQUE (reference_number, created_at),
     transaction_status transaction_status DEFAULT 'PENDING',
     processed_at TIMESTAMP WITH TIME ZONE,
     scheduled_at TIMESTAMP WITH TIME ZONE,
@@ -83,7 +84,7 @@ CREATE TABLE transactions (
     location_info JSONB, -- GPS, IP address, etc.
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP UNIQUE ,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (transaction_id,created_at),
+    PRIMARY KEY (transaction_id),
     
     -- Ensure at least one account is specified
     CONSTRAINT check_account_specified CHECK (

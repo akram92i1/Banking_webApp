@@ -54,7 +54,7 @@ This guide explains how to insert initial data into your PostgreSQL database for
 ## 4. Insert Account Records
 
 1. **Get user IDs**  
-   ```sql
+   ``x`sql
    SELECT user_id, username FROM users;
    ```
    Copy the UUIDs for each user.
