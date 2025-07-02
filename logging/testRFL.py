@@ -6,6 +6,10 @@ from datetime import datetime, timedelta
 import json
 from typing import Dict, List, Tuple, Any
 import warnings
+from colorama import Fore, Style
+import matplotlib.pyplot as plt
+import pickle 
+from collections import defaultdict
 warnings.filterwarnings('ignore')
 
 class BankingEnvironment:
@@ -166,12 +170,15 @@ class BankingEnvironment:
 
 class ThreatDetectionAgent:
     """Q-Learning agent for threat detection"""
+    def float_defaultdict(self):
+        """Default dictionary for float values"""
+        return defaultdict(float)   
     
     def __init__(self, learning_rate=0.1, discount_factor=0.95, epsilon=0.1):
         self.lr = learning_rate
         self.gamma = discount_factor
         self.epsilon = epsilon
-        self.q_table = defaultdict(lambda: defaultdict(float))
+        self.q_table = defaultdict(self.float_defaultdict)
         self.feature_encoder = FeatureEncoder()
         
     def get_state_key(self, transaction, env_state):
@@ -206,6 +213,26 @@ class ThreatDetectionAgent:
                 return random.randint(0, 2)
             return max(q_values, key=q_values.get)
     
+    def choose_action_boltzmann(self, state_key, temperature=1.0):
+        """Choose action using Boltzmann exploration"""
+        q_values = self.q_table[state_key]
+        actions = [0, 1, 2]
+        if not q_values:
+            return random.choice(actions)
+        # Get Q-values for all actions, defaulting to 0.0 if missing
+        q_list = np.array([q_values.get(a, 0.0) for a in actions])
+        # Prevent division by zero or overflow
+        temp = max(temperature, 1e-6)
+        exp_q = np.exp(q_list / temp)
+        sum_exp_q = np.sum(exp_q)
+        if sum_exp_q == 0 or np.isnan(sum_exp_q):
+            # All Q-values are zero or invalid, pick random action
+            return random.choice(actions)
+        probabilities = exp_q / sum_exp_q
+        # print(Fore.BLUE, f"Action probabilities for state {state_key}: {probabilities}", Style.RESET_ALL)
+        if np.any(np.isnan(probabilities)):
+            return random.choice(actions)
+        return np.random.choice(actions, p=probabilities)
     def update_q_value(self, state_key, action, reward, next_state_key):
         """Update Q-value using Q-learning update rule"""
         current_q = self.q_table[state_key][action]
@@ -264,7 +291,7 @@ class ThreatDetectionSystem:
         self.training_history = []
         self.threat_patterns = {}
         
-    def train(self, episodes=1000):
+    def train(self, episodes=10000):
         """Train the RL agent"""
         print("Starting training...")
         
@@ -273,12 +300,14 @@ class ThreatDetectionSystem:
             total_reward = 0
             threats_in_episode = 0
             
-            for step in range(10000):  # Steps per episode
+            for step in range(50000):  # Steps per episode
                 # Generate transaction (20% chance of threat)
                 is_threat = random.random() < 0.2
+                # print(Fore.YELLOW, f"Generating transaction for Episode {episode}, Step {step}...", Style.RESET_ALL)
+                # Randomly select threat type if it's a threat
                 threat_type = random.choice(self.environment.threat_types) if is_threat else None
+                # print(Fore.GREEN,f"Episode {episode}, Step {step}: {'Threat' if is_threat else 'Legitimate'} transaction", Style.RESET_ALL)
                 transaction = self.environment.generate_transaction(is_threat, threat_type)
-                
                 if is_threat:
                     threats_in_episode += 1
                 
@@ -286,7 +315,7 @@ class ThreatDetectionSystem:
                 state_key = self.agent.get_state_key(transaction, state)
                 
                 # Choose action
-                action = self.agent.choose_action(state_key)
+                action = self.agent.choose_action_boltzmann(state_key)
                 
                 # Execute action
                 next_state, reward, done, info = self.environment.step(action, transaction)
@@ -326,6 +355,7 @@ class ThreatDetectionSystem:
         transaction = self._format_transaction(transaction_data)
         
         # Get current environment state (in production, this would be real-time metrics)
+        # This will be connected to a live system in a real application via containers or APIs 
         env_state = {
             'detection_rate': 0.85,
             'false_positive_rate': 0.05,
@@ -338,7 +368,7 @@ class ThreatDetectionSystem:
         # Get action probabilities
         q_values = self.agent.q_table[state_key]
         if not q_values:
-            return {'action': 'allow', 'confidence': 0.5, 'risk_score': 0.5}
+            return {'action': 'allow', 'confidence': 0.5, 'risk_score': 0.5, 'threat_indicators': self._analyze_threat_indicators(transaction)}
         
         best_action = max(q_values, key=q_values.get)
         max_q_value = max(q_values.values())
@@ -444,7 +474,7 @@ def demo_threat_detection():
     threat_detector = ThreatDetectionSystem()
     
     # Train the system
-    threat_detector.train(episodes=500)
+    threat_detector.train(episodes=10000)
     
     print("\n=== Training Summary ===")
     summary = threat_detector.get_training_summary()
@@ -492,5 +522,46 @@ def demo_threat_detection():
         print(f"Confidence: {result['confidence']:.3f}")
         print(f"Threat Indicators: {', '.join(result['threat_indicators']) if result['threat_indicators'] else 'None'}")
 
+    # --- Plotting training metrics ---
+    history = threat_detector.training_history
+    episodes = [h['episode'] for h in history]
+    rewards = [h['total_reward'] for h in history]
+    detection_rates = [h['detection_rate'] for h in history]
+    customer_satisfaction = [h['customer_satisfaction'] for h in history]
+
+    plt.figure(figsize=(16, 5))
+
+    plt.subplot(1, 3, 1)
+    plt.plot(episodes, rewards, label='Reward', color='blue')
+    plt.xlabel('Episode')
+    plt.ylabel('Total Reward')
+    plt.title('Reward per Episode')
+    plt.grid(True)
+
+    plt.subplot(1, 3, 2)
+    plt.plot(episodes, detection_rates, label='Detection Rate', color='green')
+    plt.xlabel('Episode')
+    plt.ylabel('Detection Rate')
+    plt.title('Detection Rate per Episode')
+    plt.grid(True)
+
+    plt.subplot(1, 3, 3)
+    plt.plot(episodes, customer_satisfaction, label='Customer Satisfaction', color='orange')
+    plt.xlabel('Episode')
+    plt.ylabel('Customer Satisfaction')
+    plt.title('Customer Satisfaction per Episode')
+    plt.grid(True)
+
+    plt.tight_layout()
+    plt.savefig("training_metrics.png")
+    plt.show()
+
+    print(Fore.LIGHTGREEN_EX,"\nTraining completed successfully!",Style.RESET_ALL)
+    print(Fore.RED,"Q-Table Size:", len(threat_detector.agent.q_table), Style.RESET_ALL)
+    # Save the trained model
+    with open('trained_agent.pkl', 'wb') as f:
+        pickle.dump(threat_detector.agent, f)
+    print(Fore.LIGHTGREEN_EX,"\nTrained agent saved to 'trained_agent.pkl'",Style.RESET_ALL)
 if __name__ == "__main__":
     demo_threat_detection()
+
