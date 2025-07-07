@@ -1,9 +1,6 @@
-INSERT INTO accounts (
-    account_number, user_id, bank_id, account_type, account_status, balance, available_balance
-) VALUES
-('10000001', 'user-uuid-1', 'bank-uuid', 'CHECKING', 'ACTIVE', 5000.00, 5000.00),
-('10000002', 'user-uuid-2', 'bank-uuid', 'SAVINGS', 'ACTIVE', 3000.00, 3000.00),
-('10000003', 'user-uuid-3', 'bank-uuid', 'CHECKING', 'ACTIVE', 7000.00, 7000.00),
-('10000004', 'user-uuid-4', 'bank-uuid', 'SAVINGS', 'ACTIVE', 2000.00, 2000.00),
-('10000005', 'user-uuid-5', 'bank-uuid', 'CHECKING', 'ACTIVE', 10000.00, 10000.00),
-('10000006', 'user-uuid-6', 'bank-uuid', 'CHECKING', 'ACTIVE', 8000.00, 8000.00);
+INSERT INTO users (username, email, password_hash, first_name, last_name, phone, date_of_birth, ssn_hash, address, role, is_active, email_verified)
+VALUES
+('jdoe', 'jdoe@example.com', 'hashed_pw1', 'John', 'Doe', '+1234567890', '1990-01-01', 'ssn_hash1', '{"street":"123 Main St","city":"New York","zip":"10001"}', 'CUSTOMER', TRUE, TRUE),
+('asmith', 'asmith@example.com', 'hashed_pw2', 'Alice', 'Smith', '+1234567891', '1985-05-12', 'ssn_hash2', '{"street":"456 Oak Ave","city":"Los Angeles","zip":"90001"}', 'CUSTOMER', TRUE, TRUE),
+-- Add more users as needed
+;

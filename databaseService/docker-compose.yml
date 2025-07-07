@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  database:
+    image: postgres:latest
+    container_name: postgres_banking_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "55432:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/00-init.sql
+      - ./Banking_databse.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./data_insertion.sql:/docker-entrypoint-initdb.d/02-users.sql

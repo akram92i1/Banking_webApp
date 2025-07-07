@@ -1,7 +1,0 @@
-SELECT user_id, username FROM users;
-SELECT * from banks ;
-INSERT INTO accounts (
-    account_number, user_id, bank_id, account_type, account_status, balance, available_balance
-) VALUES
-('10000001', '593b2d80-49b0-47f3-ae24-1d434eaf09d5', 'b7e245e0-d834-4a66-ad2c-7fe51f641ad2', 'CHECKING', 'ACTIVE', 52006.00, 5000.00),
-('10000002', '379bf57c-f188-4d5d-8cac-12981d9042a4', 'b7e245e0-d834-4a66-ad2c-7fe51f641ad2', 'SAVINGS', 'ACTIVE', 3050.12, 3000.00);

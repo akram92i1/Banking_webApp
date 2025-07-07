@@ -84,7 +84,7 @@ CREATE TABLE transactions (
     location_info JSONB, -- GPS, IP address, etc.
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP UNIQUE ,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (transaction_id),
+    PRIMARY KEY (transaction_id,created_at),
     
     -- Ensure at least one account is specified
     CONSTRAINT check_account_specified CHECK (
@@ -95,10 +95,10 @@ CREATE TABLE transactions (
 ) PARTITION BY RANGE (created_at);
 
 -- Create monthly partitions for transactions (example for 2025)
-CREATE TABLE transactions_2025_01 PARTITION OF transactions
-    FOR VALUES FROM ('2025-01-01') TO ('2025-02-01');
-CREATE TABLE transactions_2025_02 PARTITION OF transactions
-    FOR VALUES FROM ('2025-02-01') TO ('2025-03-01');
+CREATE TABLE transactions_2025_07 PARTITION OF transactions
+    FOR VALUES FROM ('2025-07-01') TO ('2025-08-01');
+CREATE TABLE transactions_2025_08 PARTITION OF transactions
+    FOR VALUES FROM ('2025-08-01') TO ('2025-09-01');
 -- Continue creating partitions as needed...
 
 -- Account holders (for joint accounts)
@@ -173,6 +173,8 @@ ALTER TABLE accounts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE cards ENABLE ROW LEVEL SECURITY;
 
+-- Create the role for RLS policies
+CREATE ROLE authenticated_users;
 -- RLS Policies (example for accounts)
 CREATE POLICY account_isolation ON accounts
     FOR ALL TO authenticated_users
@@ -201,10 +203,6 @@ CREATE TRIGGER update_accounts_updated_at BEFORE UPDATE ON accounts
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_transactions_updated_at BEFORE UPDATE ON transactions
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
--- Sample data insert
-INSERT INTO banks (bank_name, routing_number, swift_code) VALUES
-('First National Bank', '123456789', 'FNBKUS33XXX');
 
 -- Views for common queries
 CREATE VIEW account_summary AS
