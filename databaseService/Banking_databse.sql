@@ -1,5 +1,6 @@
 -- Banking Application Database Schema
 -- PostgreSQL Implementation
+-- Use my_finance_db as the target database
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

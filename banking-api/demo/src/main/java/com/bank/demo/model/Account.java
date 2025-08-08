@@ -1,18 +1,29 @@
 package com.bank.demo.model;
 
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.UUID;
 
-import com.bank.demo.model.enums.AccountType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import com.bank.demo.model.enums.AccountStatus;
-import com.yourapp.model.converter.JsonConverter;
+import com.bank.demo.model.enums.AccountType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 
 @Entity
@@ -28,11 +39,11 @@ public class Account {
     @Column(name = "account_number", unique = true, nullable = false)
     private String accountNumber;
 
-    @ManyToOne
+    @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
     @JoinColumn(name = "bank_id", nullable = false)
     private Bank bank;
 
@@ -60,7 +71,8 @@ public class Account {
     @Column(name = "minimum_balance")
     private BigDecimal minimumBalance = BigDecimal.ZERO;
 
-    @Convert(converter = JsonConverter.class)
+    @JsonIgnore
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "account_metadata")
     private Map<String, Object> accountMetadata;
 

@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.bank.demo.model.User;
@@ -63,4 +65,16 @@ public class Userservice {
     public List<User> getUsersByDateOfBirth(LocalDate dob) {
         return userepository.findByDateOfBirth(dob);
     }
+ 
+    public Optional<User> findByEmailorCard(String id){
+        return userepository.findByEmail(id).or(()-> userepository.findByCardIdentificationNumber(id));
+    }
+
+    public boolean verifyPassword(User user , String rawPassword) {
+         PasswordEncoder encoder = new BCryptPasswordEncoder();
+         String encodedRawPassword = encoder.encode(rawPassword) ; 
+        // Implement password verification logic here
+        return new BCryptPasswordEncoder().matches(encodedRawPassword , user.getPasswordHash());
+    }
+
 }

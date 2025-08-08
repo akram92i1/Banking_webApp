@@ -1,19 +1,27 @@
 package com.bank.demo.model;
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import com.bank.demo.model.enums.UserRole;
-import com.yourapp.model.converter.JsonConverter;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 @Entity
 @Table(name = "users")
 @Getter @Setter 
-public class User {
+public class User  {
 
     @Id
     @GeneratedValue(generator = "uuid2")
@@ -43,7 +51,8 @@ public class User {
     @Column(name = "ssn_hash")
     private String ssnHash;
 
-    @Convert(converter = JsonConverter.class)
+    @Column(columnDefinition = "jsonb")  // Add this line
+    @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, Object> address;
 
     @Enumerated(EnumType.STRING)
@@ -54,7 +63,7 @@ public class User {
 
     @Column(name = "email_verified")
     private Boolean emailVerified = false;
-
+    
     @Column(name = "failed_login_attempts")
     private Integer failedLoginAttempts = 0;
 
@@ -66,4 +75,5 @@ public class User {
 
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt = OffsetDateTime.now();
+
 }

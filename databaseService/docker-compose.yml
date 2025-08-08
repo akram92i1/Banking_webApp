@@ -6,10 +6,11 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_DB: my_finance_db
     ports:
       - "55432:5432"
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/00-init.sql
       - ./Banking_databse.sql:/docker-entrypoint-initdb.d/01-schema.sql
       - ./data_insertion.sql:/docker-entrypoint-initdb.d/02-users.sql
+      - ./grant_privileges_to_user.sql:/docker-entrypoint-initdb.d/01-grant_privileges.sql

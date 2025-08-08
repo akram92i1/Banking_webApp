@@ -5,14 +5,16 @@ import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import com.bank.demo.model.enums.TransactionStatus;
 import com.bank.demo.model.enums.TransactionType;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert ;
 import jakarta.persistence.Entity ;
 import jakarta.persistence.EnumType ;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.Enumerated ;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
@@ -74,11 +76,11 @@ public class Transaction {
     @Column(name = "exchange_rate")
     private BigDecimal exchangeRate = BigDecimal.ONE;
 
-    @Convert(converter = JsonConverter.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "merchant_info")
     private Map<String, Object> merchantInfo;
 
-    @Convert(converter = JsonConverter.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "location_info")
     private Map<String, Object> locationInfo;
 
