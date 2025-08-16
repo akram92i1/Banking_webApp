@@ -21,16 +21,23 @@ public class PasswordMigrationService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    
     @PostConstruct
-    public void migratePasswords(){
-        List<User> users = userRepository.findAll();
+    public void migratePasswords() {
+    List<User> users = userRepository.findAll();
 
-        for (User user : users){
-            String plainTextPassword = user.getPasswordHash();
-            String encodedPassword = passwordEncoder.encode(plainTextPassword);
-            userRepository.updatePassword(user.getId(), encodedPassword);
-            System.out.println("--> Migrated password for user: " + user.getEmail());
+    for (User user : users) {
+        String password = user.getPasswordHash();
+        if (password.startsWith("$2a$") || password.startsWith("$2b$")) {
+            System.out.println("--> Already encoded: " + user.getEmail());
+            continue;
         }
+
+        String encodedPassword = passwordEncoder.encode(password);
+        userRepository.updatePassword(user.getId(), encodedPassword);
+        System.out.println("--> Migrated password for user: " + user.getEmail());
     }
+}
+
 
 }

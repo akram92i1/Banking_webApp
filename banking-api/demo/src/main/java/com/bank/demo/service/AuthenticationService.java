@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import com.bank.demo.model.User;
 import com.bank.demo.repository.AccountRepository;
 import com.bank.demo.repository.Cardsrepository;
 import com.bank.demo.repository.Userepository;
+
 
 @Service
 public class AuthenticationService {
@@ -35,8 +37,10 @@ public class AuthenticationService {
 
 
     public User authenticate(LoginUserDto input) {
+        System.out.println("--> Authenticating user with identifier: " + input.getIdentifier());
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(input.getIdentifier(), input.getPassword()));
         if  (input.getIdentifier().matches("\\d+")) { 
+            System.out.println("Identifier is numeric, treating as card ID.");
             Cards card = cardsRepository.findByCardNumber(input.getIdentifier())
                 .orElseThrow(() -> new RuntimeException("Card not found with ID: " + input.getIdentifier()));
             // Get Account associated with the card
@@ -49,6 +53,13 @@ public class AuthenticationService {
             if (user == null) {
                 throw new RuntimeException("User not found for account ID: " + accountId);
             }
+
+            if (!passwordEncoder.matches(input.getPassword(), user.getPasswordHash())) {
+            throw new BadCredentialsException("Invalid password");
+        }
+        else{
+            System.out.println("User authenticated successfully with card ID: " + input.getIdentifier());
+        }
             return user;
         } else { // Otherwise, treat it as an email
                 return    userRepository.findByEmail(input.getIdentifier())

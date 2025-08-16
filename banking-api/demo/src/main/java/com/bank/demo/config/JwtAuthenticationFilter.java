@@ -46,8 +46,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         @NonNull HttpServletResponse response,
         @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
+
         final String authHeader = request.getHeader("Authorization");
         System.out.println("We are inside the doFilterInternal function .. ");
+        String path = request.getServletPath();
+        System.out.println("----> Request path: " + path);
+        if (path.startsWith("/api/auth/login") || path.startsWith("/api/auth/test")) {
+            System.out.println("----> Public endpoint accessed: " + path);
+            filterChain.doFilter(request, response);
+            return;
+        }
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -56,7 +64,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             final String jwt = authHeader.substring(7);
             final String userEmail = JwtUtils.getEmailFromToken(jwt);
-
+            System.out.println("----> Extracted JWT: " + jwt);
+            System.out.println("----> Extracted userEmail from JWT: " + userEmail);
+            
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             System.out.println("----> Authentication object: " + authentication);
             if (userEmail != null && authentication == null) {
@@ -76,6 +86,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
         } catch (Exception exception) {
+            System.out.println("----> Exception in JWT filter: " + exception.getMessage());
             handlerExceptionResolver.resolveException(request, response, null, exception);
         }
     }
