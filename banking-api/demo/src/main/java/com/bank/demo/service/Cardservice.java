@@ -30,6 +30,9 @@ public class Cardservice {
         return cardsrepository.findByAccountId(accountId);
         
     }
+    public Optional<UUID> getAccountIdByCardId(UUID cardId) {
+        return cardsrepository.findAccountIdByCardId(cardId);
+    }
 
     public List <Cards> getCardByExpirationDate(OffsetDateTime expirationDate) {
         return cardsrepository.findByExpiryDate(expirationDate);
@@ -43,5 +46,6 @@ public class Cardservice {
         }
         return null; // or throw an exception
     }
+
 
 }

@@ -23,4 +23,7 @@ public interface Cardsrepository extends JpaRepository<Cards, UUID> {
     // find by expriration date
     @Query("SELECT c FROM Cards c WHERE c.expiryDate = :expiryDate")
     List<Cards> findByExpiryDate(OffsetDateTime expiryDate);
+    // find accountId with cardId
+    @Query("SELECT c.account.id FROM Cards c WHERE c.id = :cardId")
+    Optional<UUID> findAccountIdByCardId(@Param("cardId") UUID card);
 }     

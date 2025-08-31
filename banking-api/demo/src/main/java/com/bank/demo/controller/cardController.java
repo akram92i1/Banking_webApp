@@ -15,11 +15,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bank.demo.config.JwtUtils;
 import com.bank.demo.model.Cards;
+import com.bank.demo.service.AccountService;
 import com.bank.demo.service.Cardservice;
 
 @RestController
@@ -27,17 +30,32 @@ import com.bank.demo.service.Cardservice;
 public class cardController {
     @Autowired
     private Cardservice cardservice;
-
+    @Autowired
+    private AccountService accountservice;
+    
+    @Autowired
+    private JwtUtils jwtUtils;
     @GetMapping
     public List<Cards> getAllCards() {
         return cardservice.getAllCards();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Cards> getCardById(@PathVariable UUID id) {
+    public ResponseEntity<Cards> getCardById(@PathVariable UUID id, @RequestHeader ("Authorization") String authHeader) {
+        // Extract the token from "Bearer <token>"
+        String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
+        // Extract the userId from the JWT 
+        String userEmail = jwtUtils.getEmailFromToken(token);
+        System.out.println("User ID from token: " + userEmail);
         Optional<Cards> card = cardservice.getCardById(id);
-        return card.map(ResponseEntity::ok)
-                   .orElseGet(() -> ResponseEntity.notFound().build());
+        Optional <UUID> accountId = cardservice.getAccountIdByCardId(id);
+        UUID accountIdValue = accountId.orElse(null);
+        String userEmail2 = accountservice.getEmailByAccountId(accountIdValue);
+        if(card.isPresent() && userEmail != null && userEmail.equals(userEmail2)) {
+            return ResponseEntity.ok(card.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 
     @PostMapping
@@ -47,7 +65,7 @@ public class cardController {
     }
 
     @GetMapping("/expiration")
-    public List<Cards> getCardByExpirationDate(@RequestParam("date") String date) {
+    public List<Cards> getCardByExpirationDate(@RequestParam("date") String date , @RequestHeader ("Authorization") String authHeader) {
         OffsetDateTime expirationDate = OffsetDateTime.parse(date);
         return cardservice.getCardByExpirationDate(expirationDate);
     }

@@ -53,7 +53,7 @@ public class Transaction {
 
     private BigDecimal amount;
 
-    private String currency = "USD";
+    private String currency = "CAD";
 
     private String description;
 

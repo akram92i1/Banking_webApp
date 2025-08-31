@@ -48,7 +48,8 @@ public class JwtUtils {
     // Extract user ID from JWT token
     public UUID getUserIdFromToken(String token) {
         Claims claims = parseToken(token);
-        return UUID.fromString(claims.get("userId", String.class));
+        UUID uuidObject = UUID.fromString(claims.get("userId", String.class));
+        return uuidObject;
     }
        // Extract email from token
     public String getEmailFromToken(String token) {

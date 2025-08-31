@@ -43,6 +43,14 @@ public class authController {
         return ResponseEntity.ok("Authentication service is up and running!");
     }
 
+    @GetMapping("/authenticationStatus")
+    public ResponseEntity<String> getAuthenticationStatus(@RequestBody String token) {
+        long jwtTokenExprirationTime = jwtUtils.getExpirationTime(token);
+        return ResponseEntity.ok("Token is valid expriration time: " + jwtTokenExprirationTime);
+    }
+    
+        
+
     // Request DTOs
     public static class LoginRequest {
         private String identifier; // This can be email or card ID
