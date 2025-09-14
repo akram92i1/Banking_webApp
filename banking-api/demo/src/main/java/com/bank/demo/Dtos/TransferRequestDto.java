@@ -6,11 +6,12 @@ import java.util.UUID;
 public class TransferRequestDto {
 
     // Fields for the transfer money request
-    public class TransferRequest{
-        private UUID fromAccountId;
-        private UUID toAccountId; 
+    public static class TransferRequest{
+        private String fromAccountId;
+        private String toAccountId; 
         private String recipientEmail;
         private String recipientphoneNumber;
+        private String transactionType; // "INTERAC", "INTERNAL"
         private double amount;
         private String currency;
         private String securityQuestion;
@@ -20,16 +21,25 @@ public class TransferRequestDto {
 
         // Getters and Setters
         public String getFromAccountId() {
-            return fromAccountId.toString();
+            return fromAccountId;
         }
         
-        public void setFromAccountId(UUID fromAccountId) {
+        public void setFromAccountId(String fromAccountId) {
             this.fromAccountId = fromAccountId;
         }
-        public String getToAccountId() {
-            return toAccountId.toString();
+
+        public String getTransactionType() {
+            return transactionType;
         }
-        public void setToAccountId(UUID toAccountId) {
+
+        public void setTransactionType(String transactionType) {
+            this.transactionType = transactionType;
+        }
+
+        public String getToAccountId() {
+            return toAccountId;
+        }
+        public void setToAccountId(String toAccountId) {
             this.toAccountId = toAccountId;
         }
 
@@ -60,13 +70,13 @@ public class TransferRequestDto {
     }
 
     // Claim transfer
-    public class ClaimRequest {
+    public static class ClaimRequest {
         private String recipientEmail;
         private String securityAnswer;
     }
 
     // Register auto-deposit
-    public class AutoDepositRequest {
+    public static class AutoDepositRequest {
         private UUID userId;
         private UUID accountId;
         private String email;
@@ -101,7 +111,7 @@ public class TransferRequestDto {
     }
 
     // Responses 
-    public class  TransferResponse{
+    public static class  TransferResponse{
         private UUID transactionId;
         private String interacReferenceId;
         private String status; // PENDING, COMPLETED, FAILED
@@ -134,7 +144,7 @@ public class TransferRequestDto {
         }
     }
 
-    public class AutoDepositResponse {
+    public static class AutoDepositResponse {
         private boolean registred ; 
         private String message;
         // Getters and Setters
@@ -152,14 +162,14 @@ public class TransferRequestDto {
         }
     }
 
-    public class TransferStatusResponse {
+    public static class TransferStatusResponse {
     private UUID transactionId;
     private String status;
     private Double amount;
     private String currency;
 
     // Getters and Setters
-    public UUID getTransactionId() {
+    public  UUID getTransactionId() {
         return transactionId;
      }
     

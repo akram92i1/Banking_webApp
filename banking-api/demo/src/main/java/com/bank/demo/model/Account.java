@@ -47,10 +47,12 @@ public class Account {
     @JoinColumn(name = "bank_id", nullable = false)
     private Bank bank;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "account_type", nullable = false)
     private AccountType accountType;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "account_status")
     private AccountStatus accountStatus = AccountStatus.ACTIVE;

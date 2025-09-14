@@ -1,5 +1,4 @@
 package com.bank.demo.model;
-
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Map;
@@ -12,13 +11,13 @@ import com.bank.demo.model.enums.TransactionStatus;
 import com.bank.demo.model.enums.TransactionType;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity ;
-import jakarta.persistence.EnumType ;
-import jakarta.persistence.Enumerated ;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Id ;
+import jakarta.persistence.IdClass ;
+import jakarta.persistence.JoinColumn ;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -37,7 +36,7 @@ public class Transaction {
 
     @Id
     @Column(name = "created_at")
-    private OffsetDateTime createdAt = OffsetDateTime.now();
+    private OffsetDateTime createdAt;
 
     @ManyToOne
     @JoinColumn(name = "from_account_id")
@@ -47,8 +46,9 @@ public class Transaction {
     @JoinColumn(name = "to_account_id")
     private Account toAccount;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)  // Hibernate 6+
     private TransactionType transactionType;
 
     private BigDecimal amount;
@@ -60,6 +60,7 @@ public class Transaction {
     @Column(name = "reference_number")
     private String referenceNumber;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "transaction_status")
     private TransactionStatus transactionStatus = TransactionStatus.PENDING;

@@ -55,11 +55,6 @@
 			<artifactId>postgresql</artifactId>
 			<version>42.7.7</version>
 		</dependency>
-		<dependency>
-  		  <groupId>com.vladmihalcea</groupId>
-   		 <artifactId>hibernate-types-60</artifactId> <!-- or hibernate-types-55 for Hibernate 5.x -->
-   		 <version>2.21.1</version>
-		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-jwt -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
