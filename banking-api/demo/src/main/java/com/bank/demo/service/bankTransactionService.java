@@ -16,6 +16,7 @@ import com.bank.demo.exceptions.InsufficientFundsException;
 import com.bank.demo.mapper.TransactionMapper;
 import com.bank.demo.model.Account;
 import com.bank.demo.model.Transaction;
+import com.bank.demo.model.enums.TransactionStatus;
 import com.bank.demo.model.enums.TransactionType;
 import com.bank.demo.repository.AccountRepository;
 import com.bank.demo.repository.transactionRepository;
@@ -87,11 +88,12 @@ public static final String ANSI_CYAN = "\u001B[36m";
         // Fetch the receipient account (connected user)
         Account recipient  = accountRepository.findByAccountNumber(recipientAccountId)
             .orElseThrow(() -> new IllegalArgumentException("Recipient Account not found")); 
-
+        System.out.println(ANSI_PURPLE +"--> handlePendingTransfer() called in bankTransactionService for recipient: " + recipientAccountId + " transactionId: " + transactionId + " accept: " + accept+ANSI_RESET);
+        
         // Fetch the transaction 
         Transaction transaction = transactionRepository.findById(transactionId)
             .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
-        
+
          // Ensure this transaction is for the recipient
         if (!transaction.getToAccount().getAccountNumber().equals(recipient.getAccountNumber())) {
             throw new SecurityException("This transaction does not belong to the connected user");
@@ -105,7 +107,7 @@ public static final String ANSI_CYAN = "\u001B[36m";
         if (accept){
             // Accept: credit recipient account
             recipient.setBalance(recipient.getBalance().add(transaction.getAmount()));
-            transaction.setStatus(Status.COMPLETED);
+            transaction.setStatus(TransactionStatus.COMPLETED);
             transaction.setCompletedAt(OffsetDateTime.now());
         }
         else{
