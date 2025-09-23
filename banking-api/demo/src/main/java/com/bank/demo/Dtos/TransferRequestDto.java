@@ -108,40 +108,6 @@ public class TransferRequestDto {
         private String securityAnswer;
     }
 
-    // Register auto-deposit
-    public static class AutoDepositRequest {
-        private UUID userId;
-        private UUID accountId;
-        private String email;
-        private String phoneNumber;
-
-        // Getters and Setters
-        public UUID getUserId() {
-            return userId;
-        }
-        public void setUserId(UUID userId) {
-            this.userId = userId;
-        }
-        public UUID getAccountId() {
-            return accountId;
-        }
-        public void setAccountId(UUID accountId) {
-            this.accountId = accountId;
-        }
-        public String getEmail() {
-            return email;
-        }
-        public void setEmail(String email) {
-            this.email = email;
-        }
-        public String getPhoneNumber() {
-            return phoneNumber;
-        }
-        public void setPhoneNumber(String phoneNumber) {
-            this.phoneNumber = phoneNumber;
-        }
-
-    }
 
     // Responses 
     public static class  TransferResponse{
@@ -177,23 +143,6 @@ public class TransferRequestDto {
         }
     }
 
-    public static class AutoDepositResponse {
-        private boolean registred ; 
-        private String message;
-        // Getters and Setters
-        public boolean isRegistered() {
-            return registred;
-        }
-        public void setRegistered(boolean registred) {
-            this.registred = registred;
-        }
-        public String getMessage() {
-            return message;
-        }
-        public void setMessage(String message) {
-            this.message = message;
-        }
-    }
 
     public static class TransferStatusResponse {
     private UUID transactionId;
@@ -228,5 +177,70 @@ public class TransferRequestDto {
         this.currency = currency;
     }
 }    
+
+    public static class ReceiveMoneyRequest {
+        private String toAccountId;
+        private String fromAccountId; 
+        private String interacReferenceId;
+        private String securityAnswer; // plain, will be hashed in service
+        // Getters and Setters
+        public String getToAccountId() {
+            return toAccountId;
+        }
+        public void setToAccountId(String toAccountId) {
+            this.toAccountId = toAccountId;
+        }
+        public String getFromAccountId() {
+            return fromAccountId;
+        }
+        public void setFromAccountId(String fromAccountId) {
+            this.fromAccountId = fromAccountId;
+        }
+        public String getInteracReferenceId() {
+            return interacReferenceId;
+        }
+        public void setInteracReferenceId(String interacReferenceId) {
+            this.interacReferenceId = interacReferenceId;
+        }
+        public String getSecurityAnswer() {
+            return securityAnswer;
+        }
+        public void setSecurityAnswer(String securityAnswer) {
+            this.securityAnswer = securityAnswer;
+        }
+    }
+
+    public static class ReceiveMoneyResponse {
+        private UUID transactionId;
+        private String status; // PENDING, COMPLETED, FAILED
+        private String message;
+        private double amount;
+
+        // Getters and Setters
+        public UUID getTransactionId() {
+            return transactionId;       
+        }
+        public void setTransactionId(UUID transactionId) {
+            this.transactionId = transactionId;
+        }
+        public String getStatus() {
+            return status;
+        }
+        public void setStatus(String status) {
+            this.status = status;
+        }
+        public String getMessage() {
+            return message;
+        }
+        public void setMessage(String message) {
+            this.message = message;
+        }
+        public double getAmount() {
+            return amount;
+        }   
+        public void setAmount(double amount) {
+            this.amount = amount;
+        }
+    }
 
 }

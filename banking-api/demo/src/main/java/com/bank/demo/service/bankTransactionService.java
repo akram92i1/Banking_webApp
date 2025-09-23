@@ -83,23 +83,43 @@ public static final String ANSI_CYAN = "\u001B[36m";
     return response;
 }
 
-     public AutoDepositResponse registerAutoDeposit(AutoDepositRequest request) {
-        // Insert into autodeposit_registrations
-        TransferRequestDto outer = new TransferRequestDto();
-        TransferRequestDto.AutoDepositResponse response = new TransferRequestDto.AutoDepositResponse();
-        response.setRegistered(true);
-        response.setMessage("Auto-deposit registered successfully.");
-        return response;
-    }
+    public TransferRequestDto.ReceiveMoneyResponse receiveMoney(TransferRequestDto.ReceiveMoneyRequest request) {
+        System.out.println(ANSI_PURPLE + "--> receiveMoney() called in bankTransactionService" + ANSI_RESET);
+        System.err.println(ANSI_BLUE + "Here is the request: " + request + ANSI_RESET);
+        System.out.println("--> Initiating receiveMoney to " + request.getToAccountId() + " from " + request.getFromAccountId() + " amount: " + request.getAmount());
 
-    public TransferStatusResponse getStatus(UUID transactionId) {
-        // Query transactions + interac_transfer_metadata
-        TransferRequestDto outer = new TransferRequestDto();
-        TransferRequestDto.TransferStatusResponse response = new TransferRequestDto.TransferStatusResponse();
-        response.setTransactionId(transactionId);
-        response.setStatus("PENDING"); // stub
-        response.setAmount(100.00);
-        response.setCurrency("CAD");
+        Account toAccount = accountRepository.findByAccountNumber(request.getToAccountId())
+                .orElseThrow(() -> new IllegalArgumentException("Recipient Account not found"));
+        System.out.println(ANSI_GREEN + "--> To Account: " + toAccount.getAccountNumber() + ", Balance: " + toAccount.getBalance() + ANSI_RESET);
+
+        BigDecimal requestAmount = BigDecimal.valueOf(request.getAmount());
+        System.out.println(ANSI_YELLOW + "--> Requested Amount: " + requestAmount + ANSI_RESET);
+
+        toAccount.setBalance(toAccount.getBalance().add(requestAmount));
+        System.out.println(ANSI_RED + "--> New To Account Balance: " + toAccount.getBalance() + ANSI_RESET);
+
+        String typeString = request.getTransactionType();
+        TransactionType typeEnum = TransactionType.valueOf(typeString);
+
+        Account fromAccount = accountRepository.findByAccountNumber(request.getFromAccountId())
+                .orElseThrow(() -> new IllegalArgumentException("Sender Account not found"));
+        System.out.println(ANSI_GREEN + "--> From Account: " + fromAccount.getAccountNumber() + ", Balance: " + fromAccount.getBalance() + ANSI_RESET);
+
+        // Use TransactionMapper to map DTO to entity
+        Transaction transaction = TransactionMapper.toEntity(request, fromAccount, toAccount, typeEnum);
+        transaction.setTransactionId(UUID.randomUUID());
+        transaction.setCreatedAt(OffsetDateTime.now());
+
+        try {
+            transactionRepository.save(transaction);
+        } catch (Exception e) {
+            System.out.println(ANSI_RED + "--> Error saving transaction: " + e.getMessage() + ANSI_RESET);
+        }
+
+        TransferRequestDto.ReceiveMoneyResponse response = new TransferRequestDto.ReceiveMoneyResponse();
+        response.setTransactionId(transaction.getTransactionId());
+        response.setInteracReferenceId("INT-" + System.currentTimeMillis());
+        response.setStatus("COMPLETED");
+        response.setMessage("Funds received successfully.");
         return response;
-    }
 }
