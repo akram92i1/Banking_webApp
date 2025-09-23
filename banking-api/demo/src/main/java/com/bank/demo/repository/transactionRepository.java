@@ -18,5 +18,7 @@ public interface  transactionRepository extends JpaRepository  <Transaction,Tran
 
     // Find by the complete composite key
     Optional<Transaction> findByTransactionIdAndCreatedAt(UUID transactionId, OffsetDateTime createdAt);
+
+    public Object findById(UUID transactionId);
     
 }

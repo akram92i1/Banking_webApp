@@ -183,6 +183,8 @@ public class TransferRequestDto {
         private String fromAccountId; 
         private String interacReferenceId;
         private String securityAnswer; // plain, will be hashed in service
+        private double amount;
+
         // Getters and Setters
         public String getToAccountId() {
             return toAccountId;
@@ -208,6 +210,13 @@ public class TransferRequestDto {
         public void setSecurityAnswer(String securityAnswer) {
             this.securityAnswer = securityAnswer;
         }
+        public double getAmount() {
+            return amount;
+        }
+        public void setAmount(double amount) {
+            this.amount = amount;
+        }
+        
     }
 
     public static class ReceiveMoneyResponse {

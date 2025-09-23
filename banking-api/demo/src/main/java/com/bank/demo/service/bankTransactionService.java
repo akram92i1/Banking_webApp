@@ -83,43 +83,45 @@ public static final String ANSI_CYAN = "\u001B[36m";
     return response;
 }
 
-    public TransferRequestDto.ReceiveMoneyResponse receiveMoney(TransferRequestDto.ReceiveMoneyRequest request) {
-        System.out.println(ANSI_PURPLE + "--> receiveMoney() called in bankTransactionService" + ANSI_RESET);
-        System.err.println(ANSI_BLUE + "Here is the request: " + request + ANSI_RESET);
-        System.out.println("--> Initiating receiveMoney to " + request.getToAccountId() + " from " + request.getFromAccountId() + " amount: " + request.getAmount());
+    public TransferRequestDto.ReceiveMoneyResponse handlePendingTransfer(String recipientAccountId, UUID transactionId , boolean accept) {
+        // Fetch the receipient account (connected user)
+        Account recipient  = accountRepository.findByAccountNumber(recipientAccountId)
+            .orElseThrow(() -> new IllegalArgumentException("Recipient Account not found")); 
 
-        Account toAccount = accountRepository.findByAccountNumber(request.getToAccountId())
-                .orElseThrow(() -> new IllegalArgumentException("Recipient Account not found"));
-        System.out.println(ANSI_GREEN + "--> To Account: " + toAccount.getAccountNumber() + ", Balance: " + toAccount.getBalance() + ANSI_RESET);
-
-        BigDecimal requestAmount = BigDecimal.valueOf(request.getAmount());
-        System.out.println(ANSI_YELLOW + "--> Requested Amount: " + requestAmount + ANSI_RESET);
-
-        toAccount.setBalance(toAccount.getBalance().add(requestAmount));
-        System.out.println(ANSI_RED + "--> New To Account Balance: " + toAccount.getBalance() + ANSI_RESET);
-
-        String typeString = request.getTransactionType();
-        TransactionType typeEnum = TransactionType.valueOf(typeString);
-
-        Account fromAccount = accountRepository.findByAccountNumber(request.getFromAccountId())
-                .orElseThrow(() -> new IllegalArgumentException("Sender Account not found"));
-        System.out.println(ANSI_GREEN + "--> From Account: " + fromAccount.getAccountNumber() + ", Balance: " + fromAccount.getBalance() + ANSI_RESET);
-
-        // Use TransactionMapper to map DTO to entity
-        Transaction transaction = TransactionMapper.toEntity(request, fromAccount, toAccount, typeEnum);
-        transaction.setTransactionId(UUID.randomUUID());
-        transaction.setCreatedAt(OffsetDateTime.now());
-
-        try {
-            transactionRepository.save(transaction);
-        } catch (Exception e) {
-            System.out.println(ANSI_RED + "--> Error saving transaction: " + e.getMessage() + ANSI_RESET);
+        // Fetch the transaction 
+        Transaction transaction = transactionRepository.findById(transactionId)
+            .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+        
+         // Ensure this transaction is for the recipient
+        if (!transaction.getToAccount().getAccountNumber().equals(recipient.getAccountNumber())) {
+            throw new SecurityException("This transaction does not belong to the connected user");
         }
 
+        // Ensure it is still pending 
+        if (!transaction.getTransactionStatus().equals("PENDING")) {
+            throw new IllegalStateException("This transaction is not pending");
+        }
+
+        if (accept){
+            // Accept: credit recipient account
+            recipient.setBalance(recipient.getBalance().add(transaction.getAmount()));
+            transaction.setStatus(Status.COMPLETED);
+            transaction.setCompletedAt(OffsetDateTime.now());
+        }
+        else{
+             // Decline: refund sender
+            Account sender = transaction.getFromAccount();
+            sender.setBalance(sender.getBalance().add(transaction.getAmount()));
+            transaction.setStatus(Status.DECLINED);
+            transaction.setCompletedAt(OffsetDateTime.now());
+        }
+        transactionRepository.save(transaction);
+        // Build response 
         TransferRequestDto.ReceiveMoneyResponse response = new TransferRequestDto.ReceiveMoneyResponse();
         response.setTransactionId(transaction.getTransactionId());
         response.setInteracReferenceId("INT-" + System.currentTimeMillis());
-        response.setStatus("COMPLETED");
-        response.setMessage("Funds received successfully.");
+        response.setStatus(transaction.getStatus().name());
+        response.setMessage(accept ? "Funds received successfully." : "Transfer declined, funds returned.");
         return response;
+    }
 }
