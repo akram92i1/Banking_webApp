@@ -1,5 +1,7 @@
 package com.bank.demo.Dtos;
 
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.UUID;
 
@@ -14,9 +16,13 @@ public class TransferRequestDto {
         private String transactionType; // "INTERAC", "INTERNAL"
         private double amount;
         private String currency;
+        private String referenceNumber;
         private String securityQuestion;
         private String securityAnswer; // plain, will be hashed in service
         private String description;
+        private OffsetDateTime scheduledAt;
+        private BigDecimal feeAmount;
+        private BigDecimal exchangeRate; // if cross-currency
         private Map<String, Object> merchantInfo;
 
         // Getters and Setters
@@ -41,6 +47,33 @@ public class TransferRequestDto {
         }
         public void setToAccountId(String toAccountId) {
             this.toAccountId = toAccountId;
+        }
+        public OffsetDateTime getScheduledAt() {
+            return scheduledAt;
+        }
+        public void setScheduledAt(OffsetDateTime scheduledAt) {
+            this.scheduledAt = scheduledAt;
+        }
+
+        public BigDecimal getFeeAmount() {
+            return feeAmount;
+        }
+        public void setFeeAmount(BigDecimal feeAmount) {
+            this.feeAmount = feeAmount;
+        }
+
+        public String getReferenceNumber() {
+            return referenceNumber;
+        }
+        public void setReferenceNumber(String referenceNumber) {
+            this.referenceNumber = referenceNumber;
+        }
+
+        public BigDecimal getExchangeRate() {
+            return exchangeRate;
+        }
+        public void setExchangeRate(BigDecimal exchangeRate) {
+            this.exchangeRate = exchangeRate;
         }
 
         public double getAmount() {
