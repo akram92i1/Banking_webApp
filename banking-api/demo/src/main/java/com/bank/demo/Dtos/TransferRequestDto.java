@@ -252,4 +252,23 @@ public class TransferRequestDto {
         }
     }
 
+    public static class receivePendingRequest {
+        private String recipientAccountId;
+        private boolean accept; // true to accept, false to decline
+
+        // Getters and Setters
+        public String getRecipientAccountId() {
+            return recipientAccountId;
+        }
+        public void setRecipientAccountId(String recipientAccountId) {
+            this.recipientAccountId = recipientAccountId;
+        }
+        public boolean isAccept() {
+            return accept;
+        }
+        public void setAccept(boolean accept) {
+            this.accept = accept;
+        }
+    } 
+
 }

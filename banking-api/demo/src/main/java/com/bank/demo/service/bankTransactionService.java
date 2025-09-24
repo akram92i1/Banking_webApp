@@ -84,15 +84,16 @@ public static final String ANSI_CYAN = "\u001B[36m";
     return response;
 }
 
-    public TransferRequestDto.ReceiveMoneyResponse handlePendingTransfer(String recipientAccountId, UUID transactionId , boolean accept) {
+    public TransferRequestDto.ReceiveMoneyResponse handlePendingTransfer(String recipientAccountId , boolean accept) {
         // Fetch the receipient account (connected user)
         Account recipient  = accountRepository.findByAccountNumber(recipientAccountId)
             .orElseThrow(() -> new IllegalArgumentException("Recipient Account not found")); 
         System.out.println(ANSI_PURPLE +"--> handlePendingTransfer() called in bankTransactionService for recipient: " + recipientAccountId + " transactionId: " + transactionId + " accept: " + accept+ANSI_RESET);
-        
-        // Fetch the transaction 
-        Transaction transaction = transactionRepository.findById(transactionId)
-            .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+
+        // Fetch the PENDING  transaction
+        Transaction transaction = transactionRepository.findPendingTransactionsByRecipient(UUID.fromString(recipientAccountId), TransactionStatus.PENDING)
+            .stream().findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("No pending transaction found"));
 
          // Ensure this transaction is for the recipient
         if (!transaction.getToAccount().getAccountNumber().equals(recipient.getAccountNumber())) {
@@ -107,22 +108,31 @@ public static final String ANSI_CYAN = "\u001B[36m";
         if (accept){
             // Accept: credit recipient account
             recipient.setBalance(recipient.getBalance().add(transaction.getAmount()));
-            transaction.setStatus(TransactionStatus.COMPLETED);
-            transaction.setCompletedAt(OffsetDateTime.now());
+            transaction.setTransactionStatus(TransactionStatus.COMPLETED);
+            transaction.setProcessedAt(OffsetDateTime.now());
         }
         else{
              // Decline: refund sender
             Account sender = transaction.getFromAccount();
             sender.setBalance(sender.getBalance().add(transaction.getAmount()));
-            transaction.setStatus(Status.DECLINED);
-            transaction.setCompletedAt(OffsetDateTime.now());
+            transaction.setTransactionStatus(TransactionStatus.CANCELLED);
+            transaction.setProcessedAt(OffsetDateTime.now());
         }
         transactionRepository.save(transaction);
         // Build response 
         TransferRequestDto.ReceiveMoneyResponse response = new TransferRequestDto.ReceiveMoneyResponse();
         response.setTransactionId(transaction.getTransactionId());
-        response.setInteracReferenceId("INT-" + System.currentTimeMillis());
-        response.setStatus(transaction.getStatus().name());
+        if (accept){
+
+            response.setAmount(transaction.getAmount().doubleValue());
+            response.setMessage("The amount of "+ transaction.getAmount()+"was deposed to your account ");
+        }
+        else
+        {
+            response.setAmount(0.0);
+            response.setMessage("Transaction with the amount of"+transaction.getAmount()+"Was canceled");
+        }
+        response.setStatus(transaction.getTransactionStatus().name());
         response.setMessage(accept ? "Funds received successfully." : "Transfer declined, funds returned.");
         return response;
     }

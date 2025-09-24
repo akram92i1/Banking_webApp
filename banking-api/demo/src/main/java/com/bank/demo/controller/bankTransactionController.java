@@ -3,14 +3,17 @@ package com.bank.demo.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bank.demo.Dtos.TransferRequestDto;
 import com.bank.demo.Dtos.TransferRequestDto.TransferRequest;
 import com.bank.demo.Dtos.TransferRequestDto.TransferResponse;
+import com.bank.demo.Dtos.TransferRequestDto.ReceiveMoneyResponse
 import com.bank.demo.exceptions.InsufficientFundsException;
 import com.bank.demo.service.bankTransactionService;
 
@@ -30,5 +33,12 @@ public class bankTransactionController {
         System.out.println("Request From Account ID: " + request.getFromAccountId());
         TransferResponse response = transactionService.sendMoney(request);
         return ResponseEntity.status(HttpStatus.OK).body(response); 
+    }
+
+    @GetMapping("receive")
+    public ResponseEntity<ReceiveMoneyResponse> receiveMoney(@RequestBody TransferRequestDto.receivePendingRequest request , @RequestHeader ("Authorization") String authHeader) {
+        System.out.println("----> /api/bank-transactions/receive endpoint accessed.");
+        ReceiveMoneyResponse response = transactionService.handlePendingTransfer(request.getRecipientAccountId(), request.getTransactionId(), request.isAccept());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
