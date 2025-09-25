@@ -7,11 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bank.demo.Dtos.TransferRequestDto;
-import com.bank.demo.Dtos.TransferRequestDto.AutoDepositRequest;
-import com.bank.demo.Dtos.TransferRequestDto.AutoDepositResponse;
 import com.bank.demo.Dtos.TransferRequestDto.TransferRequest;
 import com.bank.demo.Dtos.TransferRequestDto.TransferResponse;
-import com.bank.demo.Dtos.TransferRequestDto.TransferStatusResponse;
 import com.bank.demo.exceptions.InsufficientFundsException;
 import com.bank.demo.mapper.TransactionMapper;
 import com.bank.demo.model.Account;
@@ -88,7 +85,7 @@ public static final String ANSI_CYAN = "\u001B[36m";
         // Fetch the receipient account (connected user)
         Account recipient  = accountRepository.findByAccountNumber(recipientAccountId)
             .orElseThrow(() -> new IllegalArgumentException("Recipient Account not found")); 
-        System.out.println(ANSI_PURPLE +"--> handlePendingTransfer() called in bankTransactionService for recipient: " + recipientAccountId + " transactionId: " + transactionId + " accept: " + accept+ANSI_RESET);
+        System.out.println(ANSI_PURPLE +"--> handlePendingTransfer() called in bankTransactionService for recipient: " + recipientAccountId  + " accept: " + accept+ANSI_RESET);
 
         // Fetch the PENDING  transaction
         Transaction transaction = transactionRepository.findPendingTransactionsByRecipient(UUID.fromString(recipientAccountId), TransactionStatus.PENDING)

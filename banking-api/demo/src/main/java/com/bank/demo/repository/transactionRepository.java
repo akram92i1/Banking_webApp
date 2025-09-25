@@ -22,11 +22,9 @@ public interface  transactionRepository extends JpaRepository  <Transaction,Tran
     // Find by the complete composite key
     Optional<Transaction> findByTransactionIdAndCreatedAt(UUID transactionId, OffsetDateTime createdAt);
 
-    public Object findById(UUID transactionId);
-
     // Custom query with JPQL
     @Query("SELECT t FROM Transaction t " +
-           "WHERE t.toAccount.accountId = :recipientAccountId " +
+           "WHERE t.toAccount.id = :recipientAccountId " +
            "AND t.transactionStatus = :status " +
            "ORDER BY t.createdAt DESC")
     public List <Transaction> findPendingTransactionsByRecipient(@Param("recipientAccountId") UUID recipientAccountId , @Param("status") TransactionStatus status );
