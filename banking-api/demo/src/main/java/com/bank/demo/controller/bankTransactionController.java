@@ -35,10 +35,10 @@ public class bankTransactionController {
         return ResponseEntity.status(HttpStatus.OK).body(response); 
     }
 
-    @GetMapping("receive")
+    @GetMapping("/receive")
     public ResponseEntity<ReceiveMoneyResponse> receiveMoney(@RequestBody TransferRequestDto.receivePendingRequest request , @RequestHeader ("Authorization") String authHeader) {
         System.out.println("----> /api/bank-transactions/receive endpoint accessed.");
-        ReceiveMoneyResponse response = transactionService.handlePendingTransfer(request.getRecipientAccountId(), request.isAccept());
+        ReceiveMoneyResponse response = transactionService.handlePendingTransfer(request.getRecipientAccountId(), request.isAccept() );
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

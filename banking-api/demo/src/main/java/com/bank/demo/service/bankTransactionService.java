@@ -83,7 +83,7 @@ public static final String ANSI_CYAN = "\u001B[36m";
 
     public TransferRequestDto.ReceiveMoneyResponse handlePendingTransfer(String recipientAccountId , boolean accept) {
         // Fetch the receipient account (connected user)
-        Account recipient  = accountRepository.findByAccountNumber(recipientAccountId)
+        Account recipient  = accountRepository.findById(UUID.fromString(recipientAccountId))
             .orElseThrow(() -> new IllegalArgumentException("Recipient Account not found")); 
         System.out.println(ANSI_PURPLE +"--> handlePendingTransfer() called in bankTransactionService for recipient: " + recipientAccountId  + " accept: " + accept+ANSI_RESET);
 

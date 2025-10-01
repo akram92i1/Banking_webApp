@@ -14,7 +14,6 @@ import com.bank.demo.model.Account;
 public interface AccountRepository extends JpaRepository<Account, java.util.UUID> {
     // Custom query to find accounts by their account number
     Optional<Account> findByAccountNumber(@Param("account_number") String accountNumber);
-    
     //find userId with accountId
     @Query("SELECT a.user.id FROM Account a WHERE a.id = :account_id")
     Optional<UUID> findUserIdById(@Param("account_id") UUID id);
