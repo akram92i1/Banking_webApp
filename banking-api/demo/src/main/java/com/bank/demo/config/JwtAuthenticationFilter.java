@@ -16,16 +16,19 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.beans.factory.annotation.Autowired;
+
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import com.bank.demo.service.TokenBlacklistService;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    private TokenBlacklistService tokenBlacklistService;
     private final HandlerExceptionResolver handlerExceptionResolver;
-
     private final JwtUtils JwtUtils;
     private final UserDetailsService userDetailsService;
 
@@ -38,6 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.JwtUtils = JwtUtils;
         this.userDetailsService = userDetailsService;
         this.handlerExceptionResolver = handlerExceptionResolver;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
     @Override
@@ -63,6 +67,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             final String jwt = authHeader.substring(7);
+            if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
+                 System.out.println(">>> Blocked request with blacklisted token");
+                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                 response.getWriter().write("Token has been revoked. Please log in again.");
+                 return;
+                }
             final String userEmail = JwtUtils.getEmailFromToken(jwt);
             System.out.println("----> Extracted JWT: " + jwt);
             System.out.println("----> Extracted userEmail from JWT: " + userEmail);
@@ -95,7 +105,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:8080"));
+        configuration.setAllowedOrigins(List.of("http://localhost:8082"));
         configuration.setAllowedMethods(List.of("GET","POST"));
         configuration.setAllowedHeaders(List.of("Authorization","Content-Type"));
 

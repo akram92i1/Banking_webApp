@@ -8,13 +8,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bank.demo.model.Cards;
+import com.bank.demo.repository.AccountRepository;
 import com.bank.demo.repository.Cardsrepository;
+import com.bank.demo.repository.Userepository;
 
-
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 @Service
 public class Cardservice {
     @Autowired
     private Cardsrepository cardsrepository;
+    @Autowired
+    private Userepository userepository;
+    @Autowired
+    private AccountRepository accountRepository;
+
 
     public List<Cards> getAllCards() {
         return cardsrepository.findAll();
@@ -47,5 +55,37 @@ public class Cardservice {
         return null; // or throw an exception
     }
 
+    public Cards getCardInformation() {
+        // Get the connected user information
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName(); // this comes from the JWT subject
+        // Fetch the userId using the userEmail
+        Optional <UUID> userIdOpt = userepository.findByEmail(userEmail).map(user -> user.getId());
+        UUID userId = userIdOpt.orElse(null);
+        if (userId == null) {
+            System.err.println("User not found for email: " + userEmail);
+            return null; // or throw an exception
+        }
+        else {
+           //Fetch the accountId using the userId
+              Optional <UUID> accountIdOpt = accountRepository.findByUserId(userId);
+              UUID accountId = accountIdOpt.orElse(null);
+                if (accountId == null) {
+                    System.err.println("Account not found for userId: " + userId);
+                    return null; // or throw an exception
+                }
+                else{
+                    System.out.println("Account ID for user " + userEmail + ": " + accountId);
+                    // Fetch the card information using the accountId
+                    List<Cards> cardOpt = cardsrepository.findByAccountId(accountId);
+                    if (!cardOpt.isEmpty()) {
+                        return cardOpt.get(0);
+                    } else {
+                        System.err.println("No cards found for accountId: " + accountId);
+                        return null; // or throw an exception
+                    }
+                }
 
+        }
+    }
 }

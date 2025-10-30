@@ -1,6 +1,9 @@
 package com.bank.demo.controller;
 
+import java.time.Instant;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +16,7 @@ import com.bank.demo.config.JwtUtils;
 import com.bank.demo.model.User;
 import com.bank.demo.responses.LoginResponse;
 import com.bank.demo.service.AuthenticationService;
+import com.bank.demo.service.TokenBlacklistService;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -22,6 +26,11 @@ public class authController {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @Autowired
+    TokenBlacklistService tokenBlacklistService;
+
+
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginUserDto LoginUserDto) {
@@ -37,6 +46,25 @@ public class authController {
         loginResponse.setExpirationTime(jwtUtils.getExpirationTime(jwtToken));
         return ResponseEntity.ok(loginResponse);
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logoutUser(HttpRequest request){
+        String authHeader = request.getHeaders().getFirst("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            if(jwtUtils.validateToken(token))
+            {
+                long expiry = jwtUtils.getExpirationTime(token);
+                Instant expiryInstant = Instant.ofEpochMilli(expiry);
+                tokenBlacklistService.blacklistToken(token, expiryInstant);
+            }
+            return ResponseEntity.ok("User logged out successfully.");
+        } else {
+            return ResponseEntity.badRequest().body("Invalid Authorization header.");
+        }
+    }
+
+
 
     @GetMapping("/test")
     public ResponseEntity<String> testEndpoint() {

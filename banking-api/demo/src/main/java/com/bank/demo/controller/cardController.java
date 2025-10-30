@@ -80,4 +80,12 @@ public class cardController {
         Cards deleted = cardservice.deleteCard(id);
         return deleted != null ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }    
+
+    @GetMapping("/cardInformation")
+    public ResponseEntity<Cards> getCardInformation(@RequestHeader ("Authorization") String authHeader) {
+        Cards userCard = cardservice.getCardInformation();
+        return userCard != null ? ResponseEntity.ok(userCard) : ResponseEntity.notFound().build();
+    }
+
 }
+

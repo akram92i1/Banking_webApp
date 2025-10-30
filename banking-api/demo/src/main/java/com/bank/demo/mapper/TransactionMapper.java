@@ -42,8 +42,8 @@ public class TransactionMapper {
         }
 
         TransferRequestDto.TransferRequest dto = new TransferRequestDto.TransferRequest();
-        dto.setFromAccountId(entity.getFromAccount() != null ? entity.getFromAccount().getAccountNumber() : null);
-        dto.setToAccountId(entity.getToAccount() != null ? entity.getToAccount().getAccountNumber() : null);
+        dto.setFromAccountNumber(entity.getFromAccount() != null ? entity.getFromAccount().getAccountNumber() : null);
+        dto.setToAccountNumber(entity.getToAccount() != null ? entity.getToAccount().getAccountNumber() : null);
         dto.setTransactionType(entity.getTransactionType() != null ? entity.getTransactionType().name() : null);
         dto.setAmount(entity.getAmount() != null ? entity.getAmount().doubleValue() : 0.0);
         dto.setCurrency(entity.getCurrency());

@@ -9,8 +9,8 @@ public class TransferRequestDto {
 
     // Fields for the transfer money request
     public static class TransferRequest{
-        private String fromAccountId;
-        private String toAccountId; 
+        private String fromAccountNumber;
+        private String toAccountNumber; 
         private String recipientEmail;
         private String recipientphoneNumber;
         private String transactionType; // "INTERAC", "INTERNAL"
@@ -26,12 +26,12 @@ public class TransferRequestDto {
         private Map<String, Object> merchantInfo;
 
         // Getters and Setters
-        public String getFromAccountId() {
-            return fromAccountId;
+        public String getFromAccountNumber() {
+            return fromAccountNumber;
         }
-        
-        public void setFromAccountId(String fromAccountId) {
-            this.fromAccountId = fromAccountId;
+
+        public void setFromAccountNumber(String fromAccountNumber) {
+            this.fromAccountNumber = fromAccountNumber;
         }
 
         public String getTransactionType() {
@@ -42,11 +42,11 @@ public class TransferRequestDto {
             this.transactionType = transactionType;
         }
 
-        public String getToAccountId() {
-            return toAccountId;
+        public String getToAccountNumber() {
+            return toAccountNumber;
         }
-        public void setToAccountId(String toAccountId) {
-            this.toAccountId = toAccountId;
+        public void setToAccountNumber(String toAccountNumber) {
+            this.toAccountNumber = toAccountNumber;
         }
         public OffsetDateTime getScheduledAt() {
             return scheduledAt;

@@ -4,6 +4,8 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.bank.demo.Dtos.TransferRequestDto;
@@ -37,20 +39,28 @@ public static final String ANSI_CYAN = "\u001B[36m";
     private transactionRepository transactionRepository;
 
     public TransferResponse sendMoney(TransferRequest request) throws InsufficientFundsException {
+    // Get the authenticated user's account (the sender)
+    Authentication authentication  = SecurityContextHolder.getContext().getAuthentication();
+    String username = authentication.getName(); // this comes from the JWT subject    
     System.out.println(ANSI_PURPLE +"--> sendMoney() called in bankTransactionService"+ANSI_RESET);
     System.err.println(ANSI_BLUE+"Here is the request: " + request+ANSI_RESET);
-    System.out.println("--> Initiating sendMoney from " + request.getFromAccountId() + " to " + request.getToAccountId() + " amount: " + request.getAmount());
+    System.out.println("--> Initiating sendMoney from " + request.getFromAccountNumber() + " to " + request.getToAccountNumber() + " amount: " + request.getAmount());
+    
 
-    Account fromAccount = accountRepository.findByAccountNumber(request.getFromAccountId())
-        .orElseThrow(() -> new IllegalArgumentException("Account not found"));
+    System.out.println(ANSI_YELLOW +"'" + request.getFromAccountNumber() + "' length=" + request.getFromAccountNumber().length()+ANSI_RESET);
+    String fromNumber = request.getFromAccountNumber();
+    Account fromAccount = accountRepository.findByAccountNumber(fromNumber)
+        .orElseThrow(() -> new IllegalArgumentException("FromAccount not found"));
     System.out.println(ANSI_GREEN +"--> From Account: " + fromAccount.getAccountNumber() + ", Balance: " + fromAccount.getBalance()+ANSI_RESET);
 
     BigDecimal requestAmount = BigDecimal.valueOf(request.getAmount());
     System.out.println(ANSI_YELLOW +"--> Requested Amount: " + requestAmount +ANSI_RESET);
 
+
     if(fromAccount.getBalance().compareTo(requestAmount)<0){
         throw new InsufficientFundsException("Not enough balance to complete transfer");
     }
+
     fromAccount.setBalance(fromAccount.getBalance().subtract(requestAmount));
     System.out.println(ANSI_RED +"--> New From Account Balance: " + fromAccount.getBalance()+ANSI_RESET);
 
@@ -58,10 +68,13 @@ public static final String ANSI_CYAN = "\u001B[36m";
     String typeString = request.getTransactionType();
     TransactionType typeEnum = TransactionType.valueOf(typeString);
 
-    Account toAccount = accountRepository.findByAccountNumber(request.getToAccountId())
+    Account toAccount = accountRepository.findByAccountNumber(request.getToAccountNumber())
         .orElseThrow(()-> new IllegalArgumentException("Recipient Account not found"));
     System.out.println(ANSI_GREEN +"--> To Account: " + toAccount.getAccountNumber() + ", Balance: " + toAccount.getBalance()+ANSI_RESET);
-
+    //Prevent self-transfer 
+    if (fromAccount.getAccountNumber().equals(toAccount.getAccountNumber())){
+        throw new IllegalArgumentException("Cannot transfer to the same account");
+    }
     // Use TransactionMapper to map DTO to entity
     Transaction transaction = TransactionMapper.toEntity(request, fromAccount, toAccount, typeEnum);
     transaction.setTransactionId(UUID.randomUUID());
@@ -91,14 +104,17 @@ public static final String ANSI_CYAN = "\u001B[36m";
         Transaction transaction = transactionRepository.findPendingTransactionsByRecipient(UUID.fromString(recipientAccountId), TransactionStatus.PENDING)
             .stream().findFirst()
             .orElseThrow(() -> new IllegalArgumentException("No pending transaction found"));
-
+        // check the PENDING transaction
+        System.out.println(ANSI_GREEN +"--> Found pending transaction: " + transaction.getTransactionId() + " amount: " + transaction.getAmount()+ANSI_RESET + " transaction status: " + transaction.getTransactionStatus());
+        
+        System.out.println("Type of status: " + transaction.getTransactionStatus().getClass().getName());
          // Ensure this transaction is for the recipient
         if (!transaction.getToAccount().getAccountNumber().equals(recipient.getAccountNumber())) {
             throw new SecurityException("This transaction does not belong to the connected user");
         }
 
         // Ensure it is still pending 
-        if (!transaction.getTransactionStatus().equals("PENDING")) {
+        if (transaction.getTransactionStatus() != TransactionStatus.PENDING) {
             throw new IllegalStateException("This transaction is not pending");
         }
 
