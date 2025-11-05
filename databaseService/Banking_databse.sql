@@ -65,6 +65,13 @@ CREATE TABLE accounts (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- blacklisted tokens table for session management
+CREATE TABLE blacklisted_tokens (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    token TEXT NOT NULL UNIQUE,
+    expiry TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
 -- Transactions table (partitioned by date for performance)
 CREATE TABLE transactions (
     transaction_id UUID  DEFAULT uuid_generate_v4(),

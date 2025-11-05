@@ -15,6 +15,7 @@ public class TokenBlacklistService {
     private BlacklistedTokenRepository blacklistedTokenRepository;
 
     public void blacklistToken(String token, Instant expiry) {
+        System.out.println(">>> Blacklisting token: " + token.substring(0, 20) + "...");
         if (!blacklistedTokenRepository.existsByToken(token)) {
             blacklistedTokenRepository.save(new BlacklistedToken(token, expiry));
             System.out.println(">>> Token blacklisted successfully: " + token.substring(0, 20) + "...");
@@ -28,7 +29,7 @@ public class TokenBlacklistService {
     // Optional cleanup for expired tokens
     public void cleanupExpiredTokens() {
         blacklistedTokenRepository.findAll().stream()
-            .filter(t -> t.getExpirationDate().isBefore(Instant.now()))
+            .filter(t -> t.getExpiry().isBefore(Instant.now()))
             .forEach(t -> blacklistedTokenRepository.delete(t));
     }
 }

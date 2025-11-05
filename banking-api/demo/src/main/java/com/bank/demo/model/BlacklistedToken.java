@@ -21,22 +21,22 @@ public class BlacklistedToken {
     private String token;
 
     @Column(nullable = false)
-    private Instant expirationDate;
+    private Instant expiry;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
 
-    public BlacklistedToken(String token , Instant expirationDate) {
+    public BlacklistedToken(String token , Instant expiry) {
         this.token = token;
-        this.expirationDate = expirationDate;
+        this.expiry = expiry;
     }
 
     public String getToken() {
         return token;
     }
 
-    public Instant getExpirationDate() {
-        return expirationDate;
+    public Instant getExpiry() {
+        return expiry;
     }
     
 }

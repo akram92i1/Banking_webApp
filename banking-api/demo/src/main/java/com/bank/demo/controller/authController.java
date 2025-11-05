@@ -3,7 +3,6 @@ package com.bank.demo.controller;
 import java.time.Instant;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +16,8 @@ import com.bank.demo.model.User;
 import com.bank.demo.responses.LoginResponse;
 import com.bank.demo.service.AuthenticationService;
 import com.bank.demo.service.TokenBlacklistService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -48,10 +49,12 @@ public class authController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logoutUser(HttpRequest request){
-        String authHeader = request.getHeaders().getFirst("Authorization");
+    public ResponseEntity<String> logoutUser(HttpServletRequest request){
+        String authHeader = request.getHeader("Authorization");
+        System.out.println("Processing logout request...");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
+            System.out.println("Extracted token for logout: " + token.substring(0, 20) + "...");
             if(jwtUtils.validateToken(token))
             {
                 long expiry = jwtUtils.getExpirationTime(token);

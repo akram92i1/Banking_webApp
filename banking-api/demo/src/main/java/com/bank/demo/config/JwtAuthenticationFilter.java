@@ -16,18 +16,16 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import com.bank.demo.service.TokenBlacklistService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import com.bank.demo.service.TokenBlacklistService;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private TokenBlacklistService tokenBlacklistService;
+    private final TokenBlacklistService tokenBlacklistService;
     private final HandlerExceptionResolver handlerExceptionResolver;
     private final JwtUtils JwtUtils;
     private final UserDetailsService userDetailsService;
@@ -35,7 +33,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public JwtAuthenticationFilter(
         JwtUtils JwtUtils,
         UserDetailsService userDetailsService,
-        HandlerExceptionResolver handlerExceptionResolver
+        HandlerExceptionResolver handlerExceptionResolver,
+        TokenBlacklistService tokenBlacklistService
     ) {
         System.out.println("--> JwtAuthenticationFilter Initiliazation.");
         this.JwtUtils = JwtUtils;
@@ -55,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         System.out.println("We are inside the doFilterInternal function .. ");
         String path = request.getServletPath();
         System.out.println("----> Request path: " + path);
-        if (path.startsWith("/api/auth/login") || path.startsWith("/api/auth/test")) {
+        if (path.startsWith("/api/auth/login") || path.startsWith("/api/auth/test") || path.startsWith("/api/auth/logout")) {
             System.out.println("----> Public endpoint accessed: " + path);
             filterChain.doFilter(request, response);
             return;

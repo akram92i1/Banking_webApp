@@ -1,6 +1,9 @@
+package com.bank.demo.config;
+import java.time.Instant;
+
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import java.time.Instant;
+
 import com.bank.demo.repository.BlacklistedTokenRepository;
 
 @Component

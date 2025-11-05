@@ -10,5 +10,5 @@ import com.bank.demo.model.BlacklistedToken;
 public interface BlacklistedTokenRepository extends JpaRepository<BlacklistedToken, UUID> {
     Optional<BlacklistedToken> findByToken(String token);
     boolean existsByToken(String token);
-    void deleteByExpirationDateBefore(java.time.Instant now);
+    void deleteByExpiryBefore(java.time.Instant now);
 }

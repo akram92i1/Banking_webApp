@@ -34,8 +34,6 @@ public class AuthenticationService {
     @Autowired
     private  AccountRepository accountRepository;
 
-
-
     public User authenticate(LoginUserDto input) {
         System.out.println("--> Authenticating user with identifier: " + input.getIdentifier());
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(input.getIdentifier(), input.getPassword()));
