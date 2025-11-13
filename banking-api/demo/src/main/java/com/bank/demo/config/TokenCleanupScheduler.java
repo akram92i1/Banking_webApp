@@ -18,7 +18,7 @@ public class TokenCleanupScheduler {
     // Runs once every hour
     @Scheduled(fixedRate = 3600000)
     public void cleanExpiredTokens() {
-        blacklistedTokenRepository.deleteByExpirationDateBefore(Instant.now());
+        blacklistedTokenRepository.deleteByExpiryBefore(Instant.now());
         System.out.println("🧹 Expired tokens cleaned up");
     }
 }

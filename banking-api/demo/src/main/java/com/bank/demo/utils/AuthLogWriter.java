@@ -7,8 +7,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
+import org.springframework.stereotype.Component;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+@Component
 public class AuthLogWriter {
      private static final String LOG_DIR = "logs" ; // Folder at the project root
      private static final ObjectMapper objectMapper = new ObjectMapper();

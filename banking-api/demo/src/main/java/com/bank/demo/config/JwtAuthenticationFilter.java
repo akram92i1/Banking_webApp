@@ -1,6 +1,10 @@
 package com.bank.demo.config;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.lang.NonNull;
@@ -18,6 +22,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import com.bank.demo.service.TokenBlacklistService;
+import com.bank.demo.utils.AuthLogWriter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -29,18 +34,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final HandlerExceptionResolver handlerExceptionResolver;
     private final JwtUtils JwtUtils;
     private final UserDetailsService userDetailsService;
+    private final AuthLogWriter authLogWriter;
 
     public JwtAuthenticationFilter(
         JwtUtils JwtUtils,
         UserDetailsService userDetailsService,
         HandlerExceptionResolver handlerExceptionResolver,
-        TokenBlacklistService tokenBlacklistService
+        TokenBlacklistService tokenBlacklistService,
+        AuthLogWriter authLogWriter 
     ) {
         System.out.println("--> JwtAuthenticationFilter Initiliazation.");
         this.JwtUtils = JwtUtils;
         this.userDetailsService = userDetailsService;
         this.handlerExceptionResolver = handlerExceptionResolver;
         this.tokenBlacklistService = tokenBlacklistService;
+        this.authLogWriter = authLogWriter;
     }
 
     @Override
@@ -49,9 +57,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         @NonNull HttpServletResponse response,
         @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-
-        final String authHeader = request.getHeader("Authorization");
         System.out.println("We are inside the doFilterInternal function .. ");
+        final String authHeader = request.getHeader("Authorization");
+        String token = null ; 
+        String username = null ; 
+        String clientIP = getClientIpAddress(request);
+        System.out.println("----> Client IP: " + clientIP);
+        String userAgent = request.getHeader("User-Agent");
+        String requestMethod = request.getMethod();
+        String requestURI = request.getRequestURI();
         String path = request.getServletPath();
         System.out.println("----> Request path: " + path);
         if (path.startsWith("/api/auth/login") || path.startsWith("/api/auth/test") || path.startsWith("/api/auth/logout")) {
@@ -60,6 +74,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            // Log unauthorized access attempt
+            Map<String, Object> logData = new HashMap<>();
+            logData.put("timestamp",  LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+            logData.put("event","Unauthorized access attempt");
+            logData.put("clientIP", clientIP);
+            logData.put("userAgent", userAgent);
+            logData.put("requestMethod", requestMethod);
+            logData.put("requestURI", requestURI);
+            logData.put("reason", "Missing or invalid Authorization header");
+            authLogWriter.writeLog(logData);
             filterChain.doFilter(request, response);
             return;
         }
@@ -68,6 +92,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final String jwt = authHeader.substring(7);
             if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
                  System.out.println(">>> Blocked request with blacklisted token");
+                 // Log blacklisted token access attempt
+                 Map<String, Object> logData = new HashMap<>();
+                 logData.put("timestamp",  LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                 logData.put("event","Blacklisted token access attempt");
+                 logData.put("clientIP", clientIP);
+                 logData.put("userAgent", userAgent);
+                 logData.put("requestMethod", requestMethod);
+                 logData.put("requestURI", requestURI);
+                 logData.put("path", path);
+                 logData.put("sucess", false);
+                 logData.put("details", "Attempt to use blacklisted token");
+                 authLogWriter.writeLog(logData);
                  response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                  response.getWriter().write("Token has been revoked. Please log in again.");
                  return;
@@ -90,6 +126,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+
+                    // Log successful authentication 
+                    Map<String , Object> logData = new HashMap<>();
+                    logData.put("timestamp",  LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                    logData.put("event","Successful authentication");
+                    logData.put("path", path);
+                    logData.put("clientIP", clientIP);
+                    logData.put("userAgent", userAgent);
+                    logData.put("requestMethod", requestMethod);
+                    logData.put("requestURI", requestURI);
+                    logData.put("path", path);
+                    logData.put("sucess", true);
+                    logData.put("details", "User authenticated successfully");
+                    authLogWriter.writeLog(logData);
+                    System.out.println("LogInformation: " + logData.toString());
                 }
             }
 
@@ -113,5 +164,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         source.registerCorsConfiguration("/**",configuration);
 
         return source;
+    }
+    private String getClientIpAddress(HttpServletRequest request) {
+        String xForwardedForHeader = request.getHeader("X-Forwarded-For");
+        if (xForwardedForHeader == null || xForwardedForHeader.isEmpty()) {
+            return request.getRemoteAddr();
+        }
+        else {
+            return xForwardedForHeader.split(",")[0];
+        }
+        
     }
 }
