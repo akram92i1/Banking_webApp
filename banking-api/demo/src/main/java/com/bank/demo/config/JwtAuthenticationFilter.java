@@ -58,6 +58,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         @NonNull HttpServletResponse response,
         @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
+        // TODO: Update the logging to be asynchronous to avoid blocking the main thread
+        // TODO: Standardize log format using a DTO for lighter log writing in JWT filter and controllers
 
         final String authHeader = request.getHeader("Authorization");
         String token = null ; 

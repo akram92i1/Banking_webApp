@@ -54,8 +54,10 @@ public class authController {
             String jwtToken = jwtUtils.generateToken(authenticatedUser.getId(), authenticatedUser.getEmail());
             System.out.println("Generated JWT Token: " + jwtToken);
             boolean tokenValid = jwtUtils.validateToken(jwtToken);
-            
+            // TODO: Handle the logging system asynchronously to avoid blocking the main thread
+            // TODO : Implement log through DTO to standardize log format and make a lighter log writer in the controllers 
             // Log successful login
+            
             Map<String, Object> logData = new HashMap<>();
             logData.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
             logData.put("event", "LOGIN_SUCCESS");
