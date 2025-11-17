@@ -1,10 +1,7 @@
 package com.bank.demo.config;
+
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.lang.NonNull;
@@ -21,8 +18,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
+import com.bank.demo.service.AuthLoggingService;
 import com.bank.demo.service.TokenBlacklistService;
-import com.bank.demo.utils.AuthLogWriter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -33,23 +30,23 @@ import jakarta.servlet.http.HttpServletResponse;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final TokenBlacklistService tokenBlacklistService;
     private final HandlerExceptionResolver handlerExceptionResolver;
-    private final JwtUtils JwtUtils;
+    private final JwtUtils jwtUtils;
     private final UserDetailsService userDetailsService;
-    private final AuthLogWriter authLogWriter;
+    private final AuthLoggingService authLoggingService;
 
     public JwtAuthenticationFilter(
-        JwtUtils JwtUtils,
+        JwtUtils jwtUtils,
         UserDetailsService userDetailsService,
         HandlerExceptionResolver handlerExceptionResolver,
         TokenBlacklistService tokenBlacklistService,
-        AuthLogWriter authLogWriter 
+        AuthLoggingService authLoggingService 
     ) {
-        System.out.println("--> JwtAuthenticationFilter Initiliazation.");
-        this.JwtUtils = JwtUtils;
+        System.out.println("--> JwtAuthenticationFilter Initialization with Clean Logging.");
+        this.jwtUtils = jwtUtils;
         this.userDetailsService = userDetailsService;
         this.handlerExceptionResolver = handlerExceptionResolver;
         this.tokenBlacklistService = tokenBlacklistService;
-        this.authLogWriter = authLogWriter;
+        this.authLoggingService = authLoggingService;
     }
 
     @Override
@@ -58,39 +55,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         @NonNull HttpServletResponse response,
         @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        // TODO: Update the logging to be asynchronous to avoid blocking the main thread
-        // TODO: Standardize log format using a DTO for lighter log writing in JWT filter and controllers
 
         final String authHeader = request.getHeader("Authorization");
-        String token = null ; 
-        String username = null ; 
         String clientIP = getClientIpAddress(request);
-        System.out.println("----> Client IP: " + clientIP);
-        String userAgent = request.getHeader("User-Agent");
-        String requestMethod = request.getMethod();
-        System.out.println("We are inside the doFilterInternal function .. ");
         String path = request.getServletPath();
+        
+        System.out.println("----> Client IP: " + clientIP);
+        System.out.println("We are inside the doFilterInternal function .. ");
         System.out.println("----> Request path: " + path);
         
+        // Skip authentication for public endpoints
         if (path.startsWith("/api/auth/login") || path.startsWith("/api/auth/test") || path.startsWith("/api/auth/logout")) {
             System.out.println("----> Public endpoint accessed: " + path);
             filterChain.doFilter(request, response);
             return;
         }
         
+        // Check for missing or invalid Authorization header
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            // Log missing token attempt
-            Map<String, Object> logData = new HashMap<>();
-            logData.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-            logData.put("event", "MISSING_TOKEN");
-            logData.put("clientIP", clientIP);
-            logData.put("userAgent", userAgent);
-            logData.put("requestMethod", requestMethod);
-            logData.put("path", path);
-            logData.put("success", false);
-            logData.put("details", "No Authorization header or invalid format");
-            authLogWriter.writeLog(logData);
-            
+            authLoggingService.logMissingToken(request);
             filterChain.doFilter(request, response);
             return;
         }
@@ -98,27 +81,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             final String jwt = authHeader.substring(7);
             
+            // Check if token is blacklisted
             if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
                 System.out.println(">>> Blocked request with blacklisted token");
-                
-                // Log blacklisted token attempt
-                Map<String, Object> logData = new HashMap<>();
-                logData.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-                logData.put("event", "BLACKLISTED_TOKEN");
-                logData.put("clientIP", clientIP);
-                logData.put("userAgent", userAgent);
-                logData.put("requestMethod", requestMethod);
-                logData.put("path", path);
-                logData.put("success", false);
-                logData.put("details", "Attempt to use blacklisted token");
-                authLogWriter.writeLog(logData);
+                authLoggingService.logBlacklistedToken(request);
                 
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("Token has been revoked. Please log in again.");
                 return;
             }
             
-            final String userEmail = JwtUtils.getEmailFromToken(jwt);
+            final String userEmail = jwtUtils.getEmailFromToken(jwt);
             System.out.println("----> Extracted JWT: " + jwt);
             System.out.println("----> Extracted userEmail from JWT: " + userEmail);
             
@@ -128,7 +101,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (userEmail != null && authentication == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-                if (JwtUtils.validateToken(jwt)) {
+                if (jwtUtils.validateToken(jwt)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
@@ -138,55 +111,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                     
-                    // Log successful authentication
-                    Map<String, Object> logData = new HashMap<>();
-                    logData.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-                    logData.put("event", "AUTHENTICATION_SUCCESS");
-                    logData.put("username", userEmail);
-                    logData.put("clientIP", clientIP);
-                    logData.put("userAgent", userAgent);
-                    logData.put("requestMethod", requestMethod);
-                    logData.put("path", path);
-                    logData.put("success", true);
-                    logData.put("details", "User successfully authenticated");
-                    authLogWriter.writeLog(logData);
+                    // Log successful authentication - clean and simple
+                    authLoggingService.logAuthenticationSuccess(userEmail, request);
                 } else {
-                    // Log invalid token
-                    Map<String, Object> logData = new HashMap<>();
-                    logData.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-                    logData.put("event", "INVALID_TOKEN");
-                    logData.put("username", userEmail);
-                    logData.put("clientIP", clientIP);
-                    logData.put("userAgent", userAgent);
-                    logData.put("requestMethod", requestMethod);
-                    logData.put("path", path);
-                    logData.put("success", false);
-                    logData.put("details", "Token validation failed");
-                    authLogWriter.writeLog(logData);
+                    // Log invalid token - clean and simple
+                    authLoggingService.logInvalidToken(userEmail, request);
                 }
             }
 
             filterChain.doFilter(request, response);
+            
         } catch (Exception exception) {
             System.out.println("----> Exception in JWT filter: " + exception.getMessage());
             
-            // Log authentication exception
-            Map<String, Object> logData = new HashMap<>();
-            logData.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-            logData.put("event", "AUTHENTICATION_ERROR");
-            logData.put("clientIP", clientIP);
-            logData.put("userAgent", userAgent);
-            logData.put("requestMethod", requestMethod);
-            logData.put("path", path);
-            logData.put("success", false);
-            logData.put("details", "Exception during authentication: " + exception.getMessage());
-            authLogWriter.writeLog(logData);
+            // Log authentication error - clean and simple
+            authLoggingService.logAuthenticationError(exception.getMessage(), request);
             
             handlerExceptionResolver.resolveException(request, response, null, exception);
         }
     }
 
-     @Bean
+    @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
@@ -195,7 +140,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         configuration.setAllowedHeaders(List.of("Authorization","Content-Type"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-
         source.registerCorsConfiguration("/**",configuration);
 
         return source;
@@ -205,8 +149,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String xForwardedForHeader = request.getHeader("X-Forwarded-For");
         if (xForwardedForHeader == null || xForwardedForHeader.isEmpty()) {
             return request.getRemoteAddr();
-        }
-        else {
+        } else {
             return xForwardedForHeader.split(",")[0];
         }
     }

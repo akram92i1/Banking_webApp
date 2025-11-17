@@ -18,9 +18,10 @@ import com.bank.demo.Dtos.LoginUserDto;
 import com.bank.demo.config.JwtUtils;
 import com.bank.demo.model.User;
 import com.bank.demo.responses.LoginResponse;
+import com.bank.demo.service.AuthLoggingService;
 import com.bank.demo.service.AuthenticationService;
 import com.bank.demo.service.TokenBlacklistService;
-import com.bank.demo.utils.AuthLogWriter;
+import com.bank.demo.utils.AsyncAuthLogWriter;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -34,75 +35,54 @@ public class authController {
     private JwtUtils jwtUtils;
 
     @Autowired
-    TokenBlacklistService tokenBlacklistService;
+    private TokenBlacklistService tokenBlacklistService;
     
     @Autowired
-    private AuthLogWriter authLogWriter;
+    private AuthLoggingService authLoggingService;
+    
+    @Autowired
+    private AsyncAuthLogWriter asyncAuthLogWriter;
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginUserDto LoginUserDto, HttpServletRequest request) {
-        String clientIP = getClientIpAddress(request);
-        String userAgent = request.getHeader("User-Agent");
-        String requestMethod = request.getMethod();
-        String path = request.getServletPath();
-        
-        System.out.println("Received login request for identifier: " + LoginUserDto.getIdentifier());
+    public ResponseEntity<?> authenticateUser(@RequestBody LoginUserDto loginUserDto, HttpServletRequest request) {
+        System.out.println("Received login request for identifier: " + loginUserDto.getIdentifier());
         
         try {
-            User authenticatedUser = authenticationService.authenticate(LoginUserDto);
+            User authenticatedUser = authenticationService.authenticate(loginUserDto);
             
             String jwtToken = jwtUtils.generateToken(authenticatedUser.getId(), authenticatedUser.getEmail());
             System.out.println("Generated JWT Token: " + jwtToken);
             boolean tokenValid = jwtUtils.validateToken(jwtToken);
-            // TODO: Handle the logging system asynchronously to avoid blocking the main thread
-            // TODO : Implement log through DTO to standardize log format and make a lighter log writer in the controllers 
-            // Log successful login
             
-            Map<String, Object> logData = new HashMap<>();
-            logData.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-            logData.put("event", "LOGIN_SUCCESS");
-            logData.put("username", authenticatedUser.getEmail());
-            logData.put("userId", authenticatedUser.getId().toString());
-            logData.put("clientIP", clientIP);
-            logData.put("userAgent", userAgent);
-            logData.put("requestMethod", requestMethod);
-            logData.put("path", path);
-            logData.put("success", true);
-            logData.put("details", "User successfully logged in and JWT token generated");
-            authLogWriter.writeLog(logData);
+            // Log successful login - clean and simple
+            authLoggingService.logLoginSuccess(
+                authenticatedUser.getEmail(), 
+                authenticatedUser.getId().toString(), 
+                request
+            );
             
             LoginResponse loginResponse = new LoginResponse(jwtToken, Boolean.toString(tokenValid));
             loginResponse.setExpirationTime(jwtUtils.getExpirationTime(jwtToken));
             return ResponseEntity.ok(loginResponse);
             
         } catch (Exception e) {
-            // Log failed login attempt
-            Map<String, Object> logData = new HashMap<>();
-            logData.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-            logData.put("event", "LOGIN_FAILED");
-            logData.put("username", LoginUserDto.getIdentifier()); // Could be email or card ID
-            logData.put("clientIP", clientIP);
-            logData.put("userAgent", userAgent);
-            logData.put("requestMethod", requestMethod);
-            logData.put("path", path);
-            logData.put("success", false);
-            logData.put("details", "Authentication failed: " + e.getMessage());
-            authLogWriter.writeLog(logData);
+            // Log failed login attempt - clean and simple
+            authLoggingService.logLoginFailed(
+                loginUserDto.getIdentifier(), 
+                e.getMessage(), 
+                request
+            );
             
-            System.out.println("Authentication failed for identifier: " + LoginUserDto.getIdentifier());
+            System.out.println("Authentication failed for identifier: " + loginUserDto.getIdentifier());
             return ResponseEntity.badRequest().body("Authentication failed: " + e.getMessage());
         }
     }
 
     @PostMapping("/logout")
     public ResponseEntity<String> logoutUser(HttpServletRequest request) {
-        String clientIP = getClientIpAddress(request);
-        String userAgent = request.getHeader("User-Agent");
-        String requestMethod = request.getMethod();
-        String path = request.getServletPath();
-        String authHeader = request.getHeader("Authorization");
-        
         System.out.println("Processing logout request...");
+        
+        String authHeader = request.getHeader("Authorization");
         
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
@@ -117,65 +97,25 @@ public class authController {
                     Instant expiryInstant = Instant.ofEpochMilli(expiry);
                     tokenBlacklistService.blacklistToken(token, expiryInstant);
                     
-                    // Log successful logout
-                    Map<String, Object> logData = new HashMap<>();
-                    logData.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-                    logData.put("event", "LOGOUT_SUCCESS");
-                    logData.put("username", userEmail);
-                    logData.put("clientIP", clientIP);
-                    logData.put("userAgent", userAgent);
-                    logData.put("requestMethod", requestMethod);
-                    logData.put("path", path);
-                    logData.put("success", true);
-                    logData.put("details", "User successfully logged out and token blacklisted");
-                    authLogWriter.writeLog(logData);
+                    // Log successful logout - clean and simple
+                    authLoggingService.logLogoutSuccess(userEmail, request);
                     
                     return ResponseEntity.ok("User logged out successfully.");
                 } else {
-                    // Log logout attempt with invalid token
-                    Map<String, Object> logData = new HashMap<>();
-                    logData.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-                    logData.put("event", "LOGOUT_INVALID_TOKEN");
-                    logData.put("username", "unknown");
-                    logData.put("clientIP", clientIP);
-                    logData.put("userAgent", userAgent);
-                    logData.put("requestMethod", requestMethod);
-                    logData.put("path", path);
-                    logData.put("success", false);
-                    logData.put("details", "Logout attempted with invalid token");
-                    authLogWriter.writeLog(logData);
+                    // Log logout attempt with invalid token - clean and simple
+                    authLoggingService.logLogoutInvalidToken(request);
                     
                     return ResponseEntity.badRequest().body("Invalid token for logout.");
                 }
             } catch (Exception e) {
-                // Log logout error
-                Map<String, Object> logData = new HashMap<>();
-                logData.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-                logData.put("event", "LOGOUT_ERROR");
-                logData.put("username", "unknown");
-                logData.put("clientIP", clientIP);
-                logData.put("userAgent", userAgent);
-                logData.put("requestMethod", requestMethod);
-                logData.put("path", path);
-                logData.put("success", false);
-                logData.put("details", "Logout failed with error: " + e.getMessage());
-                authLogWriter.writeLog(logData);
+                // Log logout error - clean and simple
+                authLoggingService.logLogoutError(e.getMessage(), request);
                 
                 return ResponseEntity.status(500).body("Logout failed: " + e.getMessage());
             }
         } else {
-            // Log logout attempt without proper authorization header
-            Map<String, Object> logData = new HashMap<>();
-            logData.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-            logData.put("event", "LOGOUT_NO_TOKEN");
-            logData.put("username", "unknown");
-            logData.put("clientIP", clientIP);
-            logData.put("userAgent", userAgent);
-            logData.put("requestMethod", requestMethod);
-            logData.put("path", path);
-            logData.put("success", false);
-            logData.put("details", "Logout attempted without Authorization header");
-            authLogWriter.writeLog(logData);
+            // Log logout attempt without proper authorization header - clean and simple
+            authLoggingService.logLogoutNoToken(request);
             
             return ResponseEntity.badRequest().body("Invalid Authorization header.");
         }
@@ -192,14 +132,14 @@ public class authController {
         return ResponseEntity.ok("Token is valid expriration time: " + jwtTokenExprirationTime);
     }
     
-    // Helper method to get client IP address
-    private String getClientIpAddress(HttpServletRequest request) {
-        String xForwardedForHeader = request.getHeader("X-Forwarded-For");
-        if (xForwardedForHeader == null || xForwardedForHeader.isEmpty()) {
-            return request.getRemoteAddr();
-        } else {
-            return xForwardedForHeader.split(",")[0];
-        }
+    @GetMapping("/logging-status")
+    public ResponseEntity<Map<String, Object>> getLoggingStatus() {
+        Map<String, Object> status = new HashMap<>();
+        status.put("asyncLoggerActive", true);
+        status.put("pendingLogs", asyncAuthLogWriter.getBufferSize());
+        status.put("loggingMode", "standardized-async");
+        status.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        return ResponseEntity.ok(status);
     }
 
     // Request DTOs
