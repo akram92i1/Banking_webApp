@@ -111,3 +111,6 @@ jspm_packages/
 # Temporary files created during development
 tmp_*
 temp_*
+
+# Atlassian CLI
+acli.exe
