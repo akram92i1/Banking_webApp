@@ -6,6 +6,7 @@ import MyWalletTable from './components/MyWallet/MyWalletTable';
 import PageOverview from './components/Overview/PageOverview';
 import ProfileCard from './components/ProfileCard';
 import Settings from './components/Settings';
+import AIAssistant from './components/AIAssistant';
 function App() {
   return (
     <Router>
@@ -32,6 +33,13 @@ function App() {
             </Routes>
           </div>
         </div>
+        
+        {/* AI Assistant - Available on all pages */}
+        <AIAssistant 
+          userRole="user" 
+          userId="akram001" 
+          location="toronto" 
+        />
       </div>
     </Router> 
   );
