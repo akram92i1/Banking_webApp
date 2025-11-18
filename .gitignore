@@ -1,116 +1,66 @@
-# Node.js dependencies and build files
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-.pnpm-debug.log*
 
-# Frontend build outputs
-finance_front_end/build/
-finance_front_end/dist/
-finance_front_end/.eslintcache
+# Node.js dependencies
+auth-service/node_modules/
+frontend/node_modules/
 
-# Package manager files
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
+# Java build files
+banking-api/target/
+banking-api/.class# Node.js dependencies
+auth-service/node_modules/
+frontend/node_modules/
+finance_front_end/node_modules/
 
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+# Java build files
+banking-api/target/
+banking-api/.classpath
+banking-api/.project
+banking-api/.settings/
 
-# IDE and Editor files
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
+# Environment files
+*.env
+
+# Logs
+*.log
+logs/
+logging/logs/
 
 # OS generated files
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 
-# Java/Maven/Spring Boot
-banking-api/demo/target/
-banking-api/demo/*.jar
-banking-api/demo/*.war
-banking-api/demo/*.ear
-banking-api/demo/*.class
-banking-api/demo/.mvn/
-banking-api/demo/mvnw
-banking-api/demo/mvnw.cmd
+# IDE files
+.vscode/
+.idea/
 
-# Eclipse IDE files (lots of these in your banking-api/demo/.metadata/)
-banking-api/demo/.metadata/
-banking-api/demo/.settings/
-banking-api/demo/.project
-banking-api/demo/.classpath
-banking-api/demo/bin/
+# Docker artifacts
+**/.docker/
+**/Dockerfile~
 
-# Temporary and log files
+# Misc
+*.swppath
+banking-api/.project
+banking-api/.settings/
+
+# Environment files
+*.env
+
+# Logs
 *.log
-*.tmp
-*.temp
-log2.txt
+logs/
+logging/logs/
 
-# Database files
-*.db
-*.sqlite
-*.sqlite3
+# OS generated files
+.DS_Store
+Thumbs.db
 
-# Cache files
-.cache/
-.parcel-cache/
+# IDE files
+.vscode/
+.idea/
 
-# Coverage directory used by tools like istanbul
-coverage/
-*.lcov
+# Docker artifacts
+**/.docker/
+**/Dockerfile~
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Dependency directories
-jspm_packages/
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Microbundle cache
-.rpt2_cache/
-.rts2_cache_cjs/
-.rts2_cache_es/
-.rts2_cache_umd/
-*.exe
-# Optional REPL history
-.node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# Stores VSCode versions used for testing VSCode extensions
-.vscode-test
-
-# Temporary files created during development
-tmp_*
-temp_*
-
-# Atlassian CLI
-acli.exe
+# Misc
+*.swp
+banking-api/demo/acli.exe

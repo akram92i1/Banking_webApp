@@ -1,0 +1,132 @@
+import api from './api';
+
+const bankingService = {
+  // Get all users
+  getAllUsers: async () => {
+    try {
+      const response = await api.get('/users');
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Get users error:', error);
+      return { success: false, message: error.response?.data || 'Failed to fetch users' };
+    }
+  },
+
+  // Get user by ID
+  getUserById: async (userId) => {
+    try {
+      const response = await api.get(`/users/${userId}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Get user error:', error);
+      return { success: false, message: error.response?.data || 'Failed to fetch user' };
+    }
+  },
+
+  // Create new user
+  createUser: async (userData) => {
+    try {
+      const response = await api.post('/users', userData);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Create user error:', error);
+      return { success: false, message: error.response?.data || 'Failed to create user' };
+    }
+  },
+
+  // Update user
+  updateUser: async (userId, userData) => {
+    try {
+      const response = await api.put(`/users/${userId}`, userData);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Update user error:', error);
+      return { success: false, message: error.response?.data || 'Failed to update user' };
+    }
+  },
+
+  // Delete user
+  deleteUser: async (userId) => {
+    try {
+      await api.delete(`/users/${userId}`);
+      return { success: true };
+    } catch (error) {
+      console.error('Delete user error:', error);
+      return { success: false, message: error.response?.data || 'Failed to delete user' };
+    }
+  },
+
+  // Bank Transactions
+  sendMoney: async (transferData) => {
+    try {
+      const response = await api.post('/bank-transactions/send', transferData);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Send money error:', error);
+      return { 
+        success: false, 
+        message: error.response?.data?.message || error.response?.data || 'Failed to send money' 
+      };
+    }
+  },
+
+  // Receive pending money
+  receiveMoney: async (receiveData) => {
+    try {
+      const response = await api.get('/bank-transactions/receive', { data: receiveData });
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Receive money error:', error);
+      return { 
+        success: false, 
+        message: error.response?.data?.message || error.response?.data || 'Failed to receive money' 
+      };
+    }
+  },
+
+  // Test connected user
+  testConnectedUser: async () => {
+    try {
+      const response = await api.get('/bank-transactions/testConnectedUser');
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Test connected user error:', error);
+      return { success: false, message: error.response?.data || 'Failed to test connection' };
+    }
+  },
+
+  // Get user accounts (you might need to create this endpoint in backend)
+  getUserAccounts: async (userId) => {
+    try {
+      const response = await api.get(`/accounts/user/${userId}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Get accounts error:', error);
+      return { success: false, message: error.response?.data || 'Failed to fetch accounts' };
+    }
+  },
+
+  // Get user transactions (you might need to create this endpoint in backend)
+  getUserTransactions: async (userId, limit = 10) => {
+    try {
+      const response = await api.get(`/transactions/user/${userId}?limit=${limit}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Get transactions error:', error);
+      return { success: false, message: error.response?.data || 'Failed to fetch transactions' };
+    }
+  },
+
+  // Get account balance (you might need to create this endpoint in backend)
+  getAccountBalance: async (accountId) => {
+    try {
+      const response = await api.get(`/accounts/${accountId}/balance`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Get balance error:', error);
+      return { success: false, message: error.response?.data || 'Failed to fetch balance' };
+    }
+  }
+};
+
+export default bankingService;
