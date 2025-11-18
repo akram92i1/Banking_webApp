@@ -1,4 +1,6 @@
 import React, { useState, useRef } from "react";
+import ApiTester from './ApiTester';
+import { useAuth } from '../contexts/AuthContext';
 
 const initialProfile = {
   name: "John Doe",
@@ -160,18 +162,25 @@ export default function Settings() {
         )}
       </div>
 
-      {/* Right: Support Box */}
-      <div className="bg-cyan-200 rounded-lg p-8 h-fit flex flex-col items-start min-w-[320px]">
-        <h2 className="text-xl font-bold mb-2">
-          Still can’t find what you looking for?
-        </h2>
-        <div className="mb-4">
-          <span className="font-bold">Call us: </span>
-          <span>(60) 305-240-9671</span>
+      {/* Right: Support Box and API Tester */}
+      <div className="flex flex-col gap-6 min-w-[320px]">
+        <div className="bg-cyan-200 rounded-lg p-8 h-fit flex flex-col items-start">
+          <h2 className="text-xl font-bold mb-2">
+            Still can't find what you looking for?
+          </h2>
+          <div className="mb-4">
+            <span className="font-bold">Call us: </span>
+            <span>(60) 305-240-9671</span>
+          </div>
+          <button className="border border-white text-white rounded-full px-6 py-2 font-semibold hover:bg-cyan-300 transition">
+            Chat with us
+          </button>
         </div>
-        <button className="border border-white text-white rounded-full px-6 py-2 font-semibold hover:bg-cyan-300 transition">
-          Chat with us
-        </button>
+        
+        {/* API Tester */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <ApiTester />
+        </div>
       </div>
     </div>
   );

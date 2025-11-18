@@ -1,7 +1,16 @@
 // components/Sidebar.js
 import { FaWallet, FaUser, FaCog, FaQuestionCircle, FaSignOutAlt, FaChartPie  } from 'react-icons/fa';
-import  {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+
 export default function Sidebar() {
+  const { logout, user } = useAuth();
+
+  const handleLogout = async () => {
+    if (window.confirm('Are you sure you want to logout?')) {
+      await logout();
+    }
+  };
     return (
       <div className="bg-white w-64 min-h-screen p-4 flex flex-col justify-between border-r">
         <div>
@@ -31,7 +40,10 @@ export default function Sidebar() {
             <button className="bg-teal-300 mt-3  text-white px-4 py-1 rounded-full text-xl">Upgrade</button>
           </div>
         </div>
-        <button className="flex items-center gap-2 text-gray-600 hover:text-black mt-6">
+        <button 
+          onClick={handleLogout}
+          className="flex items-center gap-2 text-gray-600 hover:text-red-600 mt-6 transition-colors duration-200"
+        >
           <FaSignOutAlt /> Logout
         </button>
       </div>

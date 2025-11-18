@@ -30,4 +30,7 @@ public class LoginResponse {
         this.expirationTime = expirationTime;
     }
     
+    public long getExpirationTime() {
+        return expirationTime;
+    }
 }
