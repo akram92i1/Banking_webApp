@@ -1,0 +1,101 @@
+{
+  "date" : "2025-11-18",
+  "createdAt" : "2025-11-18T14:06:03.6096588",
+  "lastUpdated" : "2025-11-18T14:37:17.4629727",
+  "totalEntries" : 9,
+  "logs" : [ {
+    "path" : "/api/auth/login",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "POST",
+    "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "User successfully logged in and JWT token generated",
+    "event" : "LOGIN_SUCCESS",
+    "userId" : "6a3c9031-a5a7-42a7-bb42-4068aeedb88e",
+    "timestamp" : "2025-11-18T14:06:01.1933752",
+    "username" : "jdoe@example.com"
+  }, {
+    "path" : "/api/auth/login",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "POST",
+    "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "User successfully logged in and JWT token generated",
+    "event" : "LOGIN_SUCCESS",
+    "userId" : "6a3c9031-a5a7-42a7-bb42-4068aeedb88e",
+    "timestamp" : "2025-11-18T14:06:04.2941046",
+    "username" : "jdoe@example.com"
+  }, {
+    "path" : "/api/auth/login",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "POST",
+    "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "User successfully logged in and JWT token generated",
+    "event" : "LOGIN_SUCCESS",
+    "userId" : "6a3c9031-a5a7-42a7-bb42-4068aeedb88e",
+    "timestamp" : "2025-11-18T14:08:21.0708879",
+    "username" : "jdoe@example.com"
+  }, {
+    "path" : "/api/auth/login",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "POST",
+    "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "User successfully logged in and JWT token generated",
+    "event" : "LOGIN_SUCCESS",
+    "userId" : "6a3c9031-a5a7-42a7-bb42-4068aeedb88e",
+    "timestamp" : "2025-11-18T14:35:31.1144249",
+    "username" : "jdoe@example.com"
+  }, {
+    "path" : "/api/bank-transactions/testConnectedUser",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "GET",
+    "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "User successfully authenticated",
+    "event" : "AUTHENTICATION_SUCCESS",
+    "timestamp" : "2025-11-18T14:35:31.2441765",
+    "username" : "jdoe@example.com"
+  }, {
+    "path" : "/api/bank-transactions/testConnectedUser",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "GET",
+    "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "User successfully authenticated",
+    "event" : "AUTHENTICATION_SUCCESS",
+    "timestamp" : "2025-11-18T14:35:31.2783338",
+    "username" : "jdoe@example.com"
+  }, {
+    "path" : "/api/bank-transactions/testConnectedUser",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "GET",
+    "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "User successfully authenticated",
+    "event" : "AUTHENTICATION_SUCCESS",
+    "timestamp" : "2025-11-18T14:36:09.6320139",
+    "username" : "jdoe@example.com"
+  }, {
+    "path" : "/api/bank-transactions/testConnectedUser",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "GET",
+    "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "User successfully authenticated",
+    "event" : "AUTHENTICATION_SUCCESS",
+    "timestamp" : "2025-11-18T14:36:09.6568093",
+    "username" : "jdoe@example.com"
+  }, {
+    "path" : "/api/auth/logout",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "POST",
+    "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "User successfully logged out and token blacklisted",
+    "event" : "LOGOUT_SUCCESS",
+    "timestamp" : "2025-11-18T14:37:16.3755734",
+    "username" : "jdoe@example.com"
+  } ]
+}

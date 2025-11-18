@@ -1,0 +1,87 @@
+{
+  "date" : "2025-11-17",
+  "createdAt" : "2025-11-17T02:19:30.5450637",
+  "lastUpdated" : "2025-11-17T04:42:41.9249725",
+  "totalEntries" : 8,
+  "logs" : [ {
+    "path" : "/api/auth/login",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "POST",
+    "userAgent" : "PostmanRuntime/7.49.1",
+    "details" : "User successfully logged in and JWT token generated",
+    "event" : "LOGIN_SUCCESS",
+    "userId" : "6a3c9031-a5a7-42a7-bb42-4068aeedb88e",
+    "timestamp" : "2025-11-17T02:19:26.6963352",
+    "username" : "jdoe@example.com"
+  }, {
+    "path" : "/api/cards/cardInformation",
+    "success" : false,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "GET",
+    "userAgent" : "PostmanRuntime/7.49.1",
+    "details" : "Exception during authentication: JWT expired at 2025-11-16T08:44:57Z. Current time: 2025-11-17T07:19:58Z, a difference of 81301451 milliseconds.  Allowed clock skew: 0 milliseconds.",
+    "event" : "AUTHENTICATION_ERROR",
+    "timestamp" : "2025-11-17T02:19:58.4532804"
+  }, {
+    "path" : "/",
+    "success" : false,
+    "clientIP" : "192.168.0.25",
+    "requestMethod" : "GET",
+    "userAgent" : "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "No Authorization header or invalid format",
+    "event" : "MISSING_TOKEN",
+    "timestamp" : "2025-11-17T04:00:05.0183497",
+    "username" : "unknown"
+  }, {
+    "path" : "/",
+    "success" : false,
+    "clientIP" : "127.0.0.1",
+    "requestMethod" : "GET",
+    "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "No Authorization header or invalid format",
+    "event" : "MISSING_TOKEN",
+    "timestamp" : "2025-11-17T04:02:49.3186306",
+    "username" : "unknown"
+  }, {
+    "path" : "/",
+    "success" : false,
+    "clientIP" : "192.168.0.25",
+    "requestMethod" : "GET",
+    "userAgent" : "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "No Authorization header or invalid format",
+    "event" : "MISSING_TOKEN",
+    "timestamp" : "2025-11-17T04:03:31.6388729",
+    "username" : "unknown"
+  }, {
+    "path" : "/",
+    "success" : false,
+    "clientIP" : "192.168.0.25",
+    "requestMethod" : "GET",
+    "userAgent" : "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "No Authorization header or invalid format",
+    "event" : "MISSING_TOKEN",
+    "timestamp" : "2025-11-17T04:14:44.4143202",
+    "username" : "unknown"
+  }, {
+    "path" : "/api/auth/logout",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "POST",
+    "userAgent" : "PostmanRuntime/7.49.1",
+    "details" : "User successfully logged out and token blacklisted",
+    "event" : "LOGOUT_SUCCESS",
+    "timestamp" : "2025-11-17T04:41:23.4840334",
+    "username" : "jdoe@example.com"
+  }, {
+    "path" : "/jerniehfihefheohfohefojef",
+    "success" : false,
+    "clientIP" : "192.168.0.25",
+    "requestMethod" : "GET",
+    "userAgent" : "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "No Authorization header or invalid format",
+    "event" : "MISSING_TOKEN",
+    "timestamp" : "2025-11-17T04:42:40.8719243",
+    "username" : "unknown"
+  } ]
+}
