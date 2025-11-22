@@ -68,7 +68,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         
         // Check for missing or invalid Authorization header
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            authLoggingService.logMissingToken(request);
+            // Only log missing token for non-public endpoints that should have auth
+            // Skip logging for normal page loads without tokens
             filterChain.doFilter(request, response);
             return;
         }
@@ -79,6 +80,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Check if token is blacklisted
             if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
                 System.out.println(">>> Blocked request with blacklisted token");
+                // Log blacklisted token usage - this is a security event worth logging
                 authLoggingService.logBlacklistedToken(request);
                 
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -106,10 +108,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                     
-                    // Log successful authentication - clean and simple
-                    authLoggingService.logAuthenticationSuccess(userEmail, request);
+                    // Don't log every successful authentication - only log first login success
+                    // The authentication success is already logged in authController.login()
                 } else {
-                    // Log invalid token - clean and simple
+                    // Log invalid token attempts - this is a security event
                     authLoggingService.logInvalidToken(userEmail, request);
                 }
             }
@@ -119,8 +121,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (Exception exception) {
             System.out.println("----> Exception in JWT filter: " + exception.getMessage());
             
-            // Log authentication error - clean and simple
-            authLoggingService.logAuthenticationError(exception.getMessage(), request);
+            // Only log critical authentication errors, not routine validation failures
+            if (exception.getMessage().contains("signature") || exception.getMessage().contains("malformed")) {
+                authLoggingService.logAuthenticationError(exception.getMessage(), request);
+            }
             
             handlerExceptionResolver.resolveException(request, response, null, exception);
         }

@@ -1,5 +1,6 @@
 package com.bank.demo.repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,7 +19,15 @@ public interface AccountRepository extends JpaRepository<Account, java.util.UUID
     @Query("SELECT a.user.id FROM Account a WHERE a.id = :account_id")
     Optional<UUID> findUserIdById(@Param("account_id") UUID id);
 
-    //find accountId with userId 
+    //find first accountId with userId 
     @Query("SELECT a.id FROM Account a WHERE a.user.id = :user_id")
-    Optional<UUID> findByUserId(@Param("user_id") UUID userId);
+    Optional<UUID> findFirstAccountIdByUserId(@Param("user_id") UUID userId);
+
+    //find all accounts by userId with EAGER fetch for user to avoid lazy loading issues
+    @Query("SELECT a FROM Account a JOIN FETCH a.user WHERE a.user.id = :user_id")
+    List<Account> findByUserId(@Param("user_id") UUID userId);
+
+    // Native query as backup to test if JPA mapping is the issue
+    @Query(value = "SELECT account_id, account_number, balance, available_balance, account_type, account_status FROM accounts WHERE user_id = :user_id", nativeQuery = true)
+    List<Object[]> findAccountDataByUserIdNative(@Param("user_id") UUID userId);
 }

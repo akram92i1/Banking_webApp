@@ -63,9 +63,9 @@ const bankingService = {
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Send money error:', error);
-      return { 
-        success: false, 
-        message: error.response?.data?.message || error.response?.data || 'Failed to send money' 
+      return {
+        success: false,
+        message: error.response?.data?.message || error.response?.data || 'Failed to send money'
       };
     }
   },
@@ -77,9 +77,9 @@ const bankingService = {
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Receive money error:', error);
-      return { 
-        success: false, 
-        message: error.response?.data?.message || error.response?.data || 'Failed to receive money' 
+      return {
+        success: false,
+        message: error.response?.data?.message || error.response?.data || 'Failed to receive money'
       };
     }
   },
@@ -117,7 +117,7 @@ const bankingService = {
     }
   },
 
-  // Get account balance (you might need to create this endpoint in backend)
+  // Get account balance
   getAccountBalance: async (accountId) => {
     try {
       const response = await api.get(`/accounts/${accountId}/balance`);
@@ -125,6 +125,30 @@ const bankingService = {
     } catch (error) {
       console.error('Get balance error:', error);
       return { success: false, message: error.response?.data || 'Failed to fetch balance' };
+    }
+  },
+
+  // Get current user's accounts
+  getCurrentUserAccounts: async () => {
+    try {
+      console.log("####### DEBUG: Getting accounts for current user");
+      const response = await api.get('/accounts/current-user');
+      console.log("Response---->", response);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Get current user accounts error:', error);
+      return { success: false, message: error.response?.data || 'Failed to fetch accounts' };
+    }
+  },
+
+  // Get current user's transactions
+  getCurrentUserTransactions: async (limit = 10) => {
+    try {
+      const response = await api.get(`/transactions/current-user?limit=${limit}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Get current user transactions error:', error);
+      return { success: false, message: error.response?.data || 'Failed to fetch transactions' };
     }
   }
 };

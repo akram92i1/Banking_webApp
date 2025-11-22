@@ -12,6 +12,7 @@ import org.hibernate.type.SqlTypes;
 import com.bank.demo.model.enums.AccountStatus;
 import com.bank.demo.model.enums.AccountType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,6 +30,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "accounts" , schema = "public")
 @Getter @Setter
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Account {
 
     @Id
@@ -41,6 +43,7 @@ public class Account {
 
     @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "address"})
     private User user;
 
     @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
@@ -57,8 +60,9 @@ public class Account {
     @Column(name = "account_status")
     private AccountStatus accountStatus = AccountStatus.ACTIVE;
 
+    @Column(name = "balance", precision = 15, scale = 2)
     private BigDecimal balance = BigDecimal.ZERO;
-    @Column(name = "available_balance")
+    @Column(name = "available_balance", precision = 15, scale = 2)
     private BigDecimal availableBalance = BigDecimal.ZERO;
 
     @Column(name = "credit_limit")

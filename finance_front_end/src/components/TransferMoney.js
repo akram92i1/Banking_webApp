@@ -4,8 +4,8 @@ import bankingService from '../services/bankingService';
 
 const TransferMoney = ({ isOpen, onClose, onTransferComplete }) => {
   const [transferData, setTransferData] = useState({
-    senderAccountId: '',
-    recipientAccountId: '',
+    fromAccountNumber: '',
+    toAccountNumber: '',
     amount: '',
     description: ''
   });
@@ -30,7 +30,7 @@ const TransferMoney = ({ isOpen, onClose, onTransferComplete }) => {
     setSuccess('');
 
     // Basic validation
-    if (!transferData.senderAccountId || !transferData.recipientAccountId || !transferData.amount) {
+    if (!transferData.fromAccountNumber || !transferData.toAccountNumber || !transferData.amount) {
       setError('Please fill in all required fields');
       setIsLoading(false);
       return;
@@ -48,8 +48,8 @@ const TransferMoney = ({ isOpen, onClose, onTransferComplete }) => {
       if (result.success) {
         setSuccess('Money transferred successfully!');
         setTransferData({
-          senderAccountId: '',
-          recipientAccountId: '',
+          fromAccountNumber: '',
+          toAccountNumber: '',
           amount: '',
           description: ''
         });
@@ -96,30 +96,30 @@ const TransferMoney = ({ isOpen, onClose, onTransferComplete }) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              From Account ID *
+              From Account Number *
             </label>
             <input
               type="text"
-              name="senderAccountId"
-              value={transferData.senderAccountId}
+              name="fromAccountNumber"
+              value={transferData.fromAccountNumber}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Your account ID"
+              placeholder="Your account number"
               required
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              To Account ID *
+              To Account Number *
             </label>
             <input
               type="text"
-              name="recipientAccountId"
-              value={transferData.recipientAccountId}
+              name="toAccountNumber"
+              value={transferData.toAccountNumber}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Recipient's account ID"
+              placeholder="Recipient's account number"
               required
             />
           </div>

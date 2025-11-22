@@ -1,8 +1,8 @@
 {
   "date" : "2025-11-18",
   "createdAt" : "2025-11-18T14:06:03.6096588",
-  "lastUpdated" : "2025-11-18T14:37:17.4629727",
-  "totalEntries" : 9,
+  "lastUpdated" : "2025-11-18T18:35:18.9086838",
+  "totalEntries" : 21,
   "logs" : [ {
     "path" : "/api/auth/login",
     "success" : true,
@@ -96,6 +96,128 @@
     "details" : "User successfully logged out and token blacklisted",
     "event" : "LOGOUT_SUCCESS",
     "timestamp" : "2025-11-18T14:37:16.3755734",
+    "username" : "jdoe@example.com"
+  }, {
+    "path" : "/api/auth/login",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "POST",
+    "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "User successfully logged in and JWT token generated",
+    "event" : "LOGIN_SUCCESS",
+    "userId" : "6a3c9031-a5a7-42a7-bb42-4068aeedb88e",
+    "timestamp" : "2025-11-18T16:50:53.9059111",
+    "username" : "jdoe@example.com"
+  }, {
+    "path" : "/api/bank-transactions/testConnectedUser",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "GET",
+    "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "User successfully authenticated",
+    "event" : "AUTHENTICATION_SUCCESS",
+    "timestamp" : "2025-11-18T16:50:54.4647034",
+    "username" : "jdoe@example.com"
+  }, {
+    "path" : "/api/bank-transactions/testConnectedUser",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "GET",
+    "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "User successfully authenticated",
+    "event" : "AUTHENTICATION_SUCCESS",
+    "timestamp" : "2025-11-18T16:50:54.5376891",
+    "username" : "jdoe@example.com"
+  }, {
+    "path" : "/api/bank-transactions/testConnectedUser",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "GET",
+    "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "User successfully authenticated",
+    "event" : "AUTHENTICATION_SUCCESS",
+    "timestamp" : "2025-11-18T16:55:02.4730612",
+    "username" : "jdoe@example.com"
+  }, {
+    "path" : "/api/bank-transactions/testConnectedUser",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "GET",
+    "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "User successfully authenticated",
+    "event" : "AUTHENTICATION_SUCCESS",
+    "timestamp" : "2025-11-18T16:55:02.5654553",
+    "username" : "jdoe@example.com"
+  }, {
+    "path" : "/api/bank-transactions/testConnectedUser",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "GET",
+    "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "User successfully authenticated",
+    "event" : "AUTHENTICATION_SUCCESS",
+    "timestamp" : "2025-11-18T16:56:26.5178784",
+    "username" : "jdoe@example.com"
+  }, {
+    "path" : "/api/bank-transactions/testConnectedUser",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "GET",
+    "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "User successfully authenticated",
+    "event" : "AUTHENTICATION_SUCCESS",
+    "timestamp" : "2025-11-18T16:56:26.574588",
+    "username" : "jdoe@example.com"
+  }, {
+    "path" : "/api/bank-transactions/testConnectedUser",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "GET",
+    "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "User successfully authenticated",
+    "event" : "AUTHENTICATION_SUCCESS",
+    "timestamp" : "2025-11-18T16:57:33.4239625",
+    "username" : "jdoe@example.com"
+  }, {
+    "path" : "/api/bank-transactions/testConnectedUser",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "GET",
+    "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "User successfully authenticated",
+    "event" : "AUTHENTICATION_SUCCESS",
+    "timestamp" : "2025-11-18T16:57:33.4746406",
+    "username" : "jdoe@example.com"
+  }, {
+    "path" : "/api/auth/login",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "POST",
+    "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "User successfully logged in and JWT token generated",
+    "event" : "LOGIN_SUCCESS",
+    "userId" : "6a3c9031-a5a7-42a7-bb42-4068aeedb88e",
+    "timestamp" : "2025-11-18T18:35:14.9814337",
+    "username" : "jdoe@example.com"
+  }, {
+    "path" : "/api/bank-transactions/testConnectedUser",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "GET",
+    "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "User successfully authenticated",
+    "event" : "AUTHENTICATION_SUCCESS",
+    "timestamp" : "2025-11-18T18:35:15.231952",
+    "username" : "jdoe@example.com"
+  }, {
+    "path" : "/api/bank-transactions/testConnectedUser",
+    "success" : true,
+    "clientIP" : "0:0:0:0:0:0:0:1",
+    "requestMethod" : "GET",
+    "userAgent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "details" : "User successfully authenticated",
+    "event" : "AUTHENTICATION_SUCCESS",
+    "timestamp" : "2025-11-18T18:35:15.27249",
     "username" : "jdoe@example.com"
   } ]
 }

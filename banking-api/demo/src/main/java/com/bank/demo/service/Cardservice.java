@@ -68,7 +68,7 @@ public class Cardservice {
         }
         else {
            //Fetch the accountId using the userId
-              Optional <UUID> accountIdOpt = accountRepository.findByUserId(userId);
+              Optional <UUID> accountIdOpt = accountRepository.findFirstAccountIdByUserId(userId);
               UUID accountId = accountIdOpt.orElse(null);
                 if (accountId == null) {
                     System.err.println("Account not found for userId: " + userId);

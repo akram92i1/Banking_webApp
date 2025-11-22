@@ -36,8 +36,8 @@ export default function PageOverview() {
 
     const handleTransferComplete = (transferData) => {
         console.log('Transfer completed:', transferData);
-        // You can refresh balance/transaction data here
-        // or trigger a refetch of account data
+        // Refresh the page to update balances and transactions
+        window.location.reload();
     };
 
     const getWelcomeMessage = () => {
