@@ -1,5 +1,6 @@
 package com.bank.demo.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -11,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -118,6 +120,33 @@ public class TransactionController {
             return ResponseEntity.ok(transactions);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/transfer")
+    public ResponseEntity<Transaction> transfer(
+            @RequestParam UUID fromAccountId,
+            @RequestParam UUID toAccountId,
+            @RequestParam BigDecimal amount,
+            @RequestParam(required = false) String description) {
+        try {
+            Transaction transaction = transactionService.transfer(fromAccountId, toAccountId, amount, description);
+            return ResponseEntity.ok(transaction);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    
+    @PostMapping("/deposit")
+    public ResponseEntity<Transaction> deposit(
+            @RequestParam UUID accountId,
+            @RequestParam BigDecimal amount,
+            @RequestParam(required = false) String description) {
+        try {
+            Transaction transaction = transactionService.deposit(accountId, amount, description);
+            return ResponseEntity.ok(transaction);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 }
