@@ -17,6 +17,7 @@ import com.bank.demo.model.enums.TransactionStatus;
 import com.bank.demo.model.enums.TransactionType;
 import com.bank.demo.repository.AccountRepository;
 import com.bank.demo.repository.transactionRepository;
+import com.bank.demo.repository.Userepository;
 
 @Service
 public class TransactionService {
@@ -26,6 +27,9 @@ public class TransactionService {
     
     @Autowired
     private AccountRepository accountRepository;
+    
+    @Autowired
+    private Userepository userRepository;
 
     public List<Transaction> getTransactionsByUserId(UUID userId, int limit) {
         PageRequest pageRequest = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -100,6 +104,55 @@ public class TransactionService {
         return savedTransaction;
     }
     
+    @Transactional
+    public Transaction transferByEmail(String senderEmail, String recipientEmail, BigDecimal amount, String description) {
+        // Find sender's primary account by email
+        Account fromAccount = accountRepository.findPrimaryAccountByUserEmail(senderEmail)
+            .orElseThrow(() -> new RuntimeException("Sender account not found for email: " + senderEmail));
+            
+        // Find recipient's primary account by email
+        Account toAccount = accountRepository.findPrimaryAccountByUserEmail(recipientEmail)
+            .orElseThrow(() -> new RuntimeException("Recipient account not found for email: " + recipientEmail));
+        
+        // Prevent self-transfer
+        if (senderEmail.equalsIgnoreCase(recipientEmail)) {
+            throw new RuntimeException("Cannot transfer to yourself");
+        }
+        
+        // Validate sufficient balance
+        if (fromAccount.getBalance().compareTo(amount) < 0) {
+            throw new RuntimeException("Insufficient balance. Available: " + fromAccount.getBalance());
+        }
+        
+        // Create transaction
+        Transaction transaction = new Transaction();
+        transaction.setFromAccount(fromAccount);
+        transaction.setToAccount(toAccount);
+        transaction.setTransactionType(TransactionType.TRANSFER);
+        transaction.setAmount(amount);
+        transaction.setDescription(description != null ? description : "Email transfer to " + recipientEmail);
+        transaction.setReferenceNumber(generateReferenceNumber());
+        transaction.setTransactionStatus(TransactionStatus.COMPLETED); // For now, complete immediately
+        transaction.setCreatedAt(OffsetDateTime.now());
+        transaction.setProcessedAt(OffsetDateTime.now());
+        
+        Transaction savedTransaction = transactionRepository.save(transaction);
+        
+        // Update balances
+        fromAccount.setBalance(fromAccount.getBalance().subtract(amount));
+        fromAccount.setAvailableBalance(fromAccount.getAvailableBalance().subtract(amount));
+        toAccount.setBalance(toAccount.getBalance().add(amount));
+        toAccount.setAvailableBalance(toAccount.getAvailableBalance().add(amount));
+        
+        accountRepository.save(fromAccount);
+        accountRepository.save(toAccount);
+        
+        System.out.println("DEBUG: Email transfer completed - ID: " + savedTransaction.getTransactionId() + 
+                          ", Amount: " + amount + ", From: " + senderEmail + ", To: " + recipientEmail);
+        
+        return savedTransaction;
+    }
+
     private String generateReferenceNumber() {
         return "TXN" + System.currentTimeMillis();
     }

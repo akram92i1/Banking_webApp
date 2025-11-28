@@ -46,9 +46,7 @@ public class Account {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "address"})
     private User user;
 
-    @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
-    @JoinColumn(name = "bank_id", nullable = false)
-    private Bank bank;
+    // Bank reference removed - was unused
 
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)

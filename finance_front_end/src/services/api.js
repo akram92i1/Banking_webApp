@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: 'http://localhost:8082/api',
+  baseURL: 'http://localhost:8082', // Updated to match Spring Boot application.properties port
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

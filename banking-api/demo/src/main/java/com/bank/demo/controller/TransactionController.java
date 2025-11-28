@@ -136,6 +136,34 @@ public class TransactionController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @PostMapping("/transfer-email")
+    public ResponseEntity<Transaction> transferByEmail(
+            @RequestParam String recipientEmail,
+            @RequestParam BigDecimal amount,
+            @RequestParam(required = false) String description,
+            @RequestParam(defaultValue = "TRANSFER") String transactionType,
+            @RequestHeader("Authorization") String authHeader) {
+        try {
+            // Get authenticated user's email
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            
+            String senderEmail = authentication.getName();
+            System.out.println("DEBUG: Transfer by email - Sender: " + senderEmail + ", Recipient: " + recipientEmail + ", Amount: " + amount);
+            
+            Transaction transaction = transactionService.transferByEmail(senderEmail, recipientEmail, amount, description);
+            return ResponseEntity.ok(transaction);
+        } catch (RuntimeException e) {
+            System.err.println("ERROR: " + e.getMessage());
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            System.err.println("UNEXPECTED ERROR: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
     
     @PostMapping("/deposit")
     public ResponseEntity<Transaction> deposit(
