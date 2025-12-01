@@ -16,6 +16,7 @@ import com.bank.demo.Dtos.TransferRequestDto;
 import com.bank.demo.Dtos.TransferRequestDto.ReceiveMoneyResponse;
 import com.bank.demo.Dtos.TransferRequestDto.TransferRequest;
 import com.bank.demo.Dtos.TransferRequestDto.TransferResponse;
+import com.bank.demo.Dtos.EmailTransferRequestDto;
 import com.bank.demo.exceptions.InsufficientFundsException;
 import com.bank.demo.service.bankTransactionService;
 
@@ -30,9 +31,38 @@ public class bankTransactionController {
 
     @PostMapping("/send")
     public ResponseEntity<TransferResponse> sendMoney(@RequestBody TransferRequest request , @RequestHeader ("Authorization") String authHeader) throws  InsufficientFundsException {
-        System.out.println("----> /api/bank-transactions/send endpoint accessed.");
+        System.out.println("----> /api/bank-transactions/send endpoint accessed (Email-based transfer).");
         TransferResponse response = transactionService.sendMoney(request);
         return ResponseEntity.status(HttpStatus.OK).body(response); 
+    }
+
+    @PostMapping("/send-email")
+    public ResponseEntity<EmailTransferRequestDto.EmailTransferResponse> sendMoneyByEmail(
+            @RequestBody EmailTransferRequestDto.EmailTransferRequest request, 
+            @RequestHeader("Authorization") String authHeader) throws InsufficientFundsException {
+        
+        System.out.println("----> /api/bank-transactions/send-email endpoint accessed.");
+        
+        // Convert EmailTransferRequest to TransferRequest
+        TransferRequest transferRequest = new TransferRequest();
+        transferRequest.setRecipientEmail(request.getRecipientEmail());
+        transferRequest.setAmount(request.getAmount());
+        transferRequest.setDescription(request.getDescription());
+        transferRequest.setTransactionType(request.getTransactionType());
+        
+        // Call the service
+        TransferResponse serviceResponse = transactionService.sendMoney(transferRequest);
+        
+        // Convert response
+        EmailTransferRequestDto.EmailTransferResponse response = new EmailTransferRequestDto.EmailTransferResponse();
+        response.setTransactionId(serviceResponse.getTransactionId());
+        response.setInteracReferenceId(serviceResponse.getInteracReferenceId());
+        response.setStatus(serviceResponse.getStatus());
+        response.setMessage(serviceResponse.getMessage());
+        response.setRecipientEmail(request.getRecipientEmail());
+        response.setAmount(request.getAmount());
+        
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/receive")

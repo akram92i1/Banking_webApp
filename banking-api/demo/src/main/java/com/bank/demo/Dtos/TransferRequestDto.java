@@ -7,11 +7,11 @@ import java.util.UUID;
 
 public class TransferRequestDto {
 
-    // Fields for the transfer money request
+    // Fields for the transfer money request (Email-based like Interac)
     public static class TransferRequest{
-        private String fromAccountNumber;
-        private String toAccountNumber; 
-        private String recipientEmail;
+        // fromAccountNumber removed - will be determined from authenticated user
+        private String toAccountNumber; // Optional - for internal use
+        private String recipientEmail; // Primary field for email-based transfers
         private String recipientphoneNumber;
         private String transactionType; // "INTERAC", "INTERNAL"
         private double amount;
@@ -26,12 +26,20 @@ public class TransferRequestDto {
         private Map<String, Object> merchantInfo;
 
         // Getters and Setters
-        public String getFromAccountNumber() {
-            return fromAccountNumber;
+        public String getRecipientEmail() {
+            return recipientEmail;
         }
 
-        public void setFromAccountNumber(String fromAccountNumber) {
-            this.fromAccountNumber = fromAccountNumber;
+        public void setRecipientEmail(String recipientEmail) {
+            this.recipientEmail = recipientEmail;
+        }
+
+        public String getRecipientphoneNumber() {
+            return recipientphoneNumber;
+        }
+
+        public void setRecipientphoneNumber(String recipientphoneNumber) {
+            this.recipientphoneNumber = recipientphoneNumber;
         }
 
         public String getTransactionType() {

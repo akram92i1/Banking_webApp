@@ -5,7 +5,7 @@ const authService = {
   login: async (credentials) => {
     try {
       console.log('Attempting login with:', credentials.identifier);
-      const response = await api.post('/auth/login', {
+      const response = await api.post('/api/auth/login', {
         identifier: credentials.identifier, // email or card number
         password: credentials.password,
       });
@@ -47,7 +47,7 @@ const authService = {
   // Logout user
   logout: async () => {
     try {
-      await api.post('/auth/logout');
+      await api.post('/api/auth/logout');
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -119,7 +119,7 @@ const authService = {
   // Test authentication status
   testAuth: async () => {
     try {
-      const response = await api.get('/auth/test');
+      const response = await api.get('/api/auth/test');
       return { success: true, message: response.data };
     } catch (error) {
       return { success: false, message: error.response?.data || 'Auth test failed' };
