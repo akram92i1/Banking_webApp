@@ -78,11 +78,11 @@ const MyWalletTable = () => {
 
     // Determine if this is incoming or outgoing for the current user
     const currentUserEmail = user?.email;
-    
+
     // Handle cases where fromAccount or toAccount might be null or have different structures
     const fromAccountEmail = fromAccount?.user?.email || fromAccount?.userEmail || null;
     const toAccountEmail = toAccount?.user?.email || toAccount?.userEmail || null;
-    
+
     const isIncoming = toAccountEmail === currentUserEmail;
     const isOutgoing = fromAccountEmail === currentUserEmail;
 
@@ -107,7 +107,7 @@ const MyWalletTable = () => {
     if (transaction.description) {
       return transaction.description;
     }
-    
+
     switch (transaction.transactionType) {
       case 'TRANSFER':
         return 'Transfer';
@@ -149,13 +149,31 @@ const MyWalletTable = () => {
     }).format(currentBalance);
   };
 
+  const handleTransactionAction = async (transactionId, status) => {
+    try {
+      setLoading(true);
+      const result = await bankingService.updateTransactionStatus(transactionId, status);
+      if (result.success) {
+        // Refresh data
+        await fetchData();
+      } else {
+        setError(result.message || 'Failed to update transaction status');
+      }
+    } catch (error) {
+      console.error('Transaction action error:', error);
+      setError('An error occurred while processing the transaction');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="glass-card rounded-3xl p-8 overflow-hidden relative animate-float">
         {/* Loading background orbs */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-2xl animate-pulse-soft"></div>
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-br from-blue-400/20 to-cyan-400/20 rounded-full blur-xl animate-pulse-soft animation-delay-2000"></div>
-        
+
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-400 via-pink-500 to-blue-600 flex items-center justify-center animate-shimmer">
@@ -165,11 +183,11 @@ const MyWalletTable = () => {
             </div>
             <h2 className="text-3xl font-bold text-glass">My Wallet</h2>
           </div>
-          
+
           <div className="space-y-4">
             <div className="h-6 bg-white/20 rounded-2xl w-full animate-shimmer"></div>
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-16 bg-white/10 rounded-2xl w-full animate-shimmer" style={{animationDelay: `${i * 200}ms`}}></div>
+              <div key={i} className="h-16 bg-white/10 rounded-2xl w-full animate-shimmer" style={{ animationDelay: `${i * 200}ms` }}></div>
             ))}
           </div>
         </div>
@@ -183,7 +201,7 @@ const MyWalletTable = () => {
       <div className="absolute -top-8 -right-8 w-40 h-40 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-3xl animate-pulse-soft"></div>
       <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-cyan-400/20 rounded-full blur-2xl animate-pulse-soft animation-delay-2000"></div>
       <div className="absolute top-1/2 right-1/4 w-24 h-24 bg-gradient-to-br from-emerald-400/20 to-green-400/20 rounded-full blur-xl animate-pulse-soft animation-delay-4000"></div>
-      
+
       {/* Shimmer effect */}
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
 
@@ -203,7 +221,7 @@ const MyWalletTable = () => {
             <p className="text-glass-muted text-lg">Transaction History & Balance</p>
           </div>
         </div>
-        
+
         {error ? (
           <div className="glass-card rounded-2xl p-6 border-red-400/30 bg-red-500/10 mb-6">
             <div className="flex items-center text-red-300">
@@ -241,43 +259,76 @@ const MyWalletTable = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {transactions.map((tx, index) => (
-                      <tr key={`${tx.transactionId || tx.id || index}-${tx.createdAt || index}`} 
+                    {transactions.map((tx, index) => {
+                      // Check if current user is the recipient (incoming transaction)
+                      const currentUserEmail = user?.email;
+                      const toAccountEmail = tx.toAccount?.user?.email || tx.toAccount?.userEmail;
+                      const isIncoming = toAccountEmail === currentUserEmail;
+                      const isPending = (tx.transactionStatus || tx.status) === 'PENDING';
+                      const showActions = isIncoming && isPending;
+
+                      return (
+                        <tr key={`${tx.transactionId || tx.id || index}-${tx.createdAt || index}`}
                           className="border-b border-white/5 hover:bg-white/5 transition-colors duration-200">
-                        <td className="px-6 py-4 text-glass font-medium">{formatDate(tx.createdAt || tx.processedAt || new Date().toISOString())}</td>
-                        <td className="px-6 py-4 text-glass-muted">{formatTime(tx.createdAt || tx.processedAt || new Date().toISOString())}</td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                              </svg>
+                          <td className="px-6 py-4 text-glass font-medium">{formatDate(tx.createdAt || tx.processedAt || new Date().toISOString())}</td>
+                          <td className="px-6 py-4 text-glass-muted">{formatTime(tx.createdAt || tx.processedAt || new Date().toISOString())}</td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                </svg>
+                              </div>
+                              <span className="text-glass font-medium">{getTransactionDescription(tx)}</span>
                             </div>
-                            <span className="text-glass font-medium">{getTransactionDescription(tx)}</span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="glass-card px-3 py-1 rounded-xl text-xs font-medium text-glass-muted">
-                            {getPaymentType(tx.transactionType)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="font-bold text-lg text-glass">
-                            {formatAmount(tx.amount, tx.transactionType, tx.fromAccount, tx.toAccount)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-glass font-medium">{calculateBalanceAtTransaction(index)}</td>
-                        <td className="px-6 py-4">
-                          <span className={`px-3 py-1 rounded-xl text-xs font-semibold ${
-                            (tx.transactionStatus || tx.status || 'PENDING') === 'COMPLETED' ? 'bg-emerald-500/20 text-emerald-300' :
-                            (tx.transactionStatus || tx.status || 'PENDING') === 'PENDING' ? 'bg-yellow-500/20 text-yellow-300' :
-                            'bg-red-500/20 text-red-300'
-                          }`}>
-                            {tx.transactionStatus || tx.status || 'PENDING'}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="glass-card px-3 py-1 rounded-xl text-xs font-medium text-glass-muted">
+                              {getPaymentType(tx.transactionType)}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="font-bold text-lg text-glass">
+                              {formatAmount(tx.amount, tx.transactionType, tx.fromAccount, tx.toAccount)}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-glass font-medium">{calculateBalanceAtTransaction(index)}</td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              <span className={`px-3 py-1 rounded-xl text-xs font-semibold ${(tx.transactionStatus || tx.status || 'PENDING') === 'COMPLETED' ? 'bg-emerald-500/20 text-emerald-300' :
+                                (tx.transactionStatus || tx.status || 'PENDING') === 'PENDING' ? 'bg-yellow-500/20 text-yellow-300' :
+                                  'bg-red-500/20 text-red-300'
+                                }`}>
+                                {tx.transactionStatus || tx.status || 'PENDING'}
+                              </span>
+
+                              {showActions && (
+                                <div className="flex gap-1 ml-2">
+                                  <button
+                                    onClick={() => handleTransactionAction(tx.transactionId || tx.id, 'COMPLETED')}
+                                    className="p-1 rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/40 transition-colors"
+                                    title="Accept"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  </button>
+                                  <button
+                                    onClick={() => handleTransactionAction(tx.transactionId || tx.id, 'CANCELLED')}
+                                    className="p-1 rounded-lg bg-red-500/20 text-red-300 hover:bg-red-500/40 transition-colors"
+                                    title="Refuse"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -290,12 +341,11 @@ const MyWalletTable = () => {
               </button>
               <div className="flex items-center space-x-2">
                 {[1, 2, 3, 4].map((page, index) => (
-                  <button key={page} 
-                          className={`w-10 h-10 rounded-xl font-semibold transition-all duration-300 ${
-                            index === 0 
-                              ? 'bg-gradient-to-r from-blue-400 to-purple-500 text-white shadow-lg' 
-                              : 'glass-button text-glass hover:scale-110'
-                          }`}>
+                  <button key={page}
+                    className={`w-10 h-10 rounded-xl font-semibold transition-all duration-300 ${index === 0
+                      ? 'bg-gradient-to-r from-blue-400 to-purple-500 text-white shadow-lg'
+                      : 'glass-button text-glass hover:scale-110'
+                      }`}>
                     {page}
                   </button>
                 ))}
