@@ -220,10 +220,24 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
       <div className="fixed bottom-6 right-6 z-50">
         <button
           onClick={() => setIsOpen(true)}
-          className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-full shadow-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 flex items-center gap-2"
+          className="w-16 h-16 glass-card border-2 border-white/20 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-500 flex items-center justify-center hover:scale-110 group relative overflow-hidden animate-float"
         >
-          <Brain className="w-6 h-6" />
-          <span className="hidden md:inline">AI Assistant</span>
+          {/* Button background gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-pink-500/30 rounded-2xl"></div>
+          
+          {/* Floating orb inside button */}
+          <div className="absolute inset-2 bg-gradient-to-br from-blue-400 via-purple-500 to-pink-600 rounded-xl opacity-80 blur-sm animate-pulse-soft"></div>
+          
+          {/* Shimmer effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 rounded-2xl"></div>
+          
+          {/* AI Icon */}
+          <Brain className="w-8 h-8 text-white relative z-10 group-hover:scale-110 transition-transform duration-300" />
+          
+          {/* Floating notification dot */}
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full flex items-center justify-center shadow-lg">
+            <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+          </div>
         </button>
       </div>
     );
