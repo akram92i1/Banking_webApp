@@ -21,13 +21,26 @@ from collections import defaultdict, deque
 import sqlite3
 import threading
 from concurrent.futures import ThreadPoolExecutor
+import os
+import glob
+
+# Configure paths
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Navigate relative to the script: ../banking-api/demo/logs
+LOG_DIR = os.path.join(BASE_DIR, '..', 'banking-api', 'demo', 'logs')
+# Navigate relative to the script: ../banking-api/demo/data
+DATA_DIR = os.path.join(BASE_DIR, '..', 'banking-api', 'demo', 'data')
+
+# Ensure directories exist
+os.makedirs(LOG_DIR, exist_ok=True)
+os.makedirs(DATA_DIR, exist_ok=True)
 
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('/app/logs/security_agent.log'),
+        logging.FileHandler(os.path.join(LOG_DIR, 'security_agent.log')),
         logging.StreamHandler()
     ]
 )
@@ -82,7 +95,8 @@ class BankingSecurityAgent:
         
     def _initialize_database(self):
         """Initialize SQLite database for storing security events"""
-        conn = sqlite3.connect('/app/data/security_events.db', check_same_thread=False)
+        db_path = os.path.join(DATA_DIR, 'security_events.db')
+        conn = sqlite3.connect(db_path, check_same_thread=False)
         cursor = conn.cursor()
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS security_events (
@@ -544,12 +558,37 @@ class LogProcessor:
         """Process logs from a file"""
         try:
             with open(file_path, 'r') as file:
-                for line in file:
-                    try:
-                        log_entry = json.loads(line.strip())
-                        await self.process_single_log(log_entry)
-                    except json.JSONDecodeError:
-                        logger.warning(f"Invalid JSON in log line: {line}")
+                # Assuming one JSON object per file (array or object) or one per line
+                # The auth_logs format usually is one JSON object with "logs": [...] array
+                # Let's inspect content or try both strategies
+                content = file.read().strip()
+                if not content:
+                    return
+
+                try:
+                    data = json.loads(content)
+                    if isinstance(data, dict) and 'logs' in data:
+                        # Format: {"logs": [...]}
+                        for log_entry in data['logs']:
+                            await self.process_single_log(log_entry)
+                    elif isinstance(data, list):
+                        # Format: [...]
+                        for log_entry in data:
+                            await self.process_single_log(log_entry)
+                    else:
+                        # Maybe single object?
+                        await self.process_single_log(data)
+                except json.JSONDecodeError:
+                    # Maybe JSON per line?
+                    file.seek(0)
+                    for line in file:
+                        if line.strip():
+                            try:
+                                log_entry = json.loads(line)
+                                await self.process_single_log(log_entry)
+                            except json.JSONDecodeError:
+                                logger.warning(f"Invalid JSON in log line: {line.strip()[:50]}...")
+                                
         except FileNotFoundError:
             logger.error(f"Log file not found: {file_path}")
     
@@ -566,7 +605,18 @@ async def main():
     agent = BankingSecurityAgent()
     processor = LogProcessor(agent)
     
-    # Sample log entries for testing
+    # Process actual log files from directory
+    log_files = glob.glob(os.path.join(LOG_DIR, 'auth_logs_*.json'))
+    logger.info(f"Found {len(log_files)} log files in {LOG_DIR}")
+    
+    if not log_files:
+        logger.warning(f"No log files found in {LOG_DIR}. Check path configuration.")
+
+    for log_file in log_files:
+        logger.info(f"Processing log file: {os.path.basename(log_file)}")
+        await processor.process_logs_from_file(log_file)
+
+    # Sample log entries for testing (fallback)
     test_logs = [
         {
             "timestamp": "2024-12-28T10:30:00",
@@ -577,29 +627,12 @@ async def main():
             "payload": "username=admin&password=password",
             "status_code": 200
         },
-        {
-            "timestamp": "2024-12-28T10:31:00",
-            "source_ip": "10.0.0.5",
-            "user_id": "user456",
-            "endpoint": "/api/transfer",
-            "method": "POST",
-            "payload": "amount=50000&to_account=123456789",
-            "status_code": 200,
-            "amount": 50000
-        },
-        {
-            "timestamp": "2024-12-28T10:32:00",
-            "source_ip": "192.168.1.200",
-            "endpoint": "/api/accounts",
-            "method": "GET",
-            "payload": "id=1' OR '1'='1",
-            "status_code": 500
-        }
+        # ... more test logs ...
     ]
     
     # Process test logs
-    for log in test_logs:
-        await processor.process_single_log(log)
+    # for log in test_logs:
+    #     await processor.process_single_log(log)
     
     # Display dashboard
     dashboard = agent.get_security_dashboard()

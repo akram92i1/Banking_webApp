@@ -20,7 +20,7 @@ from pathlib import Path
 from langchain_ollama import ChatOllama
 from langchain_core.prompts import PromptTemplate, ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser, PydanticOutputParser
-from langchain_core.pydantic_v1 import BaseModel, Field
+from pydantic import BaseModel, Field
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.chains import LLMChain
 from langchain.agents import AgentType, initialize_agent, Tool
@@ -80,7 +80,7 @@ class AIBankingAgent:
     - Output Parsers: Structured data extraction from AI responses
     """
     
-    def __init__(self, ollama_model: str = "llama3.2"):
+    def __init__(self, ollama_model: str = "tinyllama"):
         """
         Initialize the AI Banking Agent
         
@@ -90,8 +90,14 @@ class AIBankingAgent:
         # Initialize LangChain components
         self.llm = ChatOllama(
             model=ollama_model,
-            temperature=0.1,  # Low temperature for consistent, factual responses
-            top_p=0.9
+            temperature=0.3,
+            top_p=0.9,
+            num_predict=256,  # Reduced to 256 for faster responses
+            num_ctx=1024,     # Reduced context window for speed
+            num_thread=4,     # Use multiple threads
+            num_gpu=1,        # Enable GPU offloading if available
+            keep_alive="5m",  # Keep model loaded for 5 minutes
+            request_timeout=300.0  # Increased to 5 mins so backend outlives frontend timeout
         )
         
         # Memory for conversation context - keeps last 10 exchanges
@@ -194,8 +200,9 @@ class AIBankingAgent:
         """
         
         class LogAnalysisTool(BaseTool):
-            name = "analyze_security_logs"
-            description = "Analyze security logs for threats and anomalies"
+            name: str = "analyze_security_logs"
+            description: str = "Analyze security logs for threats and anomalies"
+            parent: Any = Field(default=None, exclude=True)
             
             def _run(self, log_file_path: str) -> str:
                 """Analyze security logs using existing threat detection"""
@@ -216,8 +223,9 @@ class AIBankingAgent:
                 }
         
         class RLAnalysisTool(BaseTool):
-            name = "run_reinforcement_learning_analysis" 
-            description = "Run Q-table analysis using reinforcement learning"
+            name: str = "run_reinforcement_learning_analysis" 
+            description: str = "Run Q-table analysis using reinforcement learning"
+            parent: Any = Field(default=None, exclude=True)
             
             def _run(self, transaction_data: str) -> str:
                 """Run RL threat detection analysis"""
@@ -229,8 +237,9 @@ class AIBankingAgent:
                     return f"Error in RL analysis: {str(e)}"
         
         class GroceryDealsTool(BaseTool):
-            name = "find_local_grocery_deals"
-            description = "Find local grocery deals and discounts"
+            name: str = "find_local_grocery_deals"
+            description: str = "Find local grocery deals and discounts"
+            parent: Any = Field(default=None, exclude=True)
             
             def _run(self, location: str) -> str:
                 """Find grocery deals in user's area"""
@@ -420,8 +429,12 @@ class AIBankingAgent:
         """
         
         # Determine which agent to use based on user role and message content
+        print(f"\n📨 [DEBUG] Received message from {user_context.role.value}: '{message}'")
+        start_time = datetime.now()
+
         if user_context.role == UserRole.ADMIN and any(keyword in message.lower() 
                                                       for keyword in ["security", "threat", "attack", "log"]):
+            print("🛡️ [DEBUG] Routing to Security Agent...")
             # Use security agent for admin security queries
             response = await self.security_agent_chain.arun(
                 input=message,
@@ -429,12 +442,14 @@ class AIBankingAgent:
             )
         elif any(keyword in message.lower() 
                 for keyword in ["money", "spending", "save", "grocery", "budget"]):
+            print("💰 [DEBUG] Routing to Advisory Agent...")
             # Use advisory agent for financial queries
             response = await self.advisory_agent_chain.arun(
                 input=message,
                 user_location=user_context.location
             )
         else:
+            print("🤖 [DEBUG] Routing to General Chat Agent...")
             # General purpose response
             general_prompt = f"""
             You are a helpful banking assistant. The user is a {user_context.role.value}.
@@ -442,6 +457,11 @@ class AIBankingAgent:
             """
             response = await self.llm.ainvoke(general_prompt)
             response = response.content if hasattr(response, 'content') else str(response)
+        
+        end_time = datetime.now()
+        duration = (end_time - start_time).total_seconds()
+        print(f"✅ [DEBUG] Agent responded in {duration:.2f} seconds")
+        print(f"📤 [DEBUG] Response snippet: {response[:100]}...")
         
         return response
     

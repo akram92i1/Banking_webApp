@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { MessageCircle, Brain, TrendingDown, Shield, Send, X, Minimize2 } from 'lucide-react';
+import { MessageCircle, Brain, TrendingDown, Shield, Send, X, Minimize2, Wifi, WifiOff } from 'lucide-react';
+import aiService from '../services/aiService';
 
 const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toronto' }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,22 +11,52 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
   const [isLoading, setIsLoading] = useState(false);
   const [financialAdvice, setFinancialAdvice] = useState(null);
   const [securityData, setSecurityData] = useState(null);
-
-  // API base URL - adjust as needed
-  const API_BASE = 'http://localhost:5001/api';
+  const [connectionStatus, setConnectionStatus] = useState('checking');
+  const [serviceInfo, setServiceInfo] = useState(null);
 
   useEffect(() => {
-    // Initialize with welcome message based on user role
-    const welcomeMessage = userRole === 'admin' 
-      ? "Hello Admin! I can help you with security analysis, threat detection, and system monitoring. How can I assist you today?"
-      : "Hi there! I'm your financial advisor. I can help you save money, analyze spending patterns, and find great deals. What would you like to know?";
-    
-    setMessages([{
-      id: 1,
-      text: welcomeMessage,
-      sender: 'ai',
-      timestamp: new Date()
-    }]);
+    // Initialize AI service and check connection
+    const initializeAI = async () => {
+      try {
+        setConnectionStatus('checking');
+        const health = await aiService.checkHealth();
+        setServiceInfo(health);
+        setConnectionStatus('connected');
+        
+        // Initialize with welcome message based on user role and service status
+        let welcomeMessage;
+        if (userRole === 'admin') {
+          welcomeMessage = health.bankingIntegration?.status === 'healthy' 
+            ? "🔒 Hello Admin! I'm connected to your banking system and ready to help with security analysis, threat detection, and system monitoring. How can I assist you today?"
+            : "🔒 Hello Admin! I can help you with security analysis and threat detection. Note: Banking integration is currently limited. How can I assist you today?";
+        } else {
+          welcomeMessage = health.bankingIntegration?.status === 'healthy'
+            ? "💰 Hi there! I'm your AI financial advisor with access to your real transaction data. I can help you save money, analyze spending patterns, and find great deals. What would you like to know?"
+            : "💰 Hi there! I'm your financial advisor. I can help you save money, analyze spending patterns, and find great deals. What would you like to know?";
+        }
+        
+        setMessages([{
+          id: 1,
+          text: welcomeMessage,
+          sender: 'ai',
+          timestamp: new Date(),
+          serviceStatus: health
+        }]);
+        
+      } catch (error) {
+        console.error('AI initialization failed:', error);
+        setConnectionStatus('error');
+        setMessages([{
+          id: 1,
+          text: "⚠️ I'm having trouble connecting to my AI services. Some features may be limited. I'll still try to help you as best I can!",
+          sender: 'ai',
+          timestamp: new Date(),
+          isError: true
+        }]);
+      }
+    };
+
+    initializeAI();
   }, [userRole]);
 
   const sendMessage = async () => {
@@ -42,33 +73,28 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE}/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: inputMessage,
-          user_id: userId,
-          user_role: userRole,
-          location: location
-        })
-      });
+      const userContext = {
+        userId,
+        userRole,
+        location,
+        preferences: { theme: 'banking' }
+      };
 
-      const data = await response.json();
-
-      if (data.success) {
-        const aiMessage = {
-          id: messages.length + 2,
-          text: data.response,
-          sender: 'ai',
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, aiMessage]);
-      } else {
-        throw new Error(data.error || 'Failed to get response');
-      }
+      const result = await aiService.chat(inputMessage, userContext);
+      
+      const aiMessage = {
+        id: messages.length + 2,
+        text: result.response,
+        sender: 'ai',
+        timestamp: new Date(),
+        source: result.source,
+        context: result.context
+      };
+      
+      setMessages(prev => [...prev, aiMessage]);
+      
     } catch (error) {
+      console.error('Chat error:', error);
       const errorMessage = {
         id: messages.length + 2,
         text: `Sorry, I encountered an error: ${error.message}. Please try again.`,
@@ -86,35 +112,19 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
   const getFinancialAdvice = async () => {
     setIsLoading(true);
     try {
-      // Mock spending data - in real app, this would come from transaction history
-      const spendingData = {
-        week1: 120.50,
-        week2: 145.30,
-        week3: 135.80,
-        week4: 160.20
+      const userContext = {
+        userId,
+        location,
+        targetReduction: 30.00
       };
 
-      const response = await fetch(`${API_BASE}/user/financial-advice`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user_id: userId,
-          location: location,
-          spending_data: spendingData,
-          category: 'grocery',
-          target_reduction: 30.00
-        })
+      const result = await aiService.getFinancialAdvice(userContext);
+      setFinancialAdvice({
+        ...result.advice,
+        dataSource: result.source,
+        hasRealData: result.spending_analysis || result.real_data
       });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setFinancialAdvice(data.advice);
-      } else {
-        throw new Error(data.error || 'Failed to get financial advice');
-      }
+      
     } catch (error) {
       console.error('Error getting financial advice:', error);
       setFinancialAdvice({
@@ -123,7 +133,8 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
         recommended_reduction: 0,
         savings_suggestions: ['Please try again later.'],
         grocery_deals: [],
-        action_plan: 'Contact support if the issue persists.'
+        action_plan: 'Contact support if the issue persists.',
+        dataSource: 'error'
       });
     } finally {
       setIsLoading(false);
@@ -135,14 +146,15 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
 
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE}/admin/dashboard`);
-      const data = await response.json();
-
-      if (data.success) {
-        setSecurityData(data.dashboard);
-      } else {
-        throw new Error(data.error || 'Failed to get security data');
-      }
+      const userContext = { userId, location };
+      
+      const result = await aiService.getSecurityDashboard();
+      setSecurityData({
+        ...result.dashboard,
+        dataSource: 'integrated',
+        hasRealData: true
+      });
+      
     } catch (error) {
       console.error('Error getting security data:', error);
       setSecurityData({
@@ -150,7 +162,8 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
         blocked_ips_count: 0,
         suspicious_users_count: 0,
         total_events_24h: 0,
-        top_attack_types: []
+        top_attack_types: [],
+        dataSource: 'error'
       });
     } finally {
       setIsLoading(false);
@@ -254,6 +267,21 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
           <span className="font-semibold">
             {userRole === 'admin' ? '🔒 Security Agent' : '💰 Financial Advisor'}
           </span>
+          {/* Connection Status Indicator */}
+          <div className="flex items-center gap-1 ml-2">
+            {connectionStatus === 'connected' ? (
+              <Wifi className="w-3 h-3 text-green-300" />
+            ) : connectionStatus === 'error' ? (
+              <WifiOff className="w-3 h-3 text-red-300" />
+            ) : (
+              <div className="w-3 h-3 border border-white/50 rounded-full animate-pulse"></div>
+            )}
+            <span className="text-xs opacity-75">
+              {connectionStatus === 'connected' && serviceInfo?.bankingIntegration?.status === 'healthy' ? 'Connected' :
+               connectionStatus === 'connected' ? 'Limited' :
+               connectionStatus === 'error' ? 'Offline' : 'Connecting...'}
+            </span>
+          </div>
         </div>
         <div className="flex gap-2">
           <button

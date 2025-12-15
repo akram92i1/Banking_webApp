@@ -36,7 +36,8 @@ public class SecurityConfig {
         .formLogin(form -> form.disable())
         .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/**").permitAll()   // 👈 public endpoints
+            .requestMatchers("/api/auth/**" , 
+            "/actuator/**","/api/ai/health","/api/ai/chat/**").permitAll()   // 👈 public endpoints
             .anyRequest().authenticated()              // 👈 all others require JWT
         );
             
