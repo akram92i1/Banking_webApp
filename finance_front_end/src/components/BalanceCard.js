@@ -53,53 +53,82 @@ export default function BalanceCard() {
 
     if (loading) {
         return (
-            <div className="bg-green-50 rounded-xl p-6 relative overflow-hidden shadow-md">
-                <div className="animate-pulse">
-                    <div className="h-4 bg-gray-300 rounded w-1/4 mb-2"></div>
-                    <div className="h-8 bg-gray-300 rounded w-1/2 mb-4"></div>
-                    <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+            <div className="glass-card rounded-3xl p-8 relative overflow-hidden animate-pulse-soft">
+                <div className="animate-shimmer">
+                    <div className="h-4 bg-white/20 rounded-2xl w-1/4 mb-3"></div>
+                    <div className="h-10 bg-white/20 rounded-2xl w-1/2 mb-6"></div>
+                    <div className="h-4 bg-white/20 rounded-2xl w-3/4"></div>
                 </div>
+                {/* Floating elements during loading */}
+                <div className="absolute top-4 right-4 w-16 h-16 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-md animate-float"></div>
             </div>
         );
     }
 
     return (
-      <div className="bg-green-50 rounded-xl p-6 relative overflow-hidden shadow-md">
-        {/* Decorative Circle */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-red-500 rounded-full mix-blend-multiply opacity-70 -mr-12 -mt-12"></div>
-        <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-400 rounded-full mix-blend-multiply opacity-80 -mr-6 -mt-6"></div>
+      <div className="glass-card rounded-3xl p-8 relative overflow-hidden group hover:scale-105 transition-all duration-500 animate-float">
+        {/* Decorative Floating Elements */}
+        <div className="absolute -top-8 -right-8 w-32 h-32 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full opacity-20 blur-2xl animate-pulse-soft"></div>
+        <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full opacity-20 blur-xl animate-pulse-soft animation-delay-2000"></div>
+        
+        {/* Shimmer effect on hover */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
   
         {/* Content */}
         <div className="relative z-10">
-          <p className="text-sm font-medium text-gray-600">Your Balance</p>
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm font-medium text-glass-muted tracking-wide uppercase">Your Balance</p>
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center shadow-lg">
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+              </svg>
+            </div>
+          </div>
+          
           {error ? (
-            <p className="text-red-500 text-sm">{error}</p>
+            <div className="glass-card rounded-2xl p-4 border-red-400/30">
+              <p className="text-red-300 text-sm flex items-center">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {error}
+              </p>
+            </div>
           ) : (
-            <h2 className="text-4xl font-extrabold text-gray-900">
-              {primaryAccount ? formatBalance(primaryAccount.balance) : '$0.00'}
+            <h2 className="text-5xl font-bold text-glass mb-6 tracking-tight">
+              <span className="bg-gradient-to-r from-white via-blue-100 to-cyan-100 bg-clip-text text-transparent">
+                {primaryAccount ? formatBalance(primaryAccount.balance) : '$0.00'}
+              </span>
             </h2>
           )}
   
-          <div className="mt-2 text-gray-800 tracking-widest font-semibold">
-            {primaryAccount ? formatAccountNumber(primaryAccount.accountNumber) : '**** **** **** ****'}
+          <div className="glass-card rounded-2xl p-4 mb-6">
+            <div className="text-glass font-mono text-lg tracking-[0.3em] text-center">
+              {primaryAccount ? formatAccountNumber(primaryAccount.accountNumber) : '**** **** **** ****'}
+            </div>
           </div>
   
-          <div className="mt-4 flex justify-between items-center text-sm">
-            <div>
-              <p className="text-gray-500">Account Type</p>
-              <p className="font-medium text-gray-800">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="glass-card rounded-2xl p-4 text-center animate-float animation-delay-1000">
+              <p className="text-glass-muted text-xs uppercase tracking-wider mb-1">Account Type</p>
+              <p className="font-semibold text-glass">
                 {primaryAccount ? primaryAccount.accountType : 'CHECKING'}
               </p>
             </div>
-            <div className="text-right">
-              <p className="text-gray-500">Account Holder</p>
-              <p className="font-medium text-gray-800">{getCardHolderName()}</p>
+            <div className="glass-card rounded-2xl p-4 text-center animate-float animation-delay-2000">
+              <p className="text-glass-muted text-xs uppercase tracking-wider mb-1">Account Holder</p>
+              <p className="font-semibold text-glass">{getCardHolderName()}</p>
             </div>
           </div>
 
           {accounts.length > 1 && (
-            <div className="mt-2 text-xs text-gray-500">
-              +{accounts.length - 1} more account{accounts.length > 2 ? 's' : ''}
+            <div className="mt-4 text-center">
+              <div className="glass-button inline-flex items-center px-4 py-2 rounded-xl text-xs text-glass-muted">
+                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                +{accounts.length - 1} more account{accounts.length > 2 ? 's' : ''}
+              </div>
             </div>
           )}
         </div>

@@ -26,17 +26,45 @@ public class BlacklistedToken {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
 
-    public BlacklistedToken(String token , Instant expiry) {
+    // Default constructor required by JPA
+    public BlacklistedToken() {
+    }
+
+    public BlacklistedToken(String token, Instant expiry) {
         this.token = token;
         this.expiry = expiry;
+    }
+
+    // Getters and Setters
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public String getToken() {
         return token;
     }
 
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     public Instant getExpiry() {
         return expiry;
     }
-    
+
+    public void setExpiry(Instant expiry) {
+        this.expiry = expiry;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
 }
