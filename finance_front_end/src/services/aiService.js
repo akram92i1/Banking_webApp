@@ -2,8 +2,8 @@ import axios from 'axios';
 
 // AI Agent API configuration
 const aiApi = axios.create({
-  baseURL: 'http://localhost:5001/api', // AI Agent server
-  timeout: 120000, // Increased to 2 mins for LLM processing
+  baseURL: 'http://localhost:5000/api', // AI Agent server
+  timeout: 300000, // Increased to 5 mins for LLM processing
   headers: {
     'Content-Type': 'application/json',
   },

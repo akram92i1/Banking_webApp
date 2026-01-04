@@ -265,7 +265,22 @@ class BankingSecurityAgent:
         """Process a single log entry and detect potential threats"""
         try:
             # Extract key information
-            timestamp = datetime.fromisoformat(log_entry.get('timestamp', datetime.now().isoformat()))
+            timestamp_str = log_entry.get('timestamp', datetime.now().isoformat())
+            if '.' in timestamp_str:
+                parts = timestamp_str.split('.')
+                if len(parts) > 1 and len(parts[1]) > 6:
+                    # Truncate to 6 microsecond digits
+                    if parts[1].endswith('Z'):
+                        parts[1] = parts[1][:6] + 'Z'
+                    else:
+                        parts[1] = parts[1][:6]
+                    timestamp_str = '.'.join(parts)
+            
+            # Handle 'Z' for timezone, which fromisoformat may not handle
+            if timestamp_str.endswith('Z'):
+                timestamp_str = timestamp_str.rstrip('Z') + '+00:00'
+
+            timestamp = datetime.fromisoformat(timestamp_str)
             source_ip = log_entry.get('source_ip', 'unknown')
             user_id = log_entry.get('user_id')
             endpoint = log_entry.get('endpoint', '')

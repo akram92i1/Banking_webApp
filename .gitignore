@@ -61,6 +61,9 @@ Thumbs.db
 **/.docker/
 **/Dockerfile~
 
+# Python
+/logging/venv/
+
 # Misc
 *.swp
 banking-api/demo/acli.exe

@@ -8,12 +8,14 @@ import os
 import json
 import asyncio
 from datetime import datetime
-from flask import Flask, request, jsonify, cors
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from typing import Dict, Any
 
 # Import our AI agent
 from ai_banking_agent import AIBankingAgent, UserContext, UserRole
+
+import jwt
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for React frontend
@@ -200,14 +202,31 @@ def chat_with_agent():
     try:
         data = request.get_json()
         
+        auth_header = request.headers.get('Authorization')
+        token = None
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]
+
+        user_id = data.get('user_id', 'user')
+        if token:
+            try:
+                # In a real application, use a securely stored secret key
+                decoded_token = jwt.decode(token, options={"verify_signature": False})
+                user_id = decoded_token.get('sub')
+            except jwt.ExpiredSignatureError:
+                return jsonify({"success": False, "error": "Token has expired"}), 401
+            except jwt.InvalidTokenError:
+                return jsonify({"success": False, "error": "Invalid token"}), 401
+
         # Create user context
         user_role = UserRole.ADMIN if data.get('user_role') == 'admin' else UserRole.USER
         user_context = UserContext(
-            user_id=data.get('user_id', 'user'),
+            user_id=user_id,
             role=user_role,
             location=data.get('location', 'toronto'),
             preferences=data.get('preferences', {}),
-            transaction_history=[]
+            transaction_history=[],
+            token=token
         )
         
         # Get chat response asynchronously

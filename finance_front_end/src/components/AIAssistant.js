@@ -1,6 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import { MessageCircle, Brain, TrendingDown, Shield, Send, X, Minimize2, Wifi, WifiOff } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { MessageCircle, Brain, TrendingDown, Shield, Send, X, Minimize2, Wifi, WifiOff, Sparkles, Lock, Database } from 'lucide-react';
 import aiService from '../services/aiService';
+
+const ThinkingIndicator = () => {
+  const [step, setStep] = useState(0);
+  const steps = [
+    "Analyzing Request...",
+    "Accessing Secure Database...",
+    "Processing Financial Data...",
+    "Formulating Response..."
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStep((prev) => (prev + 1) % steps.length);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="flex items-center space-x-3 p-4 bg-white rounded-xl border border-gray-100 shadow-sm animate-fade-in-up w-fit">
+      <div className="flex space-x-1">
+        <div className="w-2 h-2 bg-blue-500 rounded-full animate-thinking" style={{ animationDelay: '0s' }}></div>
+        <div className="w-2 h-2 bg-purple-500 rounded-full animate-thinking" style={{ animationDelay: '0.2s' }}></div>
+        <div className="w-2 h-2 bg-pink-500 rounded-full animate-thinking" style={{ animationDelay: '0.4s' }}></div>
+      </div>
+      <span className="text-xs font-medium text-gray-400 animate-pulse">{steps[step]}</span>
+    </div>
+  );
+};
 
 const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toronto' }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,6 +41,15 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
   const [securityData, setSecurityData] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('checking');
   const [serviceInfo, setServiceInfo] = useState(null);
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isLoading]);
 
   useEffect(() => {
     // Initialize AI service and check connection
@@ -22,19 +59,18 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
         const health = await aiService.checkHealth();
         setServiceInfo(health);
         setConnectionStatus('connected');
-        
-        // Initialize with welcome message based on user role and service status
+
         let welcomeMessage;
         if (userRole === 'admin') {
-          welcomeMessage = health.bankingIntegration?.status === 'healthy' 
-            ? "🔒 Hello Admin! I'm connected to your banking system and ready to help with security analysis, threat detection, and system monitoring. How can I assist you today?"
-            : "🔒 Hello Admin! I can help you with security analysis and threat detection. Note: Banking integration is currently limited. How can I assist you today?";
+          welcomeMessage = health.bankingIntegration?.status === 'healthy'
+            ? "🔒 System Initialized. Administrative Access Granted. I am ready for security analysis and threat monitoring."
+            : "🔒 System Initialized. Limited Mode Active.";
         } else {
           welcomeMessage = health.bankingIntegration?.status === 'healthy'
-            ? "💰 Hi there! I'm your AI financial advisor with access to your real transaction data. I can help you save money, analyze spending patterns, and find great deals. What would you like to know?"
-            : "💰 Hi there! I'm your financial advisor. I can help you save money, analyze spending patterns, and find great deals. What would you like to know?";
+            ? "💰 Hello! I'm your Banking AI. I have secure access to your account data. How can I help you optimize your finances today?"
+            : "💰 Hello! I'm currently operating in offline mode. I can still provide general advice.";
         }
-        
+
         setMessages([{
           id: 1,
           text: welcomeMessage,
@@ -42,13 +78,13 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
           timestamp: new Date(),
           serviceStatus: health
         }]);
-        
+
       } catch (error) {
         console.error('AI initialization failed:', error);
         setConnectionStatus('error');
         setMessages([{
           id: 1,
-          text: "⚠️ I'm having trouble connecting to my AI services. Some features may be limited. I'll still try to help you as best I can!",
+          text: "⚠️ Neural Link Unstable. Retrying connection...",
           sender: 'ai',
           timestamp: new Date(),
           isError: true
@@ -80,8 +116,12 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
         preferences: { theme: 'banking' }
       };
 
-      const result = await aiService.chat(inputMessage, userContext);
-      
+      // Simulate a small delay for "Processing" feel if response is too fast
+      const [result] = await Promise.all([
+        aiService.chat(inputMessage, userContext),
+        new Promise(resolve => setTimeout(resolve, 1500)) // Min 1.5s wait for animation
+      ]);
+
       const aiMessage = {
         id: messages.length + 2,
         text: result.response,
@@ -90,14 +130,14 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
         source: result.source,
         context: result.context
       };
-      
+
       setMessages(prev => [...prev, aiMessage]);
-      
+
     } catch (error) {
       console.error('Chat error:', error);
       const errorMessage = {
         id: messages.length + 2,
-        text: `Sorry, I encountered an error: ${error.message}. Please try again.`,
+        text: `Error: ${error.message}. Please retry.`,
         sender: 'ai',
         timestamp: new Date(),
         isError: true
@@ -124,16 +164,15 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
         dataSource: result.source,
         hasRealData: result.spending_analysis || result.real_data
       });
-      
+
     } catch (error) {
-      console.error('Error getting financial advice:', error);
       setFinancialAdvice({
-        analysis_summary: 'Unable to generate advice at this time.',
+        analysis_summary: 'Unable to generate advice.',
         weekly_spending: 0,
         recommended_reduction: 0,
-        savings_suggestions: ['Please try again later.'],
+        savings_suggestions: ['Service unavailable'],
         grocery_deals: [],
-        action_plan: 'Contact support if the issue persists.',
+        action_plan: 'Retry later.',
         dataSource: 'error'
       });
     } finally {
@@ -143,20 +182,15 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
 
   const getSecurityData = async () => {
     if (userRole !== 'admin') return;
-
     setIsLoading(true);
     try {
-      const userContext = { userId, location };
-      
       const result = await aiService.getSecurityDashboard();
       setSecurityData({
         ...result.dashboard,
         dataSource: 'integrated',
         hasRealData: true
       });
-      
     } catch (error) {
-      console.error('Error getting security data:', error);
       setSecurityData({
         recent_threats: [],
         blocked_ips_count: 0,
@@ -177,123 +211,64 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
     }
   };
 
-  // Quick action buttons based on user role
-  const QuickActions = () => {
-    if (userRole === 'admin') {
-      return (
-        <div className="flex flex-wrap gap-2 mb-4">
-          <button 
-            onClick={() => setInputMessage('Show me the latest security threats')}
-            className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm hover:bg-red-200"
-          >
-            🚨 Security Status
-          </button>
-          <button 
-            onClick={() => setInputMessage('Analyze recent log files')}
-            className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm hover:bg-orange-200"
-          >
-            📊 Log Analysis
-          </button>
-          <button 
-            onClick={() => setInputMessage('Run threat detection scan')}
-            className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm hover:bg-yellow-200"
-          >
-            🔍 Threat Scan
-          </button>
-        </div>
-      );
-    } else {
-      return (
-        <div className="flex flex-wrap gap-2 mb-4">
-          <button 
-            onClick={() => setInputMessage('How can I save money on groceries?')}
-            className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm hover:bg-green-200"
-          >
-            🛒 Grocery Savings
-          </button>
-          <button 
-            onClick={() => setInputMessage('Analyze my spending this week')}
-            className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm hover:bg-blue-200"
-          >
-            📈 Spending Analysis
-          </button>
-          <button 
-            onClick={() => setInputMessage('Find deals near me')}
-            className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm hover:bg-purple-200"
-          >
-            🎯 Local Deals
-          </button>
-        </div>
-      );
-    }
-  };
-
   if (!isOpen) {
     return (
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
         <button
           onClick={() => setIsOpen(true)}
-          className="w-16 h-16 glass-card border-2 border-white/20 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-500 flex items-center justify-center hover:scale-110 group relative overflow-hidden animate-float"
+          className="relative w-14 h-14 sm:w-16 sm:h-16 group animate-float active:scale-95 transition-transform"
         >
-          {/* Button background gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-pink-500/30 rounded-2xl"></div>
-          
-          {/* Floating orb inside button */}
-          <div className="absolute inset-2 bg-gradient-to-br from-blue-400 via-purple-500 to-pink-600 rounded-xl opacity-80 blur-sm animate-pulse-soft"></div>
-          
-          {/* Shimmer effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 rounded-2xl"></div>
-          
-          {/* AI Icon */}
-          <Brain className="w-8 h-8 text-white relative z-10 group-hover:scale-110 transition-transform duration-300" />
-          
-          {/* Floating notification dot */}
-          <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full flex items-center justify-center shadow-lg">
-            <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+          {/* Enhanced Orb Button - Dark Mode Theme Compatible */}
+          <div className="absolute inset-0 bg-blue-600 rounded-full blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-800 via-blue-900 to-slate-900 rounded-full shadow-2xl border-2 border-white/20 flex items-center justify-center overflow-hidden">
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+            <Brain className="w-6 h-6 sm:w-8 sm:h-8 text-white z-10 filter drop-shadow-md group-hover:scale-110 transition-transform duration-300" />
+
+            {/* Shimmer */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
           </div>
+
+          {/* Notification Dot */}
+          <div className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
         </button>
       </div>
     );
   }
 
   return (
-    <div className={`fixed bottom-6 right-6 bg-white rounded-lg shadow-2xl z-50 transition-all duration-300 ${
-      isMinimized ? 'w-80 h-16' : 'w-96 h-[600px]'
-    }`}>
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-t-lg flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Brain className="w-5 h-5" />
-          <span className="font-semibold">
-            {userRole === 'admin' ? '🔒 Security Agent' : '💰 Financial Advisor'}
-          </span>
-          {/* Connection Status Indicator */}
-          <div className="flex items-center gap-1 ml-2">
-            {connectionStatus === 'connected' ? (
-              <Wifi className="w-3 h-3 text-green-300" />
-            ) : connectionStatus === 'error' ? (
-              <WifiOff className="w-3 h-3 text-red-300" />
-            ) : (
-              <div className="w-3 h-3 border border-white/50 rounded-full animate-pulse"></div>
-            )}
-            <span className="text-xs opacity-75">
-              {connectionStatus === 'connected' && serviceInfo?.bankingIntegration?.status === 'healthy' ? 'Connected' :
-               connectionStatus === 'connected' ? 'Limited' :
-               connectionStatus === 'error' ? 'Offline' : 'Connecting...'}
-            </span>
+    <div className={`fixed z-50 transition-all duration-300 flex flex-col overflow-hidden shadow-2xl
+      bg-white border border-gray-200
+      /* Mobile Styles (Bottom Sheet) */
+      inset-x-0 bottom-0 rounded-t-2xl
+      ${isMinimized ? 'h-16' : 'h-[60vh]'}
+      
+      /* Desktop Styles (Floating Widget) */
+      sm:inset-auto sm:bottom-6 sm:right-6 sm:rounded-2xl
+      sm:${isMinimized ? 'w-64 h-16' : 'w-80 h-[600px] max-h-[600px] max-w-[320px]'}
+    `}>
+      {/* Header - Dark Gradient for Contrast */}
+      <div className="bg-slate-900 text-white p-4 flex items-center justify-between shadow-lg shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
+            <Brain className="w-5 h-5 text-blue-400" />
+          </div>
+          <div>
+            <h3 className="font-bold text-sm tracking-wide text-white">
+              {userRole === 'admin' ? 'CYBER SECURITY AI' : 'BANKING ASSISTANT'}
+            </h3>
+            <div className="flex items-center gap-1.5">
+              <span className={`w-2 h-2 rounded-full ${connectionStatus === 'connected' ? 'bg-green-400 animate-pulse' : 'bg-red-500'}`}></span>
+              <span className="text-[10px] uppercase tracking-wider text-gray-300">
+                {connectionStatus === 'connected' ? 'Online' : 'Offline'}
+              </span>
+            </div>
           </div>
         </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setIsMinimized(!isMinimized)}
-            className="hover:bg-white/20 p-1 rounded"
-          >
+        <div className="flex gap-2 text-gray-400">
+          <button onClick={() => setIsMinimized(!isMinimized)} className="hover:text-white transition-colors">
             <Minimize2 className="w-4 h-4" />
           </button>
-          <button
-            onClick={() => setIsOpen(false)}
-            className="hover:bg-white/20 p-1 rounded"
-          >
+          <button onClick={() => setIsOpen(false)} className="hover:text-white transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -301,187 +276,107 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
 
       {!isMinimized && (
         <>
-          {/* Tabs */}
-          <div className="flex border-b">
-            <button
-              onClick={() => setActiveTab('chat')}
-              className={`flex-1 py-2 px-4 text-sm font-medium ${
-                activeTab === 'chat' 
-                  ? 'border-b-2 border-blue-500 text-blue-600 bg-blue-50' 
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              <MessageCircle className="w-4 h-4 inline mr-1" />
-              Chat
-            </button>
-            
-            {userRole === 'admin' ? (
-              <button
-                onClick={() => {
-                  setActiveTab('security');
-                  if (!securityData) getSecurityData();
-                }}
-                className={`flex-1 py-2 px-4 text-sm font-medium ${
-                  activeTab === 'security' 
-                    ? 'border-b-2 border-red-500 text-red-600 bg-red-50' 
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                <Shield className="w-4 h-4 inline mr-1" />
-                Security
-              </button>
-            ) : (
-              <button
-                onClick={() => {
-                  setActiveTab('advice');
-                  if (!financialAdvice) getFinancialAdvice();
-                }}
-                className={`flex-1 py-2 px-4 text-sm font-medium ${
-                  activeTab === 'advice' 
-                    ? 'border-b-2 border-green-500 text-green-600 bg-green-50' 
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                <TrendingDown className="w-4 h-4 inline mr-1" />
-                Advice
-              </button>
-            )}
-          </div>
+          {/* Content Area - Light Mode */}
+          <div className="flex-1 flex flex-col bg-slate-50 relative overflow-hidden">
+            {/* Light Background Pattern */}
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:20px_20px]"></div>
 
-          {/* Content */}
-          <div className="flex-1 flex flex-col h-[500px]">
+            {/* Chat View */}
             {activeTab === 'chat' && (
-              <div className="flex flex-col h-full">
-                {/* Quick Actions */}
-                <div className="p-3 border-b bg-gray-50">
-                  <QuickActions />
-                </div>
-
-                {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              <div className="flex flex-col h-full relative z-10">
+                {/* Messages List */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-6">
                   {messages.map((message) => (
                     <div
                       key={message.id}
-                      className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                      className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in-up`}
                     >
-                      <div
-                        className={`max-w-xs px-3 py-2 rounded-lg ${
-                          message.sender === 'user'
-                            ? 'bg-blue-500 text-white'
+                      <div className={`flex flex-col max-w-[85%] ${message.sender === 'user' ? 'items-end' : 'items-start'}`}>
+                        <div
+                          className={`px-4 py-3 rounded-2xl shadow-sm text-sm leading-relaxed ${message.sender === 'user'
+                            ? 'bg-blue-600 text-white rounded-br-none'
                             : message.isError
-                            ? 'bg-red-100 text-red-700'
-                            : 'bg-gray-200 text-gray-800'
-                        }`}
-                      >
-                        <p className="text-sm">{message.text}</p>
-                        <p className="text-xs opacity-70 mt-1">
-                          {message.timestamp.toLocaleTimeString()}
-                        </p>
+                              ? 'bg-red-50 text-red-800 border border-red-100'
+                              : 'bg-white text-gray-800 border border-gray-100 rounded-bl-none'
+                            }`}
+                        >
+                          {message.text}
+                        </div>
+                        <span className="text-[10px] text-gray-400 mt-1 px-1">
+                          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {message.sender === 'ai' ? 'AI Agent' : 'You'}
+                        </span>
                       </div>
                     </div>
                   ))}
-                  {isLoading && (
-                    <div className="flex justify-start">
-                      <div className="bg-gray-200 px-3 py-2 rounded-lg">
-                        <p className="text-sm">AI is thinking...</p>
-                      </div>
-                    </div>
-                  )}
+
+                  {isLoading && <ThinkingIndicator />}
+                  <div ref={messagesEndRef} />
                 </div>
 
-                {/* Input */}
-                <div className="p-3 border-t flex gap-2">
-                  <textarea
-                    value={inputMessage}
-                    onChange={(e) => setInputMessage(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Ask me anything..."
-                    className="flex-1 border rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    rows="2"
-                  />
-                  <button
-                    onClick={sendMessage}
-                    disabled={!inputMessage.trim() || isLoading}
-                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <Send className="w-4 h-4" />
-                  </button>
+                {/* Input Area - Light Mode */}
+                <div className="p-4 bg-white border-t border-gray-100 safe-area-bottom">
+                  <div className="flex gap-2 items-end bg-gray-50 border border-gray-200 rounded-xl p-2 focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all">
+                    <textarea
+                      value={inputMessage}
+                      onChange={(e) => setInputMessage(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder="Ask about finances..."
+                      className="flex-1 bg-transparent border-none text-sm text-gray-800 placeholder-gray-400 focus:ring-0 resize-none max-h-32 py-2 px-1"
+                      rows="1"
+                    />
+                    <button
+                      onClick={sendMessage}
+                      disabled={!inputMessage.trim() || isLoading}
+                      className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                    >
+                      <Send className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
 
-            {activeTab === 'security' && userRole === 'admin' && (
-              <div className="p-4 overflow-y-auto">
-                <h3 className="font-semibold mb-3">Security Dashboard</h3>
-                {isLoading ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-                    <p className="mt-2 text-sm text-gray-600">Loading security data...</p>
-                  </div>
-                ) : securityData ? (
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="bg-red-50 p-3 rounded-lg">
-                        <p className="text-xs text-gray-600">Blocked IPs</p>
-                        <p className="text-lg font-semibold text-red-600">{securityData.blocked_ips_count}</p>
-                      </div>
-                      <div className="bg-yellow-50 p-3 rounded-lg">
-                        <p className="text-xs text-gray-600">Suspicious Users</p>
-                        <p className="text-lg font-semibold text-yellow-600">{securityData.suspicious_users_count}</p>
-                      </div>
-                    </div>
-                    <div className="bg-blue-50 p-3 rounded-lg">
-                      <p className="text-xs text-gray-600">Events (24h)</p>
-                      <p className="text-lg font-semibold text-blue-600">{securityData.total_events_24h}</p>
-                    </div>
-                    <button 
-                      onClick={() => setInputMessage('Generate detailed security report')}
-                      className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
-                    >
-                      Generate Full Report
-                    </button>
-                  </div>
-                ) : (
-                  <p className="text-gray-600">Failed to load security data.</p>
-                )}
+            {/* Advice Tab */}
+            {activeTab === 'advice' && (
+              <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+                <p>Financial Analysis Module</p>
               </div>
             )}
 
-            {activeTab === 'advice' && userRole !== 'admin' && (
-              <div className="p-4 overflow-y-auto">
-                <h3 className="font-semibold mb-3">Financial Advice</h3>
-                {isLoading ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto"></div>
-                    <p className="mt-2 text-sm text-gray-600">Analyzing your spending...</p>
-                  </div>
-                ) : financialAdvice ? (
-                  <div className="space-y-3">
-                    <div className="bg-green-50 p-3 rounded-lg">
-                      <p className="text-xs text-gray-600">Weekly Spending</p>
-                      <p className="text-lg font-semibold text-green-600">${financialAdvice.weekly_spending.toFixed(2)}</p>
-                    </div>
-                    <div className="bg-blue-50 p-3 rounded-lg">
-                      <p className="text-xs text-gray-600">Potential Savings</p>
-                      <p className="text-lg font-semibold text-blue-600">${financialAdvice.recommended_reduction.toFixed(2)}</p>
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium">💡 Suggestions:</p>
-                      {financialAdvice.savings_suggestions.slice(0, 3).map((suggestion, index) => (
-                        <p key={index} className="text-xs text-gray-600">• {suggestion}</p>
-                      ))}
-                    </div>
-                    <button 
-                      onClick={() => setInputMessage('Show me more detailed savings plan')}
-                      className="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600"
-                    >
-                      Get Detailed Plan
-                    </button>
-                  </div>
-                ) : (
-                  <p className="text-gray-600">Failed to load financial advice.</p>
-                )}
+            {/* Security Tab */}
+            {activeTab === 'security' && (
+              <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+                <p>Security Dashboard Module</p>
               </div>
+            )}
+
+          </div>
+
+          {/* Tab Bar - Light Mode */}
+          <div className="bg-white border-t border-gray-100 p-2 flex justify-around shrink-0 relative z-20 pb-safe">
+            <button
+              onClick={() => setActiveTab('chat')}
+              className={`p-2 rounded-lg transition-colors flex flex-col items-center gap-1 ${activeTab === 'chat' ? 'text-blue-600 bg-blue-50' : 'text-gray-400 hover:text-gray-600'}`}
+            >
+              <MessageCircle className="w-5 h-5" />
+              <span className="text-[10px] font-medium">Chat</span>
+            </button>
+            {userRole === 'admin' ? (
+              <button
+                onClick={() => setActiveTab('security')}
+                className={`p-2 rounded-lg transition-colors flex flex-col items-center gap-1 ${activeTab === 'security' ? 'text-red-600 bg-red-50' : 'text-gray-400 hover:text-gray-600'}`}
+              >
+                <Shield className="w-5 h-5" />
+                <span className="text-[10px] font-medium">Security</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => setActiveTab('advice')}
+                className={`p-2 rounded-lg transition-colors flex flex-col items-center gap-1 ${activeTab === 'advice' ? 'text-green-600 bg-green-50' : 'text-gray-400 hover:text-gray-600'}`}
+              >
+                <TrendingDown className="w-5 h-5" />
+                <span className="text-[10px] font-medium">Advice</span>
+              </button>
             )}
           </div>
         </>

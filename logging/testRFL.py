@@ -394,8 +394,12 @@ class ThreatDetectionSystem:
     def _format_transaction(self, transaction_data):
         """Format input transaction data"""
         # Ensure required fields exist
+        timestamp = transaction_data.get('timestamp', datetime.now())
+        if isinstance(timestamp, str):
+            timestamp = datetime.fromisoformat(timestamp)
+        
         formatted = {
-            'timestamp': transaction_data.get('timestamp', datetime.now()),
+            'timestamp': timestamp,
             'amount': transaction_data.get('amount', 0),
             'merchant_type': transaction_data.get('merchant_type', 'unknown'),
             'location': transaction_data.get('location', 'unknown'),

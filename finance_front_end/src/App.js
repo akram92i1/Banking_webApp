@@ -17,59 +17,61 @@ function App() {
         <Routes>
           {/* Public routes */}
           <Route path="/login" element={<Login />} />
-          
+
           {/* Protected routes */}
           <Route path="/*" element={
             <ProtectedRoute>
-              {/* Main App Background with Glass Effect */}
-              <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 relative overflow-hidden">
-                {/* Animated Background Elements */}
-                <div className="absolute inset-0">
-                  <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
-                  <div className="absolute top-1/3 right-1/4 w-72 h-72 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse animation-delay-2000"></div>
-                  <div className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-pink-400 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse animation-delay-4000"></div>
+              {/* Main App Background - Sharp Dark Banking Theme */}
+              <div className="min-h-screen bg-slate-950 relative overflow-hidden font-sans text-slate-100">
+
+                {/* Subtle Dark Background Accents */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                  {/* Deep Blue Glow Top Right */}
+                  <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-900/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
+                  {/* Deep Indigo Glow Bottom Left */}
+                  <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-900/10 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/4"></div>
                 </div>
 
                 <div className="flex h-screen relative z-10">
-                  {/* Sidebar with Glass Effect */}
-                  <div className="w-1/5 backdrop-blur-xl bg-white/10 border-r border-white/20 shadow-2xl">
+                  {/* Responsive Sidebar - Dark Surface */}
+                  <div className="hidden md:block w-64 bg-slate-900 border-r border-slate-800 shadow-xl z-20">
                     <Sidebar />
                   </div>
 
                   {/* Main Content Area */}
-                  <div className="flex-1 flex flex-col">
-                    {/* Header with Glass Effect */}
-                    <div className="backdrop-blur-xl bg-white/5 border-b border-white/10">
+                  <div className="flex-1 flex flex-col relative overflow-hidden">
+                    {/* Header - Dark Surface */}
+                    <div className="bg-slate-900/95 border-b border-slate-800 sticky top-0 z-30 shadow-sm">
                       <Header />
                     </div>
 
-                    {/* Content Area - Direct without extra frame */}
-                    <div className="p-6 flex-grow overflow-auto">
-                      <Routes>
-                        <Route path="/" element={<PageOverview />} />
-                        <Route path="/overview" element={<PageOverview />} />
-                        <Route path="/wallet" element={<MyWalletTable />} />
-                        <Route path="/profile" element={<ProfileCard user={{avatarUrl:"https://avatar.iran.liara.run/public",profilename:"Akram", email:"tes@test.com",phone:"004534234",}} />} />
-                        <Route path="/settings" element={<Settings />} />
-                        <Route path="*" element={<Navigate to="/" />} />
-                      </Routes>
+                    {/* Content Area */}
+                    <div className="flex-1 overflow-auto p-4 md:p-8 relative scroll-smooth bg-slate-950">
+                      <div className="max-w-7xl mx-auto space-y-6">
+                        <Routes>
+                          <Route path="/" element={<PageOverview />} />
+                          <Route path="/overview" element={<PageOverview />} />
+                          <Route path="/wallet" element={<MyWalletTable />} />
+                          <Route path="/profile" element={<ProfileCard user={{ avatarUrl: "https://avatar.iran.liara.run/public", profilename: "Akram", email: "tes@test.com", phone: "004534234", }} />} />
+                          <Route path="/settings" element={<Settings />} />
+                          <Route path="*" element={<Navigate to="/" />} />
+                        </Routes>
+                      </div>
                     </div>
                   </div>
-                  
-                  {/* AI Assistant with Glass Effect */}
-                  <div className="backdrop-blur-xl bg-white/5 border-l border-white/10 shadow-2xl">
-                    <AIAssistant 
-                      userRole="user" 
-                      userId="akram001" 
-                      location="toronto" 
-                    />
-                  </div>
+
+                  {/* AI Assistant - Floating Widget */}
+                  <AIAssistant
+                    userRole="user"
+                    userId="akram001"
+                    location="toronto"
+                  />
                 </div>
               </div>
             </ProtectedRoute>
           } />
         </Routes>
-      </Router> 
+      </Router>
     </AuthProvider>
   );
 }

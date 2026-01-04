@@ -6,6 +6,8 @@ Combines threat detection for admins and financial advisory for users
 
 import json
 import asyncio
+import os
+import json
 import logging
 from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional, Union
@@ -18,13 +20,19 @@ from pathlib import Path
 
 # LangChain imports
 from langchain_ollama import ChatOllama
-from langchain_core.prompts import PromptTemplate, ChatPromptTemplate
-from langchain_core.output_parsers import JsonOutputParser, PydanticOutputParser
+from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
+from langchain_core.output_parsers import JsonOutputParser, PydanticOutputParser, StrOutputParser
 from pydantic import BaseModel, Field
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.chains import LLMChain
 from langchain.agents import AgentType, initialize_agent, Tool
 from langchain.tools import BaseTool
+from langchain.schema import AgentAction, AgentFinish
+from langchain.agents import AgentOutputParser
+from langchain.schema.output_parser import StrOutputParser
+import re
+
+
 
 # Import existing modules
 from testRFL import ThreatDetectionSystem
@@ -50,6 +58,7 @@ class UserContext:
     location: str
     preferences: Dict[str, Any]
     transaction_history: List[Dict[str, Any]]
+    token: str = None
 
 # Pydantic models for structured outputs
 class ThreatAnalysisResult(BaseModel):
@@ -59,6 +68,8 @@ class ThreatAnalysisResult(BaseModel):
     severity: str = Field(description="Threat severity: LOW, MEDIUM, HIGH, CRITICAL")
     recommendation: str = Field(description="Recommended action")
     explanation: str = Field(description="Detailed explanation of the threat")
+
+
 
 class FinancialAdvice(BaseModel):
     analysis_summary: str = Field(description="Summary of spending analysis")
@@ -80,24 +91,21 @@ class AIBankingAgent:
     - Output Parsers: Structured data extraction from AI responses
     """
     
-    def __init__(self, ollama_model: str = "tinyllama"):
+    def __init__(self, ollama_model: str = "gemma3:4b"):
         """
         Initialize the AI Banking Agent
         
         Args:
-            ollama_model: The Ollama model to use (e.g., "llama3.2", "mistral")
+            ollama_model: The Ollama model to use. 
+                          User requested "gemma3:4b" for GTX 1660Ti optimization.
         """
         # Initialize LangChain components
         self.llm = ChatOllama(
             model=ollama_model,
-            temperature=0.3,
-            top_p=0.9,
-            num_predict=256,  # Reduced to 256 for faster responses
-            num_ctx=1024,     # Reduced context window for speed
-            num_thread=4,     # Use multiple threads
-            num_gpu=1,        # Enable GPU offloading if available
-            keep_alive="5m",  # Keep model loaded for 5 minutes
-            request_timeout=300.0  # Increased to 5 mins so backend outlives frontend timeout
+            temperature=0.0, # Zero temperature for maximum determinism
+            num_predict=512,
+            num_ctx=4096,     # Increased context
+            keep_alive="5m"
         )
         
         # Memory for conversation context - keeps last 10 exchanges
@@ -119,8 +127,9 @@ class AIBankingAgent:
         
         # Mock data for demonstration
         self.grocery_stores = self._load_grocery_store_data()
+        self.failed_tools = {}
         
-        logger.info("AI Banking Agent initialized successfully")
+        logger.info(f"AI Banking Agent initialized with model: {ollama_model}")
     
     def _initialize_prompts(self):
         """
@@ -147,7 +156,11 @@ class AIBankingAgent:
             - Fraudulent transactions
             - API abuse and DDoS
             - Insider threats
-            - Money laundering patterns"""),
+            - Money laundering patterns
+            
+            CRITICAL INSTRUCTION: You are a strict banking security agent. 
+            Refuse to answer ANY questions unrelated to banking, finance, or security.
+            If the user asks about general topics (e.g., cooking, coding unrelated to this repo, history), politely decline."""),
             
             ("human", """
             Analyze the following security data:
@@ -164,7 +177,7 @@ class AIBankingAgent:
         # User Financial Advisory Prompt
         self.financial_advisory_prompt = ChatPromptTemplate.from_messages([
             ("system", """You are a personal financial advisor specializing in spending optimization.
-            Help users reduce their expenses by analyzing spending patterns and finding deals.
+            Help users with their finances by answering their questions about their transactions, spending, and budget.
             
             Your advice should be:
             - Practical: Easy to implement recommendations
@@ -172,11 +185,20 @@ class AIBankingAgent:
             - Personalized: Based on user's location and preferences
             - Encouraging: Positive and motivational tone
             
+            You have access to the following tools:
+            - get_user_transactions: Use this tool to get the user's most recent transactions.
+            - find_local_grocery_deals: Use this tool to find local grocery deals.
+            
             Focus on:
+            - Answering questions about transactions
             - Grocery spending optimization
             - Local deals and discounts
             - Spending pattern analysis
-            - Realistic reduction targets"""),
+            - Realistic reduction targets
+            
+            CRITICAL INSTRUCTION: You are a strict financial advisor.
+            Refuse to answer ANY questions unrelated to personal finance, banking, spending, or budgeting.
+            If the user asks about general topics (e.g., world events, sports, writing poems), politely decline."""),
             
             ("human", """
             Analyze this user's spending and provide money-saving advice:
@@ -190,8 +212,261 @@ class AIBankingAgent:
             Provide financial advice in JSON format.
             """)
         ])
+        
+        # New: Data Summarization Prompt for Chat Query Results
+        self.data_summarization_prompt = ChatPromptTemplate.from_messages([
+            ("system", """You are a helpful banking assistant. 
+            You will receive RAW DATA from a database query and the USER'S ORIGINAL QUESTION.
+            
+            YOUR GOAL:
+            Synthesize the data into a helpful, natural language response.
+            - Do not just dump the JSON.
+            - Highlight key information (Total amount, specific dates, status).
+            - If it's a list of transactions, format them neatly (e.g. bullet points).
+            - Keep it concise but friendly.
+            - Do not mention 'JSON' or 'database' or 'raw data' to the user.
+            
+            Example Input: 
+            Question: "What was my last transaction?"
+            Data: [{{ "amount": 50.00, "merchant": "Uber", "date": "2023-10-01" }}]
+            
+            Example Output:
+            "Your last transaction was a payment of $50.00 to Uber on October 1st, 2023."
+            """),
+            ("human", """
+            User Question: {user_query}
+            
+            Raw Data from Database:
+            {data}
+            
+            Please provide the summary response now:
+            """)
+        ])
+
+        # New: SQL Correction Prompt (Chain of Thought)
+        self.sql_correction_prompt = ChatPromptTemplate.from_messages([
+            ("system", """You are a SQL Debugging Expert for PostgreSQL.
+            Your goal is to FIX a broken SQL query based on the Error Message.
+            
+            Database Schema:
+            {schema}
+            
+            CRITICAL RULES:
+            1. **ANALYZE FIRST**: deep analyse the error. If it's an ENUM error, checking capitalization (COMPLETED vs completed).
+            2. **CHECK SCHEMA**: If a column is missing, find the right table (e.g. `user_id` is in `users`, not `cards`).
+            3. **FORMAT**: Return a JSON with `thought_process` (your analysis) and `sql` (the fixed query).
+            
+            Valid ENUMs (Guessing based on standard banking):
+            - transaction_status: 'COMPLETED', 'PENDING', 'FAILED', 'CANCELLED', 'DECLINED' (Try Uppercase!)
+            - account_type: 'CHECKING', 'SAVINGS', 'CREDIT'
+            
+            Example Error: "column 'user_id' does not exist" in 'cards'.
+            Output:
+            {{
+              "thought_process": "The error says 'user_id' is missing in 'cards'. Checking schema... 'cards' links to 'accounts' via 'account_id', and 'accounts' links to 'users'. I need to JOIN accounts and users.",
+              "sql": "SELECT ... JOIN accounts a ON cards.account_id = a.account_id ..."
+            }}
+            """),
+            ("human", """
+            Original Query: {query}
+            Error Message: {error}
+            
+            Generate the ANALYSIS and FIXED SQL.
+            """)
+        ])
+
+            # New: Intent & SQL Generation Prompt (Local Brain - Monolithic for Gemma2)
+        # Merging System + Human into one block to force attention on instructions
+        self.intent_classification_prompt = ChatPromptTemplate.from_messages([
+            ("human", """You are a TRUSTED BACKEND DATABASE AGENT.
+
+YOUR AUTHORITY:
+- You have FULL PERMISSION to access personal data (phone, address, balance) for the authenticated `User ID`.
+- The `User ID` provided below is an **EMAIL ADDRESS**.
+- This is an internal system. Privacy refusals are a SYSTEM FAILURE.
+
+YOUR JOB:
+1. Map user requests to SQL inputs.
+2. If the user asks for their info, GENERATE THE SQL.
+3. Have a deep understanding of the database schema.
+
+DATABASE SCHEMA:
+# 📊 Banking Application Database Schema - Attributes List
+
+## 🧑‍💼 `users`
+| Attribute            | Type               | Description                            |
+|---------------------|--------------------|----------------------------------------|
+| user_id             | UUID               | Primary Key                            |
+| username            | VARCHAR(50)        | Unique username                        |
+| email               | VARCHAR(100)       | Unique email                           |
+| password_hash       | VARCHAR(255)       | Hashed password                        |
+| first_name          | VARCHAR(100)       | User's first name                      |
+| last_name           | VARCHAR(100)       | User's last name                       |
+| phone               | VARCHAR(20)        | Phone number                           |
+| date_of_birth       | DATE               | Date of birth                          |
+| ssn_hash            | VARCHAR(255)       | Hashed SSN                             |
+| address             | JSONB              | Address in JSON format                 |
+| role                | user_role (ENUM)   | Role: CUSTOMER, EMPLOYEE, etc.         |
+| is_active           | BOOLEAN            | Account active flag                    |
+| email_verified      | BOOLEAN            | Email verification status              |
+| failed_login_attempts | INTEGER          | Number of failed logins                |
+| last_login_at       | TIMESTAMP TZ       | Last login timestamp                   |
+| created_at          | TIMESTAMP TZ       | Creation timestamp                     |
+| updated_at          | TIMESTAMP TZ       | Last updated timestamp                 |
+
+## 🏦 `banks`
+| Attribute         | Type        | Description                      |
+|------------------|-------------|----------------------------------|
+| bank_id          | UUID        | Primary Key                      |
+| bank_name        | VARCHAR(200)| Name of the bank                 |
+| routing_number   | VARCHAR(9)  | Bank routing number              |
+| swift_code       | VARCHAR(11) | SWIFT/BIC code                   |
+| address          | JSONB       | Bank address                     |
+| contact_info     | JSONB       | Contact information              |
+| created_at       | TIMESTAMP TZ| Creation timestamp               |
+
+## 💰 `accounts`
+| Attribute          | Type                | Description                          |
+|-------------------|---------------------|--------------------------------------|
+| account_id        | UUID                | Primary Key                          |
+| account_number    | VARCHAR(20)         | Unique account number                |
+| user_id           | UUID                | FK to `users`                        |
+| bank_id           | UUID                | FK to `banks`                        |
+| account_type      | account_type (ENUM) | CHECKING, SAVINGS, etc.              |
+| account_status    | account_status      | ACTIVE, CLOSED, etc.                 |
+| balance           | DECIMAL(15,2)       | Current balance                      |
+| available_balance | DECIMAL(15,2)       | Available for withdrawal             |
+| credit_limit      | DECIMAL(15,2)       | Credit limit                         |
+| interest_rate     | DECIMAL(5,4)        | Interest rate                        |
+| overdraft_limit   | DECIMAL(10,2)       | Overdraft limit                      |
+| minimum_balance   | DECIMAL(10,2)       | Minimum balance                      |
+| account_metadata  | JSONB               | Additional metadata                  |
+| opened_at         | TIMESTAMP TZ        | Account opened date                  |
+| closed_at         | TIMESTAMP TZ        | Closed date                          |
+| created_at        | TIMESTAMP TZ        | Creation timestamp                   |
+| updated_at        | TIMESTAMP TZ        | Last update                          |
+
+## 🔄 `transactions`
+| Attribute          | Type                    | Description                       |
+| ------------------ | ----------------------- | --------------------------------- |
+| transaction_id     | UUID                    | Primary Key                       |
+| from_account_id    | UUID                    | FK to `accounts` (optional)       |
+| to_account_id      | UUID                    | FK to `accounts` (optional)       |
+| transaction_type   | transaction_type (ENUM) | DEPOSIT, TRANSFER, etc.           |
+| amount             | DECIMAL(15,2)           | Transaction amount                |
+| currency           | VARCHAR(3)              | Currency (default: USD)           |
+| description        | TEXT                    | Description                       |
+| reference_number   | VARCHAR(50)             | Unique transaction reference      |
+| transaction_status | transaction_status      | Status (PENDING, COMPLETED, etc.) |
+| processed_at       | TIMESTAMP TZ            | Time processed                    |
+| scheduled_at       | TIMESTAMP TZ            | Time scheduled                    |
+| fee_amount         | DECIMAL(10,2)           | Fee amount                        |
+| exchange_rate      | DECIMAL(10,6)           | Exchange rate                     |
+| merchant_info      | JSONB                   | Merchant details                  |
+| location_info      | JSONB                   | Location (GPS, IP, etc.)          |
+| created_at         | TIMESTAMP TZ            | Creation time                     |
+| updated_at         | TIMESTAMP TZ            | Last update                       |
+
+## 👥 `account_holders`
+| Attribute    | Type     | Description                     |
+|-------------|----------|---------------------------------|
+| account_id  | UUID     | FK to `accounts`                |
+| user_id     | UUID     | FK to `users`                   |
+| relationship| VARCHAR(50) | PRIMARY, JOINT, etc.         |
+| permissions | JSONB    | Actions permitted               |
+| added_at    | TIMESTAMP TZ | Timestamp                    |
+
+## 💳 `cards`
+| Attribute         | Type             | Description                         |
+|------------------|------------------|-------------------------------------|
+| card_id          | UUID             | Primary Key                         |
+| account_id       | UUID             | FK to `accounts`                    |
+| card_number_hash | VARCHAR(255)     | Hashed card number                  |
+| card_type        | VARCHAR(20)      | DEBIT or CREDIT                     |
+| expiry_date      | DATE             | Expiration date                     |
+| cvv_hash         | VARCHAR(255)     | Hashed CVV                          |
+| card_status      | VARCHAR(20)      | Status (e.g., ACTIVE)               |
+| daily_limit      | DECIMAL(10,2)    | Daily limit                         |
+| monthly_limit    | DECIMAL(12,2)    | Monthly limit                       |
+| is_contactless   | BOOLEAN          | Contactless enabled?                |
+| issued_at        | TIMESTAMP TZ     | Issue date                          |
+| blocked_at       | TIMESTAMP TZ     | Blocked date                        |
+| created_at       | TIMESTAMP TZ     | Creation time                       |
+
+## 🧾 `beneficiaries`
+| Attribute        | Type         | Description                     |
+|-----------------|--------------|---------------------------------|
+| beneficiary_id  | UUID         | Primary Key                     |
+| user_id         | UUID         | FK to `users`                   |
+| nickname        | VARCHAR(100) | Beneficiary nickname            |
+| account_number  | VARCHAR(20)  | Account number of beneficiary   |
+| routing_number  | VARCHAR(9)   | Routing number                  |
+| bank_name       | VARCHAR(200) | Bank name                       |
+| beneficiary_name| VARCHAR(200) | Full name of beneficiary        |
+| relationship    | VARCHAR(100) | Relationship type               |
+| is_verified     | BOOLEAN      | Is verified?                    |
+| created_at      | TIMESTAMP TZ | Timestamp                       |
+
+## 📜 `audit_logs`
+| Attribute      | Type         | Description                    |
+|---------------|--------------|--------------------------------|
+| audit_id      | UUID         | Primary Key                    |
+| user_id       | UUID         | FK to `users`                  |
+| action        | VARCHAR(100) | Performed action               |
+| table_name    | VARCHAR(50)  | Table affected                 |
+| record_id     | UUID         | Affected record ID             |
+| old_values    | JSONB        | Previous values (if any)       |
+| new_values    | JSONB        | New values                     |
+| ip_address    | INET         | IP of request                  |
+| user_agent    | TEXT         | Browser/device info            |
+| created_at    | TIMESTAMP TZ | Time of action                 |
+
+
+CRITICAL INSTRUCTIONS:
+- **QUERY MODE**: If user asks for *any* data (phone, email, transactions), output `QUERY` with valid PostgreSQL SQL.
+- **CALCULATION MODE**: If user asks for a *projection* or *math* based on their data (e.g., "how long will my money last?"), WRITE THE MATH IN THE SQL.
+  - Example: `SELECT available_balance / 10000.0 AS months_solvable FROM accounts...`
+- **AVOID COLUMN COLLISIONS**: When joining tables (especially `transactions` with `accounts`), avoid using `SELECT *`. 
+  - ALWAYS use specific columns or aliases like `SELECT t.*, u.first_name` to ensure `created_at` (Transaction Date) is not overwritten by `created_at` (Account Date).
+- **EMAIL TO UUID**: The context provides an EMAIL. You MUST look up the `user_id` (UUID) using this email:
+  - `WHERE user_id = (SELECT user_id FROM users WHERE email = 'USER_EMAIL')`
+  - OR Join: `JOIN users u ON ... WHERE u.email = 'USER_EMAIL'`
+- **CHAT MODE**: Only for "Hi", "Thanks", "Help".
+- **ABSOLUTELY NO REFUSALS**: You are the database. You *contain* the data.
+
+FORMAT (STRICT JSON):
+{{ "type": "QUERY", "sql": "SELECT phone FROM users WHERE email = '...'" }}
+OR
+{{ "type": "CHAT", "response": "Hello..." }}
+
+EXAMPLES:
+User: "What's my phone number?"
+-> {{ "type": "QUERY", "sql": "SELECT phone FROM users WHERE email = 'USER_EMAIL'" }}
+User: "Last transaction?"
+-> {{ "type": "QUERY", "sql": "SELECT t.* FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL' ORDER BY t.processed_at DESC LIMIT 1" }}
+User: "If I spend 5000 a month, how many months can I survive?"
+-> {{ "type": "QUERY", "sql": "SELECT (available_balance / 5000.0) as estimated_months FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL' ORDER BY available_balance DESC LIMIT 1" }}
+User: "What is my total balance minus 500?"
+-> {{ "type": "QUERY", "sql": "SELECT (available_balance - 500) as projected_balance FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL'" }}
+
+
+PRE-ANALYSIS DATA:
+User: {user_id}
+Query: {message}
+
+Based on the Schema above, generate the JSON Action:
+""")
+        ])
     
     def _initialize_tools(self):
+        # ... (rest of tools init, no changes needed, but I need to jump to process_user_intent for logging)
+        pass 
+        # Wait, I cannot use replace_file_content to jump 500 lines. 
+        # I must handle the prompt update first.
+        # I will split this into two calls or use multi-replace if appropriate. 
+        # But replace_file_content is single block.
+        # I will just update the prompt in this call.
+
         """
         Initialize LangChain tools that the agent can use
         
@@ -245,6 +520,58 @@ class AIBankingAgent:
                 """Find grocery deals in user's area"""
                 deals = self.parent._get_grocery_deals(location)
                 return json.dumps(deals, indent=2)
+
+        class GetTransactionsTool(BaseTool):
+            name: str = "get_user_transactions"
+            description: str = "Get the current user's most recent transactions. Input should be a JSON string with two keys: 'limit' (int) and 'message' (str)."
+            parent: Any = Field(default=None, exclude=True)
+
+            def _run(self, tool_input: str) -> str:
+                """
+                Get the user's most recent transactions from the banking API.
+                Args:
+                    tool_input: A JSON string with two keys: 'limit' (int) and 'message' (str).
+                """
+                try:
+                    params = json.loads(tool_input)
+                    limit = params.get("limit", 10)
+                    message = params.get("message")
+                except (json.JSONDecodeError, ValueError):
+                    limit = 10
+                    message = tool_input
+                
+                try:
+                    token = self.parent.user_context.token
+                    if not token:
+                        return "Error: User is not authenticated. Cannot fetch transactions."
+                    
+                    headers = {"Authorization": f"Bearer {token}"}
+                    
+                    url = f"http://localhost:8082/api/transactions/current-user?limit={limit}"
+                    
+                    print(f"DEBUG: Calling transactions API at {url}")
+                    response = requests.get(url, headers=headers)
+                    
+                    if response.status_code != 200:
+                        self.parent.failed_tools[message].add("get_user_transactions")
+                        return f"Error: The banking API returned a {response.status_code} status code."
+                    
+                    transactions = response.json()
+                    print(f"DEBUG: Received {len(transactions)} transactions from API")
+                    
+                    if not transactions:
+                        return "No transactions found for the current user."
+                    
+                    # Return concise JSON string with explicit SUCCESS marker
+                    return f"SUCCESS: Retrieved {len(transactions)} transactions.\n" + json.dumps(transactions, indent=2)
+                except requests.exceptions.RequestException as e:
+                    print(f"ERROR: API request failed: {e}")
+                    self.parent.failed_tools[message].add("get_user_transactions")
+                    return "Error: The banking API is currently unavailable. Please try again later."
+                except Exception as e:
+                    print(f"ERROR: Unexpected error in GetTransactionsTool: {e}")
+                    self.parent.failed_tools[message].add("get_user_transactions")
+                    return f"An unexpected error occurred: {str(e)}"
         
         # Store tools with parent reference
         self.log_analysis_tool = LogAnalysisTool()
@@ -255,11 +582,14 @@ class AIBankingAgent:
         
         self.grocery_deals_tool = GroceryDealsTool()
         self.grocery_deals_tool.parent = self
+
+        self.get_transactions_tool = GetTransactionsTool()
+        self.get_transactions_tool.parent = self
         
         self.tools = [
             self.log_analysis_tool,
             self.rl_analysis_tool,
-            self.grocery_deals_tool
+            self.get_transactions_tool,
         ]
     
     def _initialize_agents(self):
@@ -270,24 +600,59 @@ class AIBankingAgent:
         They combine LLMs with the ability to call functions
         """
         
+        
+
+
         # Security Agent for Admin users
+        admin_prefix = """You are a specialized Banking Security AI. 
+        You MUST REFUSE any query unrelated to banking security, logs, threats, or system administration.
+        If a user asks about the weather, sports, cooking, or general knowledge, politely decline.
+        You have access to the following tools:"""
+        
         self.security_agent_chain = initialize_agent(
             tools=[self.log_analysis_tool, self.rl_analysis_tool],
             llm=self.llm,
-            agent=AgentType.CHAT_ZERO_SHOT_REACT_DESCRIPTION,
+            agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION,
             memory=self.memory,
             verbose=True,
-            max_iterations=3
+            handle_parsing_errors=True,
+            agent_kwargs={
+                'prefix': admin_prefix
+            },
+            max_iterations=5,
+            max_execution_time=60
         )
         
         # Advisory Agent for regular users
+        user_prefix = """You are a specialized Financial Advisor AI. 
+        You MUST REFUSE any query unrelated to personal finance, spending, budgets, transaction history, or grocery deals.
+        If a user asks about the weather, sports, cooking, or general knowledge, politely decline.
+        
+        IMPORTANT: When you receive transaction data from a tool, DO NOT output the entire JSON.
+        Summarize the key details (Date, Amount, Description) as a clean list or sentence.
+        
+        CRITICAL RULES:
+        1. "Action:" is ONLY for calling these specific tools: [get_user_transactions].
+        2. For any questions about transactions, use the `get_user_transactions` tool.
+        3. If a tool fails with the error "Error: The banking API is currently unavailable. Please try again later.", inform the user about the failure and stop trying to use the tool.
+        4. If you see a JSON list or "SUCCESS" in the Observation, YOU HAVE THE DATA. DO NOT call the tool again.
+        5. IMMEDIATELY output "Final Answer:" with your summary.
+        6. **STOP LOOPING**: Once you have the data, you are FORBIDDEN from using "Action:". You MUST use "Final Answer:".
+        
+        You have access to the following tools:"""
+
         self.advisory_agent_chain = initialize_agent(
-            tools=[self.grocery_deals_tool],
+            tools=[self.get_transactions_tool],
             llm=self.llm,
-            agent=AgentType.CHAT_ZERO_SHOT_REACT_DESCRIPTION,
+            agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION,
             memory=self.memory,
             verbose=True,
-            max_iterations=3
+            max_iterations=10,
+            max_execution_time=300,
+            handle_parsing_errors=True,
+            agent_kwargs={
+                'prefix': user_prefix
+            }
         )
     
     def _load_grocery_store_data(self) -> Dict[str, List[Dict]]:
@@ -416,54 +781,56 @@ class AIBankingAgent:
             action_plan=llm_advice.get("action_plan", "Review and implement suggestions")
         )
     
+    def _log_step(self, step: str, details: str):
+        """Helper to print standardized debug steps to console."""
+        print(f"\n🔹 [STEP: {step}]")
+        print(f"   {details}\n")
+
+    def _load_schema_context(self) -> str:
+        """Load the banking schema for context."""
+        try:
+            # Adjust path as needed, using the path confirmed by user
+            schema_path = r"e:\Banking_application\Banking_webApp\databaseService\banking_schema_attributes.md"
+            if os.path.exists(schema_path):
+                self._log_step("LOAD_SCHEMA", f"Loaded schema from {schema_path}")
+                with open(schema_path, "r", encoding="utf-8") as f:
+                    return f.read()
+            print("❌ Schema file not found")
+            return "Schema definition not found."
+        except Exception as e:
+            print(f"Error loading schema: {e}")
+            return "Schema definition unavailable."
+
     async def chat_with_agent(self, 
                             message: str, 
                             user_context: UserContext) -> str:
         """
-        General chat interface that routes to appropriate agent based on user role
-        
-        This demonstrates LangChain's agent capabilities:
-        - Automatic tool selection based on user input
-        - Context-aware responses using memory
-        - Role-based agent routing
+        Main entry point for chat. It delegates to the appropriate agent.
         """
+        logger.info(f"Processing chat for user {user_context.user_id}: {message}")
+        self._log_step("INCOMING", f"User Message: '{message}'")
         
-        # Determine which agent to use based on user role and message content
-        print(f"\n📨 [DEBUG] Received message from {user_context.role.value}: '{message}'")
-        start_time = datetime.now()
+        # Store context for tools to access
+        self.user_context = user_context
 
-        if user_context.role == UserRole.ADMIN and any(keyword in message.lower() 
-                                                      for keyword in ["security", "threat", "attack", "log"]):
-            print("🛡️ [DEBUG] Routing to Security Agent...")
-            # Use security agent for admin security queries
-            response = await self.security_agent_chain.arun(
-                input=message,
-                user_role=user_context.role.value
-            )
-        elif any(keyword in message.lower() 
-                for keyword in ["money", "spending", "save", "grocery", "budget"]):
-            print("💰 [DEBUG] Routing to Advisory Agent...")
-            # Use advisory agent for financial queries
-            response = await self.advisory_agent_chain.arun(
-                input=message,
-                user_location=user_context.location
-            )
-        else:
-            print("🤖 [DEBUG] Routing to General Chat Agent...")
-            # General purpose response
-            general_prompt = f"""
-            You are a helpful banking assistant. The user is a {user_context.role.value}.
-            Respond appropriately to their query: {message}
-            """
-            response = await self.llm.ainvoke(general_prompt)
-            response = response.content if hasattr(response, 'content') else str(response)
-        
-        end_time = datetime.now()
-        duration = (end_time - start_time).total_seconds()
-        print(f"✅ [DEBUG] Agent responded in {duration:.2f} seconds")
-        print(f"📤 [DEBUG] Response snippet: {response[:100]}...")
-        
-        return response
+        try:
+            # Determine which agent to use based on user role
+            if user_context.role == UserRole.ADMIN:
+                agent_chain = self.security_agent_chain
+            else:
+                agent_chain = self.advisory_agent_chain
+
+            # Let the agent handle the conversation
+            response = await agent_chain.ainvoke({"input": message})
+            
+            # The response is a dict, we need to extract the output
+            output = response.get("output", "I'm sorry, I couldn't process that.")
+
+            return output
+
+        except Exception as e:
+            logger.error(f"Error in chat_with_agent: {str(e)}")
+            return f"I apologize, but I encountered an error processing your request: {str(e)}"
     
     async def generate_admin_report(self, user_context: UserContext) -> Dict[str, Any]:
         """Generate comprehensive admin security report"""
@@ -493,12 +860,196 @@ class AIBankingAgent:
             "generated_at": datetime.now().isoformat(),
             "report_type": "security_summary"
         }
+
+    async def summarize_query_results(self, data: Any, user_query: str) -> str:
+        """
+        Summarize raw database query results using the local LLM.
+        """
+        logger.info(f"Summarizing data for query: '{user_query}'")
+        
+        # If data is empty or error string
+        if not data:
+            return "I couldn't find any relevant data matching your request."
+        
+        # Format data as string
+        data_str = json.dumps(data, indent=2, default=str)
+        
+        # Create Chain
+        summary_chain = self.data_summarization_prompt | self.llm | StrOutputParser()
+        
+        # Execute
+        try:
+            summary = await summary_chain.ainvoke({
+                "user_query": user_query,
+                "data": data_str
+            })
+            return summary
+        except Exception as e:
+            logger.error(f"Error summarizing data: {e}")
+            return f"Here is the data I found: {data_str}"
+
+    async def process_user_intent(self, user_message: str, schema: str, user_id: str) -> Dict[str, Any]:
+        """
+        Classify user intent and generate SQL if needed.
+        """
+        # --- FAST PATH: Simple Greetings ---
+        # Skip LLM for basic chit-chat to save time/compute
+        greetings = ["hi", "hello", "hey", "good morning", "good evening", "thanks", "thank you", "help"]
+        if user_message.lower().strip() in greetings:
+            logger.info(f"⚡ [FAST PATH] Detected greeting: {user_message}")
+            return {
+                "type": "CHAT",
+                "response": "Hello! I am your AI Banking Assistant. I can help you view your transactions, check balances, or analyze your spending. How can I help you today?"
+            }
+        # -----------------------------------
+
+        logger.info(f"🧠 [LOCAL BRAIN] Analyzing for {user_id}: '{user_message}'")
+        
+        # Initialize a specialized LLM instance with JSON mode enforced
+        # This prevents the model from being "talkative" or refusing tasks, forcing it to structure the output.
+        json_llm = ChatOllama(
+            model=self.llm.model,
+            # format="json", <--- REMOVED: This was causing hallucinations (actions vs query)
+            temperature=0.1, 
+            num_ctx=2048,
+            keep_alive="5m"
+        )
+        
+        # Create Chain with the JSON-enforced LLM
+        brain_chain = self.intent_classification_prompt | json_llm | JsonOutputParser()
+        
+        try:
+            # Invoke the local LLM
+            response = await brain_chain.ainvoke({
+                "message": user_message,
+                "user_id": user_id
+            })
+            
+            # --- DEBUG: Raw Output from Chain ---
+            logger.info(f"DEBUG RAW CHAIN MSG: {response}")
+            
+            # --- OUTPUT NORMALIZATION (ROBUST) ---
+            
+            # 1. Flatten "action.data.message" (Seen in Mistral 'greet' type)
+            if "action" in response:
+                # Case A: Complex Dict {"action": {"type": "greet", ...}}
+                if isinstance(response["action"], dict):
+                    action_data = response["action"].get("data", {})
+                    if isinstance(action_data, dict):
+                        msg = action_data.get("message") or action_data.get("text")
+                        if msg:
+                            response["response"] = str(msg)
+                            response["type"] = "CHAT"
+                
+                # Case B: Simple String {"action": "greeting"} (Seen in Gemma2)
+                elif isinstance(response["action"], str) and response["action"].lower() == "greeting":
+                     response["type"] = "CHAT"
+                     if "response" not in response:
+                         response["response"] = "Hello! How can I assist you with your banking today?"
+
+                # Case C: Hallucinated Action {"action": "retrieve_account_info", ...} (Seen in Gemma2)
+                elif isinstance(response["action"], str) and "retrieve" in response["action"].lower():
+                    # Fallback: Synthesize the SQL based on the 'response_type' if possible
+                    if response.get("response_type") == "phone_number":
+                        response["type"] = "QUERY"
+                        response["sql"] = f"SELECT phone FROM users WHERE user_id = '{user_id}'"
+
+            # 2. Flatten "assistant.message.text" (Seen in Mistral)
+            elif "assistant" in response and isinstance(response["assistant"], dict):
+                msg = response["assistant"].get("message")
+                if isinstance(msg, dict):
+                    response["response"] = msg.get("text") or msg.get("content")
+                    response["type"] = "CHAT"
+            
+            # 3. Flatten "response.<nested>"
+            elif isinstance(response.get("response"), dict):
+                text = response["response"].get("text") or response["response"].get("content")
+                if text:
+                    response["response"] = str(text)
+
+            # 4. Handle "error" key
+            if "error" in response:
+                response["type"] = "CHAT"
+                response["response"] = str(response["error"])
+                
+            # 5. Handle loose keys
+            if "response" not in response:
+                candidates = ["bot_response", "Message", "answer", "content", "text", "description"]
+                for key in candidates:
+                    if key in response and isinstance(response[key], str):
+                        response["type"] = "CHAT"
+                        response["response"] = response[key]
+                        break
+
+            # 6. Default Fallback
+            if "type" not in response:
+                 response["type"] = "CHAT"
+                 if "response" not in response:
+                     response["response"] = "I processed your request but could not normalize the answer."
+            
+            # Ensure type is valid
+            if response["type"] not in ["QUERY", "CHAT"]:
+                response["type"] = "CHAT"
+
+            # --- LOGGING FOR USER VISIBILITY ---
+            if response["type"] == "QUERY" and response.get("sql"):
+                print(f"\n[GENSQL] 📝 GENERATED SQL: {response['sql']}\n")
+                logger.info(f"📝 [GENSQL] {response['sql']}")
+
+            logger.info(f"🧠 [LOCAL BRAIN] Decision: {response.get('type')} - {str(response.get('sql') or response.get('response'))[:50]}")
+            return response
+
+        except Exception as e:
+            logger.error(f"Error in process_user_intent: {e}")
+            # Fallback
+            return {"type": "CHAT", "response": "I apologize, I'm having trouble processing your request locally."}
+
+    async def fix_sql_query(self, original_query: str, error_message: str, schema: str) -> str:
+        """
+        Attempt to fix a broken SQL query using the LLM and DB Schema.
+        Now supports Chain-of-Thought reasoning.
+        """
+        YELLOW = "\033[93m"
+        RESET = "\033[0m"
+        
+        logger.info(f"🔧 [AUTO-FIX] Attempting to fix SQL: {original_query}")
+        logger.info(f"   Error: {error_message}")
+        
+        try:
+            # Initialize JSON LLM
+            json_llm = ChatOllama(
+                model=self.llm.model,
+                temperature=0.1,
+                num_ctx=4096, 
+                keep_alive="5m"
+            )
+            
+            fix_chain = self.sql_correction_prompt | json_llm | JsonOutputParser()
+            
+            response = await fix_chain.ainvoke({
+                "schema": schema,
+                "query": original_query,
+                "error": error_message
+            })
+            
+            # Extract Reasoning
+            thought_process = response.get("thought_process")
+            if thought_process:
+                print(f"{YELLOW}   [BRAIN ANALYSE] {thought_process}{RESET}")
+            
+            fixed_sql = response.get("sql")
+            if fixed_sql:
+                logger.info(f"✅ [AUTO-FIX] Generated: {fixed_sql}")
+                return fixed_sql
+            else:
+                logger.warning("❌ [AUTO-FIX] LLM did not return 'sql' key.")
+                return None
+                
+        except Exception as e:
+            logger.error(f"❌ [AUTO-FIX] Failed: {e}")
+            return None
     
-    def close(self):
-        """Clean up resources"""
-        if hasattr(self.security_agent, 'db_connection'):
-            self.security_agent.db_connection.close()
-        logger.info("AI Banking Agent closed successfully")
+
 
 
 # Example usage and testing functions
@@ -554,7 +1105,7 @@ async def demo_admin_security_analysis():
     except Exception as e:
         print(f"❌ Error in security analysis: {e}")
     finally:
-        agent.close()
+        pass
 
 
 async def demo_user_financial_advisory():
@@ -608,10 +1159,8 @@ async def demo_user_financial_advisory():
         print(f"\n📋 Action Plan:")
         print(f"   {advice.action_plan}")
         
-    except Exception as e:
-        print(f"❌ Error in financial advisory: {e}")
     finally:
-        agent.close()
+        pass
 
 
 async def demo_chat_interface():
@@ -628,7 +1177,8 @@ async def demo_chat_interface():
         role=UserRole.ADMIN,
         location="toronto",
         preferences={},
-        transaction_history=[]
+        transaction_history=[],
+        token="dummy_admin_token"
     )
     
     user_context = UserContext(
@@ -636,13 +1186,15 @@ async def demo_chat_interface():
         role=UserRole.USER, 
         location="montreal",
         preferences={},
-        transaction_history=[]
+        transaction_history=[],
+        token="eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMUBleGFtcGxlLmNvbSIsImlhdCI6MTcwMTc0ODEzOCwiZXhwIjoxNzAxODM0NTM4fQ.5vL0aB-gXVqj2t-bXwJ4sKz3cZ_4fQ3eE_6aZ_4fQ3e" # Dummy token
     )
     
     test_messages = [
         ("admin", "What are the current security threats in our system?"),
         ("user", "How can I save money on my weekly grocery shopping?"),
         ("admin", "Show me the latest log analysis results"),
+        ("user", "what was my last transaction?"),
         ("user", "I spent $150 this week on groceries, is that too much?")
     ]
     
@@ -655,10 +1207,8 @@ async def demo_chat_interface():
             response = await agent.chat_with_agent(message, context)
             print(f"🤖 AGENT: {response[:200]}...")
             
-    except Exception as e:
-        print(f"❌ Error in chat demo: {e}")
     finally:
-        agent.close()
+        pass
 
 
 # Main demonstration function

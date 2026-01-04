@@ -14,6 +14,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from typing import Dict, Any, List
 import requests
+from colorama import Fore , Style
 
 # Import our AI agent
 from ai_banking_agent import AIBankingAgent, UserContext, UserRole
@@ -457,6 +458,7 @@ def admin_security_analysis():
         )
         
         # Also run traditional security analysis if transaction data exists
+        print(Fore.GREEN ,"running traditional analysis..",Style.RESET_ALL)
         traditional_result = None
         if transaction_data:
             traditional_result = loop.run_until_complete(
@@ -527,12 +529,83 @@ def admin_security_analysis():
 # Include all other endpoints from the original enhanced_api_server.py
 # (chat, financial-advice, dashboard, etc.)
 
+@app.route('/api/analyze-log/<string:log_filename>', methods=['GET'])
+def analyze_log_file(log_filename):
+    """
+    Triggers a security analysis on a specific log file via a GET request.
+    """
+    try:
+        agent = get_agent()
+        
+        # Construct the log file path
+        # Note: This relative path is based on the location of threatDetection.py
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        log_dir = os.path.join(base_dir, '..', 'banking-api', 'demo', 'logs')
+        log_file_path = os.path.join(log_dir, log_filename)
+
+        if not os.path.exists(log_file_path):
+            return jsonify({
+                "success": False,
+                "error": f"Log file not found: {log_filename}"
+            }), 404
+
+        # Create a default admin context for the analysis
+        admin_context = UserContext(
+            user_id='admin_get_request',
+            role=UserRole.ADMIN,
+            location='internal',
+            preferences={},
+            transaction_history=[]
+        )
+
+        # Run the analysis asynchronously
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        analysis_result = loop.run_until_complete(
+            agent.analyze_security_threats(
+                log_file_path=log_file_path,
+                user_context=admin_context
+            )
+        )
+        loop.close()
+
+        # Convert the Pydantic model to a dictionary for JSON response
+        if analysis_result:
+            response_data = {
+                "threat_detected": analysis_result.threat_detected,
+                "threat_type": analysis_result.threat_type,
+                "confidence_score": analysis_result.confidence_score,
+                "severity": analysis_result.severity,
+                "recommendation": analysis_result.recommendation,
+                "explanation": analysis_result.explanation
+            }
+        else:
+            response_data = {"error": "Analysis returned no result."}
+
+        return jsonify({
+            "success": True,
+            "analysis_source_file": log_filename,
+            "analysis": response_data,
+            "timestamp": datetime.now().isoformat()
+        })
+
+    except Exception as e:
+        print(f"Log analysis GET request error: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+
 if __name__ == '__main__':
     print("🚀 Starting Enhanced Security AI Banking Agent API Server...")
     print("🔒 Comprehensive security analysis with authentication log integration")
     print("📖 Available endpoints:")
     print("   GET  /api/health")
     print("   POST /api/admin/security-analysis (ENHANCED)")
+    print("   GET  /api/analyze-log/<log_filename> (NEW)")
     print("🔗 Database integration: PostgreSQL + Authentication Logs")
     print("🧠 AI Agent: LangChain + Ollama + Security Analytics")
     

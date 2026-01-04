@@ -10,3 +10,4 @@ flask-cors>=4.0.0
 pydantic>=1.10.0
 requests>=2.28.0
 asyncio
+PyJWT>=2.8.0
