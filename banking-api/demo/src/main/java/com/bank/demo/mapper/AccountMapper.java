@@ -39,10 +39,7 @@ public class AccountMapper {
             dto.setUserLastName(account.getUser().getLastName());
         }
         
-        if (account.getBank() != null) {
-            dto.setBankId(account.getBank().getId());
-            dto.setBankName(account.getBank().getBankName());
-        }
+        // Bank information removed - was unused
         
         return dto;
     }

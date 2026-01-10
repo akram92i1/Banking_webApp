@@ -4,10 +4,10 @@ import bankingService from '../services/bankingService';
 
 const TransferMoney = ({ isOpen, onClose, onTransferComplete }) => {
   const [transferData, setTransferData] = useState({
-    fromAccountNumber: '',
-    toAccountNumber: '',
+    recipientEmail: '',
     amount: '',
-    description: ''
+    description: '',
+    transactionType: 'TRANSFER'
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -30,8 +30,16 @@ const TransferMoney = ({ isOpen, onClose, onTransferComplete }) => {
     setSuccess('');
 
     // Basic validation
-    if (!transferData.fromAccountNumber || !transferData.toAccountNumber || !transferData.amount) {
+    if (!transferData.recipientEmail || !transferData.amount) {
       setError('Please fill in all required fields');
+      setIsLoading(false);
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(transferData.recipientEmail)) {
+      setError('Please enter a valid email address');
       setIsLoading(false);
       return;
     }
@@ -46,12 +54,12 @@ const TransferMoney = ({ isOpen, onClose, onTransferComplete }) => {
       const result = await bankingService.sendMoney(transferData);
       
       if (result.success) {
-        setSuccess('Money transferred successfully!');
+        setSuccess('Email transfer sent successfully! The recipient will be notified to accept the transfer.');
         setTransferData({
-          fromAccountNumber: '',
-          toAccountNumber: '',
+          recipientEmail: '',
           amount: '',
-          description: ''
+          description: '',
+          transactionType: 'TRANSFER'
         });
         
         // Notify parent component
@@ -82,7 +90,7 @@ const TransferMoney = ({ isOpen, onClose, onTransferComplete }) => {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-gray-900">
-            Transfer Money
+            Send Money via Email
           </h2>
           <button
             onClick={onClose}
@@ -92,36 +100,29 @@ const TransferMoney = ({ isOpen, onClose, onTransferComplete }) => {
           </button>
         </div>
 
+        {/* Info Banner */}
+        <div className="bg-blue-50 border border-blue-200 text-blue-700 px-3 py-2 rounded-md text-sm mb-4">
+          📧 Send money using just an email address - like Interac e-Transfer!
+        </div>
+
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              From Account Number *
+              Recipient Email *
             </label>
             <input
-              type="text"
-              name="fromAccountNumber"
-              value={transferData.fromAccountNumber}
+              type="email"
+              name="recipientEmail"
+              value={transferData.recipientEmail}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Your account number"
+              placeholder="recipient@example.com"
               required
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              To Account Number *
-            </label>
-            <input
-              type="text"
-              name="toAccountNumber"
-              value={transferData.toAccountNumber}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Recipient's account number"
-              required
-            />
+            <p className="text-xs text-gray-500 mt-1">
+              The recipient will receive a notification to accept the transfer
+            </p>
           </div>
 
           <div>
@@ -139,6 +140,22 @@ const TransferMoney = ({ isOpen, onClose, onTransferComplete }) => {
               placeholder="0.00"
               required
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Transfer Type *
+            </label>
+            <select
+              name="transactionType"
+              value={transferData.transactionType}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            >
+              <option value="TRANSFER">Transfer</option>
+              <option value="INTERNAL">Internal Transfer</option>
+            </select>
           </div>
 
           <div>

@@ -30,4 +30,12 @@ public interface AccountRepository extends JpaRepository<Account, java.util.UUID
     // Native query as backup to test if JPA mapping is the issue
     @Query(value = "SELECT account_id, account_number, balance, available_balance, account_type, account_status FROM accounts WHERE user_id = :user_id", nativeQuery = true)
     List<Object[]> findAccountDataByUserIdNative(@Param("user_id") UUID userId);
+
+    // Find accounts by user email for email-based transfers
+    @Query("SELECT a FROM Account a JOIN FETCH a.user WHERE a.user.email = :email")
+    List<Account> findByUserEmail(@Param("email") String email);
+
+    // Find primary account by user email (first account)
+    @Query("SELECT a FROM Account a JOIN FETCH a.user WHERE a.user.email = :email ORDER BY a.createdAt ASC")
+    Optional<Account> findPrimaryAccountByUserEmail(@Param("email") String email);
 }

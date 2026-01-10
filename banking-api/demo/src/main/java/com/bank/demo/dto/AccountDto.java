@@ -22,8 +22,7 @@ public class AccountDto {
     private UUID userId;
     private String userFirstName;
     private String userLastName;
-    private UUID bankId;
-    private String bankName;
+    // Bank fields removed - were unused
     private AccountType accountType;
     private AccountStatus accountStatus;
     private BigDecimal balance;

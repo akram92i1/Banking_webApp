@@ -8,7 +8,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- Create ENUM types
 CREATE TYPE account_type AS ENUM ('CHECKING', 'SAVINGS', 'CREDIT', 'LOAN');
 CREATE TYPE account_status AS ENUM ('ACTIVE', 'INACTIVE', 'SUSPENDED', 'CLOSED');
-CREATE TYPE transaction_type AS ENUM ('DEPOSIT', 'WITHDRAWAL', 'TRANSFER', 'PAYMENT', 'FEE');
+CREATE TYPE transaction_type AS ENUM ('DEPOSIT', 'WITHDRAWAL', 'TRANSFER', 'PAYMENT', 'FEE', 'INTERAC');
 CREATE TYPE transaction_status AS ENUM ('PENDING', 'COMPLETED', 'FAILED', 'CANCELLED');
 CREATE TYPE user_role AS ENUM ('CUSTOMER', 'EMPLOYEE', 'MANAGER', 'ADMIN');
 
@@ -102,12 +102,22 @@ CREATE TABLE transactions (
     CONSTRAINT check_positive_amount CHECK (amount > 0)
 ) PARTITION BY RANGE (created_at);
 
--- Create monthly partitions for transactions (example for 2025)
+-- Create monthly partitions for transactions (for 2025)
 CREATE TABLE transactions_2025_07 PARTITION OF transactions
     FOR VALUES FROM ('2025-07-01') TO ('2025-08-01');
 CREATE TABLE transactions_2025_08 PARTITION OF transactions
     FOR VALUES FROM ('2025-08-01') TO ('2025-09-01');
--- Continue creating partitions as needed...
+CREATE TABLE transactions_2025_09 PARTITION OF transactions
+    FOR VALUES FROM ('2025-09-01') TO ('2025-10-01');
+CREATE TABLE transactions_2025_10 PARTITION OF transactions
+    FOR VALUES FROM ('2025-10-01') TO ('2025-11-01');
+CREATE TABLE transactions_2025_11 PARTITION OF transactions
+    FOR VALUES FROM ('2025-11-01') TO ('2025-12-01');
+CREATE TABLE transactions_2025_12 PARTITION OF transactions
+    FOR VALUES FROM ('2025-12-01') TO ('2026-01-01');
+-- Create partitions for 2026 for future use
+CREATE TABLE transactions_2026_01 PARTITION OF transactions
+    FOR VALUES FROM ('2026-01-01') TO ('2026-02-01');
 
 -- Account holders (for joint accounts)
 CREATE TABLE account_holders (
