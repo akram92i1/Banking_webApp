@@ -30,6 +30,7 @@ from langchain.tools import BaseTool
 from langchain.schema import AgentAction, AgentFinish
 from langchain.agents import AgentOutputParser
 from langchain.schema.output_parser import StrOutputParser
+from langchain
 import re
 
 
@@ -104,7 +105,7 @@ class AIBankingAgent:
             model=ollama_model,
             temperature=0.0, # Zero temperature for maximum determinism
             num_predict=512,
-            num_ctx=4096,     # Increased context
+            num_ctx=1024,     # Drastically reduced context for stability on GTX 1660Ti
             keep_alive="5m"
         )
         
@@ -407,19 +408,7 @@ DATABASE SCHEMA:
 | is_verified     | BOOLEAN      | Is verified?                    |
 | created_at      | TIMESTAMP TZ | Timestamp                       |
 
-## 📜 `audit_logs`
-| Attribute      | Type         | Description                    |
-|---------------|--------------|--------------------------------|
-| audit_id      | UUID         | Primary Key                    |
-| user_id       | UUID         | FK to `users`                  |
-| action        | VARCHAR(100) | Performed action               |
-| table_name    | VARCHAR(50)  | Table affected                 |
-| record_id     | UUID         | Affected record ID             |
-| old_values    | JSONB        | Previous values (if any)       |
-| new_values    | JSONB        | New values                     |
-| ip_address    | INET         | IP of request                  |
-| user_agent    | TEXT         | Browser/device info            |
-| created_at    | TIMESTAMP TZ | Time of action                 |
+
 
 
 CRITICAL INSTRUCTIONS:
@@ -572,7 +561,18 @@ Based on the Schema above, generate the JSON Action:
                     print(f"ERROR: Unexpected error in GetTransactionsTool: {e}")
                     self.parent.failed_tools[message].add("get_user_transactions")
                     return f"An unexpected error occurred: {str(e)}"
-        
+
+        # This represent the RAG system that will be implemented to help the AI agent
+        class RAGSystemImplementation:
+            def load_documents():
+                pass 
+            def load_embeddings():
+                pass
+            def generate_response():
+                pass
+            def query():
+                pass
+
         # Store tools with parent reference
         self.log_analysis_tool = LogAnalysisTool()
         self.log_analysis_tool.parent = self

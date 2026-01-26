@@ -1,0 +1,1502 @@
+Q1: How do I check my current account balance?
+A1: {"type": "QUERY", "sql": "SELECT account_type, balance, currency, available_balance FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND a.account_status = 'ACTIVE'"}
+
+Q2: What is the routing number for my bank?
+A2: {"type": "QUERY", "sql": "SELECT b.routing_number, b.bank_name FROM banks b JOIN accounts a ON b.bank_id = a.bank_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' LIMIT 1"}
+
+Q3: Can I see my last 5 transactions?
+A3: {"type": "QUERY", "sql": "SELECT t.processed_at, t.amount, t.transaction_type, t.description, t.transaction_status FROM transactions t JOIN accounts a ON (t.from_account_id = a.account_id OR t.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' ORDER BY t.processed_at DESC LIMIT 5"}
+
+Q4: How do I update my home address?
+A4: {"type": "QUERY", "sql": "SELECT address, updated_at FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q5: I forgot my password, how is it stored?
+A5: {"type": "QUERY", "sql": "SELECT password_hash FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q6: What is the daily spending limit on my debit card?
+A6: {"type": "QUERY", "sql": "SELECT daily_limit, card_type, card_status FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND c.card_type = 'DEBIT'"}
+
+Q7: How much interest does my savings account earn?
+A7: {"type": "QUERY", "sql": "SELECT interest_rate, account_type FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND a.account_type = 'SAVINGS'"}
+
+Q8: Is my email address verified?
+A8: {"type": "QUERY", "sql": "SELECT email_verified FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q9: Can I add a new beneficiary for transfers?
+A9: {"type": "QUERY", "sql": "SELECT * FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q10: Why was my last transaction declined?
+A10: {"type": "QUERY", "sql": "SELECT transaction_status, description, amount, processed_at FROM transactions t JOIN accounts a ON (t.from_account_id = a.account_id OR t.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.transaction_status = 'DECLINED' ORDER BY t.processed_at DESC LIMIT 1"}
+
+Q11: Who accessed my account recently?
+A11: {"type": "QUERY", "sql": "SELECT action, ip_address, user_agent, created_at FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND action = 'LOGIN' ORDER BY created_at DESC LIMIT 5"}
+
+Q12: How do I block my lost credit card?
+A12: {"type": "QUERY", "sql": "SELECT card_status, card_id, blocked_at FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q13: What is the SWIFT code for international transfers?
+A13: {"type": "QUERY", "sql": "SELECT b.swift_code, b.bank_name FROM banks b JOIN accounts a ON b.bank_id = a.bank_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' LIMIT 1"}
+
+Q14: Do I have any overdraft protection?
+A14: {"type": "QUERY", "sql": "SELECT overdraft_limit, account_type FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q15: How many failed login attempts have I made?
+A15: {"type": "QUERY", "sql": "SELECT failed_login_attempts FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q16: Where can I see the fees charged for a transfer?
+A16: {"type": "QUERY", "sql": "SELECT fee_amount, amount, description, processed_at FROM transactions t JOIN accounts a ON (t.from_account_id = a.account_id OR t.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND fee_amount > 0 ORDER BY processed_at DESC LIMIT 5"}
+
+Q17: Is my card enabled for contactless payments?
+A17: {"type": "QUERY", "sql": "SELECT is_contactless, card_type, card_status FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q18: What currency are my transactions processed in?
+A18: {"type": "QUERY", "sql": "SELECT currency, amount, processed_at FROM transactions t JOIN accounts a ON (t.from_account_id = a.account_id OR t.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' LIMIT 1"}
+
+Q19: Can I see the merchant details for a purchase?
+A19: {"type": "QUERY", "sql": "SELECT merchant_info, description, amount FROM transactions t JOIN accounts a ON (t.from_account_id = a.account_id OR t.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND merchant_info IS NOT NULL ORDER BY processed_at DESC LIMIT 1"}
+
+Q20: How do I know if my account is active?
+A20: {"type": "QUERY", "sql": "SELECT account_status, account_type FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q21: Can I have a joint account with my spouse?
+A21: {"type": "QUERY", "sql": "SELECT ah.relationship, ah.permissions FROM account_holders ah JOIN accounts a ON ah.account_id = a.account_id JOIN users u ON ah.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q22: When does my credit card expire?
+A22: {"type": "QUERY", "sql": "SELECT expiry_date, card_type FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q23: How do I find the location where a transaction happened?
+A23: {"type": "QUERY", "sql": "SELECT location_info, description, processed_at FROM transactions t JOIN accounts a ON (t.from_account_id = a.account_id OR t.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND location_info IS NOT NULL ORDER BY processed_at DESC LIMIT 1"}
+
+Q24: What is the minimum balance required for my account?
+A24: {"type": "QUERY", "sql": "SELECT minimum_balance, account_type FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q25: How do I verify a beneficiary I just added?
+A25: {"type": "QUERY", "sql": "SELECT beneficiary_name, is_verified FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q26: Can I see when I created my profile?
+A26: {"type": "QUERY", "sql": "SELECT created_at FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q27: What is the relationship status of my joint account holder?
+A27: {"type": "QUERY", "sql": "SELECT ah.relationship, u2.first_name, u2.last_name FROM account_holders ah JOIN users u ON ah.user_id = u.user_id JOIN account_holders ah2 ON ah.account_id = ah2.account_id JOIN users u2 ON ah2.user_id = u2.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND u.user_id != u2.user_id"}
+
+Q28: How do I find my account number?
+A28: {"type": "QUERY", "sql": "SELECT account_number, account_type FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q29: Can I update my phone number?
+A29: {"type": "QUERY", "sql": "SELECT phone, updated_at FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q30: How much credit do I have available?
+A30: {"type": "QUERY", "sql": "SELECT (credit_limit - balance) as available_credit, credit_limit, balance FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND account_type = 'CREDIT'"}
+
+Q31: Was my last deposit processed instantly?
+A31: {"type": "QUERY", "sql": "SELECT processed_at, created_at, amount, transaction_type FROM transactions t JOIN accounts a ON t.to_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'DEPOSIT' ORDER BY processed_at DESC LIMIT 1"}
+
+Q32: How do I find my bank's customer service number?
+A32: {"type": "QUERY", "sql": "SELECT b.contact_info, b.bank_name FROM banks b JOIN accounts a ON b.bank_id = a.bank_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' LIMIT 1"}
+
+Q33: Can I check if I am an employee or a customer?
+A33: {"type": "QUERY", "sql": "SELECT role FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q34: How do I view prior changes to my profile?
+A34: {"type": "QUERY", "sql": "SELECT old_values, new_values, created_at, table_name FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND table_name = 'users' ORDER BY created_at DESC"}
+
+Q35: What happens if I go below my minimum balance?
+A35: {"type": "QUERY", "sql": "SELECT balance, minimum_balance, account_type FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q36: Can I have multiple cards for one account?
+A36: {"type": "QUERY", "sql": "SELECT c.card_id, c.card_type, c.card_status FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q37: How do I retrieve my Customer ID?
+A37: {"type": "QUERY", "sql": "SELECT user_id, username FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q38: Is my SSN stored securely?
+A38: {"type": "QUERY", "sql": "SELECT ssn_hash FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q39: How do I check my monthly transaction limit on my card?
+A39: {"type": "QUERY", "sql": "SELECT monthly_limit, card_type FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q40: Can I schedule a transfer for the future?
+A40: {"type": "QUERY", "sql": "SELECT scheduled_at, transaction_status, amount FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND scheduled_at > CURRENT_TIMESTAMP"}
+
+Q41: How do I know if a transfer is internal or external?
+A41: {"type": "QUERY", "sql": "SELECT t.transaction_type, t.description, t.to_account_id FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' ORDER BY t.processed_at DESC LIMIT 1"}
+
+Q42: What is the 'available balance' vs 'current balance'?
+A42: {"type": "QUERY", "sql": "SELECT balance, available_balance, account_type FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q43: How do I delete a beneficiary?
+A43: {"type": "QUERY", "sql": "SELECT * FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q44: Can I filter transactions by type (e.g., Deposit)?
+A44: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON (t.from_account_id = a.account_id OR t.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'DEPOSIT' ORDER BY t.processed_at DESC LIMIT 5"}
+
+Q45: How long has my account been open?
+A45: {"type": "QUERY", "sql": "SELECT opened_at, NOW() - opened_at as duration FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q46: Are my card details encrypted?
+A46: {"type": "QUERY", "sql": "SELECT card_number_hash, cvv_hash FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q47: How do I find transactions over $1000?
+A47: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON (t.from_account_id = a.account_id OR t.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.amount > 1000 ORDER BY t.processed_at DESC"}
+
+Q48: Can I update the permissions for a joint holder?
+A48: {"type": "QUERY", "sql": "SELECT ah.permissions, u2.first_name FROM account_holders ah JOIN users u ON ah.user_id = u.user_id JOIN account_holders ah2 ON ah.account_id = ah2.account_id JOIN users u2 ON ah2.user_id = u2.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND u.user_id != u2.user_id"}
+
+Q49: How do I check if a bank branch is near me?
+A49: {"type": "QUERY", "sql": "SELECT address, bank_name FROM banks ORDER BY created_at LIMIT 10"}
+
+Q50: What is the status of my refund?
+A50: {"type": "QUERY", "sql": "SELECT transaction_status, amount, description FROM transactions t JOIN accounts a ON t.to_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'REFUND' ORDER BY processed_at DESC LIMIT 1"}
+
+Q51: How do I see the exchange rate used for a foreign purchase?
+A51: {"type": "QUERY", "sql": "SELECT exchange_rate, amount, currency, description FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND exchange_rate IS NOT NULL ORDER BY processed_at DESC LIMIT 1"}
+
+Q52: Can I get a list of all banks I transact with?
+A52: {"type": "QUERY", "sql": "SELECT DISTINCT bank_name FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q53: How do I reset my transaction PIN?
+A53: {"type": "QUERY", "sql": "SELECT updated_at FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q54: Is there a record of when I last updated my profile?
+A54: {"type": "QUERY", "sql": "SELECT updated_at FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q55: How do I know if a beneficiary is within the same bank?
+A55: {"type": "QUERY", "sql": "SELECT b.beneficiary_name, b.routing_number, banks.routing_number as my_bank_routing FROM beneficiaries b JOIN users u ON b.user_id = u.user_id JOIN accounts a ON a.user_id = u.user_id JOIN banks ON a.bank_id = banks.bank_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q56: Can I see the description I processed a transfer with?
+A56: {"type": "QUERY", "sql": "SELECT description, amount, processed_at FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' ORDER BY processed_at DESC LIMIT 1"}
+
+Q57: How do I stop a scheduled payment?
+A57: {"type": "QUERY", "sql": "SELECT transaction_id, amount, scheduled_at, transaction_status FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND scheduled_at > NOW() AND transaction_status = 'PENDING'"}
+
+Q58: What is the daily ATM withdrawal limit?
+A58: {"type": "QUERY", "sql": "SELECT daily_limit, card_type FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q59: How do I check if my account is locked?
+A59: {"type": "QUERY", "sql": "SELECT is_active, failed_login_attempts FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q60: Can I view my bank's full address?
+A60: {"type": "QUERY", "sql": "SELECT b.address, b.bank_name FROM banks b JOIN accounts a ON b.bank_id = a.bank_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' LIMIT 1"}
+
+
+Q61: How are merchant categories stored?
+A61: {"type": "QUERY", "sql": "SELECT merchant_info->>'category' as category, description FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' LIMIT 5"}
+
+Q62: Did I receive any interest last month?
+A62: {"type": "QUERY", "sql": "SELECT amount, processed_at FROM transactions t JOIN accounts a ON t.to_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'INTEREST' AND processed_at >= NULLIF(date_trunc('month', current_date) - interval '1 month', date_trunc('month', current_date))"}
+
+Q63: How do I find a transaction by its reference number?
+A63: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND reference_number = 'REF_NUMBER'"}
+
+Q64: Can I see the nickname of a beneficiary?
+A64: {"type": "QUERY", "sql": "SELECT nickname, beneficiary_name FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q65: What permissions do I have on a shared account?
+A65: {"type": "QUERY", "sql": "SELECT permissions, relationship FROM account_holders ah JOIN users u ON ah.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q66: How do I know if my card is blocked?
+A66: {"type": "QUERY", "sql": "SELECT card_status, blocked_at FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q67: Can I reopen a closed account?
+A67: {"type": "QUERY", "sql": "SELECT account_status, account_id FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND account_status = 'CLOSED'"}
+
+Q68: How do I track my spending by category?
+A68: {"type": "QUERY", "sql": "SELECT merchant_info->>'category' as category, SUM(amount) as total FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' GROUP BY merchant_info->>'category'"}
+
+Q69: What happens if I lose my phone number?
+A69: {"type": "QUERY", "sql": "SELECT phone FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q70: Can I see the date my card was issued?
+A70: {"type": "QUERY", "sql": "SELECT issued_at, card_type FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q71: How do I know if a transaction involved a currency conversion?
+A71: {"type": "QUERY", "sql": "SELECT exchange_rate, currency, amount FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND exchange_rate IS NOT NULL AND exchange_rate != 1.0"}
+
+Q72: Can I download my transaction history?
+A72: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' ORDER BY processed_at DESC LIMIT 100"}
+
+Q73: How do I check for duplicate transactions?
+A73: {"type": "QUERY", "sql": "SELECT amount, processed_at, description, count(*) FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' GROUP BY amount, processed_at, description HAVING count(*) > 1"}
+
+Q74: Is there a limit to how many beneficiaries I can have?
+A74: {"type": "QUERY", "sql": "SELECT count(*) as beneficiary_count FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q75: How do I check the status of a wire transfer?
+A75: {"type": "QUERY", "sql": "SELECT transaction_status, amount, processed_at FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'WIRE'"}
+
+Q76: Can I see who updated my account details?
+A76: {"type": "QUERY", "sql": "SELECT al.user_id as actor_id, al.action, al.created_at FROM audit_logs al WHERE al.record_id IN (SELECT account_id FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER')"}
+
+Q77: What happens to my data if I close my account?
+A77: {"type": "QUERY", "sql": "SELECT account_status, closed_at FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q78: How do I verify the recipient bank exists?
+A78: {"type": "QUERY", "sql": "SELECT bank_name, routing_number FROM banks WHERE routing_number = 'ROUTING_NUM'"}
+
+Q79: Can I set a custom nickname for my account?
+A79: {"type": "QUERY", "sql": "SELECT account_metadata->>'nickname' as nickname FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q80: How do I check if a transaction fee was waived?
+A80: {"type": "QUERY", "sql": "SELECT fee_amount, description FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND fee_amount = 0"}
+
+Q81: What is the format of the created_at timestamp?
+A81: {"type": "QUERY", "sql": "SELECT created_at FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER' LIMIT 1"}
+
+Q82: Can I search for transactions by description?
+A82: {"type": "QUERY", "sql": "SELECT description, amount, processed_at FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND description ILIKE '%KEYWORD%'"}
+
+Q83: How do I know if a beneficiary account is valid?
+A83: {"type": "QUERY", "sql": "SELECT is_verified, beneficiary_name FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q84: Can I verify my date of birth on file?
+A84: {"type": "QUERY", "sql": "SELECT date_of_birth FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q85: How do I see the IP address I last logged in from?
+A85: {"type": "QUERY", "sql": "SELECT ip_address, created_at FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND action = 'LOGIN' ORDER BY created_at DESC LIMIT 1"}
+
+Q86: Can I temporarily freeze my card?
+A86: {"type": "QUERY", "sql": "SELECT card_status FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q87: How do I find out my account opening anniversary?
+A87: {"type": "QUERY", "sql": "SELECT opened_at FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q88: Are transaction references unique?
+A88: {"type": "QUERY", "sql": "SELECT reference_number FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' LIMIT 1"}
+
+Q89: How do I check credit card utilization?
+A89: {"type": "QUERY", "sql": "SELECT (balance / credit_limit) * 100 as utilization_percentage FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND account_type = 'CREDIT'"}
+
+Q90: Can I see the user agent of a suspicious login?
+A90: {"type": "QUERY", "sql": "SELECT user_agent, ip_address, created_at FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND action = 'LOGIN' ORDER BY created_at DESC LIMIT 5"}
+
+Q91: How are 'permissions' defined for joint accounts?
+A91: {"type": "QUERY", "sql": "SELECT permissions FROM account_holders ah JOIN users u ON ah.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q92: What does the 'relationship' field mean in beneficiaries?
+A92: {"type": "QUERY", "sql": "SELECT relationship, beneficiary_name FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q93: How do I know if my KYC is done?
+A93: {"type": "QUERY", "sql": "SELECT email_verified, is_active FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q94: Can I categorize my beneficiaries?
+A94: {"type": "QUERY", "sql": "SELECT nickname, relationship FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q95: How do I find total fees paid this year?
+A95: {"type": "QUERY", "sql": "SELECT SUM(fee_amount) as total_fees FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND processed_at >= date_trunc('year', current_date)"}
+
+Q96: What happens if I forget my username?
+A96: {"type": "QUERY", "sql": "SELECT username, email FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q97: Can I see which employee authorized a transaction?
+A97: {"type": "QUERY", "sql": "SELECT al.user_id as employee_id, al.action FROM audit_logs al JOIN transactions t ON al.record_id = t.transaction_id JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q98: How do I check if my account is dormant?
+A98: {"type": "QUERY", "sql": "SELECT last_login_at FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q99: Can I have a negative balance?
+A99: {"type": "QUERY", "sql": "SELECT balance, overdraft_limit FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND balance < 0"}
+
+Q100: How do I validate a swift code?
+A100: {"type": "QUERY", "sql": "SELECT swift_code, bank_name FROM banks WHERE swift_code = 'SWIFT_CODE'"}
+
+Q101: How do I find all transactions linked to a specific check number?
+A101: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND (description LIKE '%CHECK_NUM%' OR reference_number = 'CHECK_NUM')"}
+
+Q102: Can I see if my account is eligible for rewards?
+A102: {"type": "QUERY", "sql": "SELECT account_metadata->>'rewards_tier' as rewards_tier FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q103: How do I update my notification preferences?
+A103: {"type": "QUERY", "sql": "SELECT account_metadata->>'notifications' as preferences FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q104: What happens if I don't use my card for a year?
+A104: {"type": "QUERY", "sql": "SELECT last_login_at, updated_at FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q105: Can I request a higher credit limit?
+A105: {"type": "QUERY", "sql": "SELECT credit_limit, account_type FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND account_type = 'CREDIT'"}
+
+Q106: How do I identify a salary deposit?
+A106: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.to_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'DEPOSIT' AND description ILIKE '%PAYROLL%'"}
+
+Q107: Can I see if a beneficiary was edited recently?
+A107: {"type": "QUERY", "sql": "SELECT * FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND table_name = 'beneficiaries' ORDER BY created_at DESC"}
+
+Q108: How do I find my bank's headquarters address?
+A108: {"type": "QUERY", "sql": "SELECT address FROM banks WHERE bank_name LIKE '%Headquarters%' LIMIT 1"}
+
+Q109: What is the maximum length for a transaction description?
+A109: {"type": "QUERY", "sql": "SELECT description FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' LIMIT 1"}
+
+Q110: How do I know if I have a pending loan approval?
+A110: {"type": "QUERY", "sql": "SELECT account_status, account_type FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND account_type = 'LOAN'"}
+
+Q111: Can I link an external account for transfers?
+A111: {"type": "QUERY", "sql": "SELECT * FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND bank_name != 'MY_BANK'"}
+
+Q112: How do I check the expiration of a hold on my funds?
+A112: {"type": "QUERY", "sql": "SELECT balance, available_balance FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q113: Can I see who I share my account with?
+A113: {"type": "QUERY", "sql": "SELECT u2.first_name, u2.last_name, ah.relationship FROM account_holders ah JOIN users u ON ah.user_id = u.user_id JOIN account_holders ah2 ON ah.account_id = ah2.account_id JOIN users u2 ON ah2.user_id = u2.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND u.user_id != u2.user_id"}
+
+Q114: How do I find transactions from a specific city?
+A114: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND location_info->>'city' = 'CITY_NAME'"}
+
+Q115: What format should my phone number be in?
+A115: {"type": "QUERY", "sql": "SELECT phone FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q116: How do I check if a transaction is a subscription payment?
+A116: {"type": "QUERY", "sql": "SELECT description, amount, processed_at FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND description ILIKE '%SUBSCRIPTION%'"}
+
+Q117: Can I request a stop payment on a check?
+A117: {"type": "QUERY", "sql": "SELECT transaction_id, transaction_status FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'CHECK'"}
+
+Q118: How do I see the total interest paid on a loan?
+A118: {"type": "QUERY", "sql": "SELECT SUM(amount) FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'INTEREST' AND a.account_type = 'LOAN'"}
+
+Q119: What is the 'cvv_hash' field used for?
+A119: {"type": "QUERY", "sql": "SELECT cvv_hash FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q120: Can I change my username?
+A120: {"type": "QUERY", "sql": "SELECT username FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+
+Q121: How do I find transactions within a specific date range?
+A121: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND processed_at BETWEEN 'START_DATE' AND 'END_DATE'"}
+
+Q122: Can I see if I have bill pay enabled?
+A122: {"type": "QUERY", "sql": "SELECT account_metadata->>'bill_pay_enabled' as bill_pay_status FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q123: How do I check the remaining term on my loan?
+A123: {"type": "QUERY", "sql": "SELECT opened_at, account_metadata->>'loan_term' as loan_term FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND account_type = 'LOAN'"}
+
+Q124: What happens if a transfer fails?
+A124: {"type": "QUERY", "sql": "SELECT transaction_status, amount, description FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_status = 'FAILED' ORDER BY processed_at DESC LIMIT 1"}
+
+Q125: Can I have multiple email addresses?
+A125: {"type": "QUERY", "sql": "SELECT email FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q126: How do I know if my address is valid?
+A126: {"type": "QUERY", "sql": "SELECT address FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q127: Can I see the time zone of a transaction?
+A127: {"type": "QUERY", "sql": "SELECT processed_at FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' LIMIT 1"}
+
+Q128: How do I find checks I've written?
+A128: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'CHECK'"}
+
+Q129: What is the secondary identification usage?
+A129: {"type": "QUERY", "sql": "SELECT user_id FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q130: How do I check if I'm eligible for a premium account?
+A130: {"type": "QUERY", "sql": "SELECT balance, opened_at FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q131: Can I see my average daily balance?
+A131: {"type": "QUERY", "sql": "SELECT AVG(balance) as avg_balance FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q132: How are refunds linked to original transactions?
+A132: {"type": "QUERY", "sql": "SELECT reference_number, description FROM transactions t JOIN accounts a ON t.to_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'REFUND'"}
+
+Q133: Can I update the name of a beneficiary?
+A133: {"type": "QUERY", "sql": "SELECT beneficiary_name FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q134: How do I see ATM fees specifically?
+A134: {"type": "QUERY", "sql": "SELECT fee_amount, description FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND description LIKE '%ATM%' AND fee_amount > 0"}
+
+Q135: What happens if my card expires?
+A135: {"type": "QUERY", "sql": "SELECT expiry_date, card_status FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q136: Can I see who created a beneficiary?
+A136: {"type": "QUERY", "sql": "SELECT user_id FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q137: How do I check the status of a dispute?
+A137: {"type": "QUERY", "sql": "SELECT transaction_status, description FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_status = 'DISPUTED'"}
+
+Q138: Can I access my account from multiple devices?
+A138: {"type": "QUERY", "sql": "SELECT user_agent, MAX(created_at) as last_access FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' GROUP BY user_agent"}
+
+Q139: How do I know if a deposit is pending?
+A139: {"type": "QUERY", "sql": "SELECT transaction_status, amount FROM transactions t JOIN accounts a ON t.to_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'DEPOSIT' AND transaction_status = 'PENDING'"}
+
+Q140: What happens to fractional cents in interest?
+A140: {"type": "QUERY", "sql": "SELECT amount FROM transactions t JOIN accounts a ON t.to_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'INTEREST' LIMIT 5"}
+
+Q141: Can I see the history of my credit limit changes?
+A141: {"type": "QUERY", "sql": "SELECT old_values, new_values, created_at FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND table_name = 'accounts' AND (old_values->>'credit_limit' IS NOT NULL OR new_values->>'credit_limit' IS NOT NULL)"}
+
+Q142: How do I find the bank name for a received transfer?
+A142: {"type": "QUERY", "sql": "SELECT description, merchant_info FROM transactions t JOIN accounts a ON t.to_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'TRANSFER'"}
+
+Q143: Can I define spending limits for categories?
+A143: {"type": "QUERY", "sql": "SELECT account_metadata->>'spending_limits' as spending_limits FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q144: How do I know if my card has a PIN set?
+A144: {"type": "QUERY", "sql": "SELECT card_number_hash FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q145: Can I see the exact time of a login?
+A145: {"type": "QUERY", "sql": "SELECT created_at FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND action = 'LOGIN' ORDER BY created_at DESC LIMIT 1"}
+
+Q146: How do I remove a joint holder?
+A146: {"type": "QUERY", "sql": "SELECT ah.user_id, ah.relationship FROM account_holders ah JOIN users u ON ah.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q147: What does 'processed_at' mean for a scheduled transfer?
+A147: {"type": "QUERY", "sql": "SELECT processed_at, scheduled_at FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND scheduled_at IS NOT NULL LIMIT 1"}
+
+Q148: Can I see the breakdown of principal vs interest in payment?
+A148: {"type": "QUERY", "sql": "SELECT amount, description FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND description LIKE '%LOAN%'"}
+
+Q149: How do I check if I have paperless statements?
+A149: {"type": "QUERY", "sql": "SELECT account_metadata->>'paperless' as paperless_status FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q150: Can I edit the date of a scheduled transfer?
+A150: {"type": "QUERY", "sql": "SELECT scheduled_at, transaction_status FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND scheduled_at > NOW() AND transaction_status = 'PENDING'"}
+
+Q151: How do I find my account creation branch?
+A151: {"type": "QUERY", "sql": "SELECT account_metadata->>'branch_id' as branch FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q152: Can I get a notification for low balance?
+A152: {"type": "QUERY", "sql": "SELECT account_metadata->>'notifications' as notification_settings FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q153: How do I see the purpose of a fee?
+A153: {"type": "QUERY", "sql": "SELECT description, fee_amount FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND fee_amount > 0"}
+
+Q154: What happens if I input the wrong CVV?
+A154: {"type": "QUERY", "sql": "SELECT transaction_status, description FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_status = 'DECLINED' ORDER BY processed_at DESC LIMIT 1"}
+
+Q155: Can I have a business account?
+A155: {"type": "QUERY", "sql": "SELECT account_type FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q156: How do I check if my account is frozen by authorities?
+A156: {"type": "QUERY", "sql": "SELECT account_status FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q157: Can I see the user ID of a beneficiary?
+A157: {"type": "QUERY", "sql": "SELECT user_id FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q158: How do I find the total deposits for the month?
+A158: {"type": "QUERY", "sql": "SELECT SUM(amount) as total_deposits FROM transactions t JOIN accounts a ON t.to_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'DEPOSIT' AND processed_at >= date_trunc('month', current_date)"}
+
+Q159: What is the 'swift_code' format?
+A159: {"type": "QUERY", "sql": "SELECT swift_code FROM banks LIMIT 1"}
+
+Q160: Can I see if a card re-issue is in progress?
+A160: {"type": "QUERY", "sql": "SELECT card_status FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q161: How do I check my rewards point balance?
+A161: {"type": "QUERY", "sql": "SELECT account_metadata->>'rewards_points' as points FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q162: Can I transfer to a phone number (P2P)?
+A162: {"type": "QUERY", "sql": "SELECT transaction_type FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' LIMIT 1"}
+
+Q163: How do I see the total withdrawn via ATM?
+A163: {"type": "QUERY", "sql": "SELECT SUM(amount) as total_withdrawn FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND description LIKE '%ATM%'"}
+
+Q164: What happens when I update my name?
+A164: {"type": "QUERY", "sql": "SELECT first_name, last_name, updated_at FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q165: Can I see if a transaction is recurring?
+A165: {"type": "QUERY", "sql": "SELECT description, count(*) FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' GROUP BY description HAVING count(*) > 1"}
+
+Q166: How do I check the maturity date of a CD?
+A166: {"type": "QUERY", "sql": "SELECT account_metadata->>'maturity_date' as maturity FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND account_type = 'CD'"}
+
+Q167: Can I delete my transaction history?
+A167: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' LIMIT 5"}
+
+Q168: How do I see if a check has cleared?
+A168: {"type": "QUERY", "sql": "SELECT transaction_status, processed_at FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'CHECK'"}
+
+Q169: What is the generic currency symbol?
+A169: {"type": "QUERY", "sql": "SELECT currency FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' LIMIT 1"}
+
+Q170: Can I view my account overdraft history?
+A170: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND balance < 0"}
+
+Q171: How do I know if my device is trusted?
+A171: {"type": "QUERY", "sql": "SELECT user_agent, ip_address FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' ORDER BY created_at DESC LIMIT 5"}
+
+Q172: Can I see the total outflow to a specific merchant?
+A172: {"type": "QUERY", "sql": "SELECT SUM(amount) as total_outflow FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND merchant_info->>'name' = 'MERCHANT_NAME'"}
+
+Q173: How do I update my tax residency?
+A173: {"type": "QUERY", "sql": "SELECT address FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q174: Can I set a travel notice on my card?
+A174: {"type": "QUERY", "sql": "SELECT card_number_hash FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q175: How do I see the generated interest for the year?
+A175: {"type": "QUERY", "sql": "SELECT SUM(amount) as total_interest FROM transactions t JOIN accounts a ON t.to_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'INTEREST' AND processed_at >= date_trunc('year', current_date)"}
+
+Q176: What if my routing number changes?
+A176: {"type": "QUERY", "sql": "SELECT routing_number, bank_name FROM banks"}
+
+Q177: Can I see the source IP of a transfer?
+A177: {"type": "QUERY", "sql": "SELECT ip_address, action FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND action LIKE '%TRANSFER%'"}
+
+Q178: How do I check if my account is joint or individual?
+A178: {"type": "QUERY", "sql": "SELECT count(*) as holder_count FROM account_holders ah JOIN accounts a ON ah.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' GROUP BY ah.account_id"}
+
+Q179: Can I see the reason for a fee reversal?
+A179: {"type": "QUERY", "sql": "SELECT description, amount FROM transactions t JOIN accounts a ON t.to_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'FEE_REVERSAL'"}
+
+Q180: How do I find the nearest ATM?
+A180: {"type": "QUERY", "sql": "SELECT address FROM banks LIMIT 5"}
+
+Q181: Can I see the authorized user on my credit card?
+A181: {"type": "QUERY", "sql": "SELECT * FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q182: How do I check if I have a mortgage?
+A182: {"type": "QUERY", "sql": "SELECT account_id, balance FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND account_type = 'MORTGAGE'"}
+
+Q183: Can I pay a loan from a savings account?
+A183: {"type": "QUERY", "sql": "SELECT account_id, account_type, balance FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND account_type IN ('SAVINGS', 'LOAN')"}
+
+Q184: How do I see the date of my last password change?
+A184: {"type": "QUERY", "sql": "SELECT created_at FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND action = 'PASSWORD_CHANGE' ORDER BY created_at DESC LIMIT 1"}
+
+Q185: Can I request a copy of a check?
+A185: {"type": "QUERY", "sql": "SELECT reference_number, description FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'CHECK'"}
+
+Q186: How do I check the status of a dispute I filed?
+A186: {"type": "QUERY", "sql": "SELECT transaction_status, description FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_status = 'DISPUTED'"}
+
+Q187: Can I see if a transaction was online or in-store?
+A187: {"type": "QUERY", "sql": "SELECT location_info, merchant_info FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' LIMIT 1"}
+
+Q188: How do I find my account's IBAN?
+A188: {"type": "QUERY", "sql": "SELECT account_number, routing_number FROM accounts a JOIN users u ON a.user_id = u.user_id JOIN banks b ON a.bank_id = b.bank_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q189: Can I see changes to my credit limit?
+A189: {"type": "QUERY", "sql": "SELECT old_values, new_values, created_at FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND table_name = 'accounts' AND action LIKE '%CREDIT%'"}
+
+Q190: How do I check if a beneficiary is blocked?
+A190: {"type": "QUERY", "sql": "SELECT is_verified FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q191: Can I see the tax withheld on interest?
+A191: {"type": "QUERY", "sql": "SELECT amount, description FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'WITHHOLDING_TAX'"}
+
+Q192: How do I find the clearing date of a transaction?
+A192: {"type": "QUERY", "sql": "SELECT processed_at FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' LIMIT 1"}
+
+Q193: Can I see if I reached my savings goal?
+A193: {"type": "QUERY", "sql": "SELECT balance FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND account_type = 'SAVINGS'"}
+
+Q194: How do I check if a payment is late?
+A194: {"type": "QUERY", "sql": "SELECT processed_at, scheduled_at FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND processed_at > scheduled_at"}
+
+Q195: Can I see the user role of a support agent?
+A195: {"type": "QUERY", "sql": "SELECT role FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND username = 'AGENT_USERNAME'"}
+
+Q196: How do I find the contact email of my bank?
+A196: {"type": "QUERY", "sql": "SELECT contact_info FROM banks LIMIT 1"}
+
+Q197: Can I see if my account is linked to a wallet (Apple/Google Pay)?
+A197: {"type": "QUERY", "sql": "SELECT card_metadata FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q198: How do I check the total balance across all my accounts?
+A198: {"type": "QUERY", "sql": "SELECT SUM(balance) as net_worth FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q199: Can I see the expiration of a promo rate?
+A199: {"type": "QUERY", "sql": "SELECT account_metadata->>'promo_expiry' as promo_end FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q200: How do I validate a beneficiary's address?
+A200: {"type": "QUERY", "sql": "SELECT * FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+
+Q201: Show me transactions between $50 and $100.
+A201: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.amount BETWEEN 50 AND 100 ORDER BY t.processed_at DESC"}
+
+Q202: Did I spend anything last weekend?
+A202: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.processed_at >= date_trunc('week', current_date) - interval '2 days' AND t.processed_at < date_trunc('week', current_date)"}
+
+Q203: How much have I spent on Uber this month?
+A203: {"type": "QUERY", "sql": "SELECT SUM(amount) FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.description ILIKE '%Uber%' AND t.processed_at >= date_trunc('month', current_date)"}
+
+Q204: What was my highest expense this year?
+A204: {"type": "QUERY", "sql": "SELECT MAX(amount) as max_spent, description, processed_at FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.processed_at >= date_trunc('year', current_date) GROUP BY description, processed_at ORDER BY max_spent DESC LIMIT 1"}
+
+Q205: List my transactions from lowest to highest amount.
+A205: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' ORDER BY t.amount ASC LIMIT 20"}
+
+Q206: How many transactions did I make this month?
+A206: {"type": "QUERY", "sql": "SELECT COUNT(*) FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.processed_at >= date_trunc('month', current_date)"}
+
+Q207: What is my average transaction size?
+A207: {"type": "QUERY", "sql": "SELECT AVG(amount) FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q208: Do I have any foreign currency transactions?
+A208: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.currency != 'USD'"}
+
+Q209: Have I received any refunds recently?
+A209: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.to_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.transaction_type = 'REFUND' ORDER BY t.processed_at DESC LIMIT 5"}
+
+Q210: How many of my transactions failed?
+A210: {"type": "QUERY", "sql": "SELECT COUNT(*) FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.transaction_status = 'FAILED'"}
+
+Q211: Show me all purchases from Amazon.
+A211: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.description ILIKE '%Amazon%'"}
+
+Q212: What are my last 3 deposits?
+A212: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.to_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.transaction_type = 'DEPOSIT' ORDER BY t.processed_at DESC LIMIT 3"}
+
+Q213: Show me withdrawals over $500.
+A213: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.transaction_type = 'WITHDRAWAL' AND t.amount > 500"}
+
+Q214: Which transactions have location data?
+A214: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.location_info IS NOT NULL LIMIT 10"}
+
+Q215: Identify my subscription payments.
+A215: {"type": "QUERY", "sql": "SELECT description, amount, COUNT(*) as frequency FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.processed_at >= date_trunc('year', current_date) GROUP BY description, amount HAVING COUNT(*) >= 3"}
+
+Q216: How much did I pay in fees last year?
+A216: {"type": "QUERY", "sql": "SELECT SUM(fee_amount) FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.processed_at >= date_trunc('year', current_date) - interval '1 year' AND t.processed_at < date_trunc('year', current_date)"}
+
+Q217: Do I have any incoming wire transfers?
+A217: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.to_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.transaction_type = 'WIRE_IN'"}
+
+Q218: Did I send money to John Doe?
+A218: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.description ILIKE '%John Doe%'"}
+
+Q219: Are there any transactions pending for more than 2 days?
+A219: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.transaction_status = 'PENDING' AND t.created_at < NOW() - interval '2 days'"}
+
+Q220: How much have I spent at gas stations?
+A220: {"type": "QUERY", "sql": "SELECT SUM(amount) FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.merchant_info->>'category' = 'Gas Station'"}
+
+Q221: What is my total income this month?
+A221: {"type": "QUERY", "sql": "SELECT SUM(amount) FROM transactions t JOIN accounts a ON t.to_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.transaction_type IN ('DEPOSIT', 'SALARY', 'TRANSFER_IN') AND t.processed_at >= date_trunc('month', current_date)"}
+
+Q222: What are my total expenses this month?
+A222: {"type": "QUERY", "sql": "SELECT SUM(amount) FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.transaction_type NOT IN ('TRANSFER_OUT', 'SAVINGS') AND t.processed_at >= date_trunc('month', current_date)"}
+
+Q223: What is my net cash flow this month?
+A223: {"type": "QUERY", "sql": "SELECT (SELECT COALESCE(SUM(amount), 0) FROM transactions t JOIN accounts a ON t.to_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.processed_at >= date_trunc('month', current_date)) - (SELECT COALESCE(SUM(amount), 0) FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.processed_at >= date_trunc('month', current_date)) as net_cash_flow"}
+
+Q224: Show me transactions sorted by date ascending.
+A224: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' ORDER BY t.processed_at ASC LIMIT 20"}
+
+Q225: Do I have any duplicate charges?
+A225: {"type": "QUERY", "sql": "SELECT amount, description, processed_at, COUNT(*) FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' GROUP BY amount, description, processed_at HAVING COUNT(*) > 1"}
+
+Q226: Review my balance history.
+A226: {"type": "QUERY", "sql": "SELECT balance, created_at FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND table_name = 'accounts' AND action = 'UPDATE_BALANCE' ORDER BY created_at DESC LIMIT 10"}
+
+Q227: What is my total available credit?
+A227: {"type": "QUERY", "sql": "SELECT SUM(credit_limit - balance) as total_available_credit FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND a.account_type = 'CREDIT'"}
+
+Q228: When does my card expire?
+A228: {"type": "QUERY", "sql": "SELECT expiry_date FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q229: Is my card physical or virtual?
+A229: {"type": "QUERY", "sql": "SELECT card_type FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q230: How many active cards do I have?
+A230: {"type": "QUERY", "sql": "SELECT COUNT(*) FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND c.card_status = 'ACTIVE'"}
+
+Q231: Are any of my accounts frozen?
+A231: {"type": "QUERY", "sql": "SELECT account_id, account_type FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND a.account_status = 'FROZEN'"}
+
+Q232: What is the interest rate on my loan?
+A232: {"type": "QUERY", "sql": "SELECT interest_rate FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND a.account_type = 'LOAN'"}
+
+Q233: What is the payoff amount for my loan?
+A233: {"type": "QUERY", "sql": "SELECT balance FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND a.account_type = 'LOAN'"}
+
+Q234: When is my next loan payment due?
+A234: {"type": "QUERY", "sql": "SELECT account_metadata->>'next_payment_date' as next_payment FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND a.account_type = 'LOAN'"}
+
+Q235: What was my last statement balance?
+A235: {"type": "QUERY", "sql": "SELECT account_metadata->>'last_statement_balance' as statement_balance FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q236: What is the nickname of my savings account?
+A236: {"type": "QUERY", "sql": "SELECT account_metadata->>'nickname' FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND a.account_type = 'SAVINGS'"}
+
+Q237: Who are the holders of my joint account?
+A237: {"type": "QUERY", "sql": "SELECT u2.first_name, u2.last_name FROM account_holders ah JOIN accounts a ON ah.account_id = a.account_id JOIN users u ON a.user_id = u.user_id JOIN account_holders ah2 ON ah.account_id = ah2.account_id JOIN users u2 ON ah2.user_id = u2.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND u.user_id != u2.user_id"}
+
+Q238: When was my old account closed?
+A238: {"type": "QUERY", "sql": "SELECT closed_at FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND a.account_status = 'CLOSED'"}
+
+Q239: What is the daily limit on my card?
+A239: {"type": "QUERY", "sql": "SELECT daily_limit FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q240: What is the monthly spending limit on my card?
+A240: {"type": "QUERY", "sql": "SELECT monthly_limit FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q241: Is overdraft protection enabled?
+A241: {"type": "QUERY", "sql": "SELECT account_metadata->>'overdraft_enabled' FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q242: What is the current overdraft fee?
+A242: {"type": "QUERY", "sql": "SELECT fee_amount FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.transaction_type = 'OVERDRAFT_FEE' ORDER BY t.processed_at DESC LIMIT 1"}
+
+Q243: How much is the minimum balance fee?
+A243: {"type": "QUERY", "sql": "SELECT account_metadata->>'min_balance_fee' FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q244: List all my savings accounts.
+A244: {"type": "QUERY", "sql": "SELECT * FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND a.account_type = 'SAVINGS'"}
+
+Q245: List all my checking accounts.
+A245: {"type": "QUERY", "sql": "SELECT * FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND a.account_type = 'CHECKING'"}
+
+Q246: What is my total savings balance?
+A246: {"type": "QUERY", "sql": "SELECT SUM(balance) FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND a.account_type = 'SAVINGS'"}
+
+Q247: What is my total debt?
+A247: {"type": "QUERY", "sql": "SELECT SUM(balance) FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND a.account_type IN ('LOAN', 'CREDIT')"}
+
+Q248: Is my card Visa or Mastercard?
+A248: {"type": "QUERY", "sql": "SELECT card_metadata->>'network' FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q249: What design is on my card?
+A249: {"type": "QUERY", "sql": "SELECT card_metadata->>'design' FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q250: What currency is my account in?
+A250: {"type": "QUERY", "sql": "SELECT currency FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' LIMIT 1"}
+
+Q251: When did I last reset my password?
+A251: {"type": "QUERY", "sql": "SELECT created_at FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND al.action = 'PASSWORD_RESET' ORDER BY created_at DESC LIMIT 1"}
+
+Q252: How many active sessions do I have?
+A252: {"type": "QUERY", "sql": "SELECT COUNT(DISTINCT session_id) FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND al.action = 'LOGIN' AND al.created_at >= NOW() - interval '24 hours'"}
+
+Q253: List my trusted devices.
+A253: {"type": "QUERY", "sql": "SELECT DISTINCT user_agent FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND al.action = 'TRUST_DEVICE'"}
+
+Q254: Show me recent failed login attempts.
+A254: {"type": "QUERY", "sql": "SELECT * FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND al.action = 'LOGIN_FAILED' ORDER BY created_at DESC LIMIT 5"}
+
+Q255: Did I login from a new IP recently?
+A255: {"type": "QUERY", "sql": "SELECT DISTINCT ip_address, created_at FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND al.action = 'LOGIN' ORDER BY created_at DESC LIMIT 5"}
+
+Q256: Is 2FA enabled on my account?
+A256: {"type": "QUERY", "sql": "SELECT is_2fa_enabled FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q257: What is my 2FA method?
+A257: {"type": "QUERY", "sql": "SELECT two_factor_method FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q258: When did I last update my profile?
+A258: {"type": "QUERY", "sql": "SELECT updated_at FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q259: Who viewed my profile recently?
+A259: {"type": "QUERY", "sql": "SELECT * FROM audit_logs al WHERE record_id = (SELECT user_id FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER') AND action = 'VIEW_PROFILE'"}
+
+Q260: Do I have security questions set?
+A260: {"type": "QUERY", "sql": "SELECT has_security_questions FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q261: When was my PIN last changed?
+A261: {"type": "QUERY", "sql": "SELECT created_at FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND al.action = 'PIN_CHANGE' ORDER BY created_at DESC LIMIT 1"}
+
+Q262: Is my account currently locked?
+A262: {"type": "QUERY", "sql": "SELECT is_locked FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q263: Which countries are blocked for my card?
+A263: {"type": "QUERY", "sql": "SELECT card_metadata->>'blocked_countries' FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q264: Show my login history for the last 30 days.
+A264: {"type": "QUERY", "sql": "SELECT * FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND al.action = 'LOGIN' AND al.created_at >= NOW() - interval '30 days'"}
+
+Q265: Do I have any suspicious activity alerts?
+A265: {"type": "QUERY", "sql": "SELECT * FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND al.action = 'SUSPICIOUS_ACTIVITY'"}
+
+Q266: What device type was used for my last login?
+A266: {"type": "QUERY", "sql": "SELECT user_agent FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND al.action = 'LOGIN' ORDER BY created_at DESC LIMIT 1"}
+
+Q267: What browser was used for my last login?
+A267: {"type": "QUERY", "sql": "SELECT user_agent FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND al.action = 'LOGIN' ORDER BY created_at DESC LIMIT 1"}
+
+Q268: What OS was used for my last login?
+A268: {"type": "QUERY", "sql": "SELECT user_agent FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND al.action = 'LOGIN' ORDER BY created_at DESC LIMIT 1"}
+
+Q269: Is API access enabled for my account?
+A269: {"type": "QUERY", "sql": "SELECT api_access_enabled FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q270: Have I requested a data export?
+A270: {"type": "QUERY", "sql": "SELECT * FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND al.action = 'DATA_EXPORT_REQUEST'"}
+
+Q271: What are my privacy settings?
+A271: {"type": "QUERY", "sql": "SELECT privacy_settings FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q272: What are my marketing preferences?
+A272: {"type": "QUERY", "sql": "SELECT marketing_preferences FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q273: Which third-party apps have access to my account?
+A273: {"type": "QUERY", "sql": "SELECT connected_apps FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q274: How do I revoke access for an app?
+A274: {"type": "QUERY", "sql": "SELECT connected_apps FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q275: Is biometric login enabled?
+A275: {"type": "QUERY", "sql": "SELECT biometric_enabled FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q276: List all my beneficiaries.
+A276: {"type": "QUERY", "sql": "SELECT * FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q277: Show me only active beneficiaries.
+A277: {"type": "QUERY", "sql": "SELECT * FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND b.is_active = TRUE"}
+
+Q278: Do I have beneficiaries at Chase Bank?
+A278: {"type": "QUERY", "sql": "SELECT * FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND b.bank_name LIKE '%Chase%'"}
+
+Q279: When did I add John as a beneficiary?
+A279: {"type": "QUERY", "sql": "SELECT created_at FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND b.beneficiary_name LIKE '%John%'"}
+
+Q280: Show total spending on Uber
+A280: {"type": "QUERY", "sql": "SELECT SUM(amount) FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND description ILIKE '%Uber%'"}
+
+Q281: Count transactions above $500
+A281: {"type": "QUERY", "sql": "SELECT COUNT(*) FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND amount > 500"}
+
+Q282: List all withdrawals from Savings
+A282: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.transaction_type = 'WITHDRAWAL' AND a.account_type = 'SAVINGS'"}
+
+Q283: Find payments to 'City Power'
+A283: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND description ILIKE '%City Power%'"}
+
+Q284: Total fees paid this year
+A284: {"type": "QUERY", "sql": "SELECT SUM(fee_amount) FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.processed_at >= date_trunc('year', current_date)"}
+
+Q285: Average transaction amount for Checking
+A285: {"type": "QUERY", "sql": "SELECT AVG(amount) FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND a.account_type = 'CHECKING'"}
+
+Q286: Max transaction amount in last 30 days
+A286: {"type": "QUERY", "sql": "SELECT MAX(amount) FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND t.processed_at >= NOW() - INTERVAL '30 days'"}
+
+Q287: Count failed transactions
+A287: {"type": "QUERY", "sql": "SELECT COUNT(*) FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_status = 'FAILED'"}
+
+Q288: Show pending credits
+A288: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.to_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_status = 'PENDING' AND transaction_type = 'DEPOSIT'"}
+
+Q289: List distinct merchants visited
+A289: {"type": "QUERY", "sql": "SELECT DISTINCT merchant_info->>'name' FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND merchant_info IS NOT NULL"}
+
+Q290: Total spending in 'Dining' category
+A290: {"type": "QUERY", "sql": "SELECT SUM(amount) FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND merchant_info->>'category' = 'Dining'"}
+
+Q291: Find refunds (credits with negative amount?) or specific type
+A291: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.to_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND description ILIKE '%Refund%'"}
+
+Q292: Show transactions with reference number 'REF123'
+A292: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND reference_number = 'REF123'"}
+
+Q293: Transactions grouped by status
+A293: {"type": "QUERY", "sql": "SELECT transaction_status, COUNT(*) FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' GROUP BY transaction_status"}
+
+Q294: Find transfers to beneficiary 'John'
+A294: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND description ILIKE '%Transfer to John%'"}
+
+Q295: List transactions ordered by date descending
+A295: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' ORDER BY processed_at DESC"}
+
+Q296: Show top 5 largest expenses
+A296: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' ORDER BY amount DESC LIMIT 5"}
+
+Q297: Total incoming funds (Deposits + Transfers In)
+A297: {"type": "QUERY", "sql": "SELECT SUM(amount) FROM transactions t JOIN accounts a ON t.to_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q298: Check if I paid 'Netflix' this month
+A298: {"type": "QUERY", "sql": "SELECT EXISTS(SELECT 1 FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND description ILIKE '%Netflix%' AND processed_at >= date_trunc('month', current_date))"}
+
+Q299: List all fee transactions
+A299: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'FEE'"}
+
+Q300: Show transactions via contactless card
+A300: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN cards c ON t.from_account_id = c.account_id JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND c.is_contactless = TRUE"}
+
+Q301: Find ATM withdrawals
+A301: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND description ILIKE '%ATM%'"}
+
+Q302: Total overdraft fees paid
+A302: {"type": "QUERY", "sql": "SELECT SUM(fee_amount) FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND description ILIKE '%Overdraft%'"}
+
+Q303: List transactions with currency 'EUR'
+A303: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON t.from_account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND currency = 'EUR'"}
+
+Q304: Show transactions for specific account number
+A304: {"type": "QUERY", "sql": "SELECT * FROM transactions t JOIN accounts a ON (t.from_account_id = a.account_id OR t.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND a.account_number = '1234567890'"}
+
+Q305: List active credit cards
+A305: {"type": "QUERY", "sql": "SELECT * FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND c.card_type = 'CREDIT' AND c.card_status = 'ACTIVE'"}
+
+Q306: Show expired cards
+A306: {"type": "QUERY", "sql": "SELECT * FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND c.expiry_date < current_date"}
+
+Q307: Total credit limit across all cards
+A307: {"type": "QUERY", "sql": "SELECT SUM(a.credit_limit) FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND a.account_type = 'CREDIT'"}
+
+Q308: Cards expiring this year
+A308: {"type": "QUERY", "sql": "SELECT * FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND extract(year from c.expiry_date) = extract(year from current_date)"}
+
+Q309: Find card with specific last 4 digits (hashed check)
+A309: {"type": "QUERY", "sql": "SELECT * FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND c.card_number_hash LIKE '%HASH_OF_LAST_4'"}
+
+Q310: Check daily limit of my debit card
+A310: {"type": "QUERY", "sql": "SELECT daily_limit FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND c.card_type = 'DEBIT'"}
+
+Q311: List blocked cards
+A311: {"type": "QUERY", "sql": "SELECT * FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND c.blocked_at IS NOT NULL"}
+
+Q312: Show cards with monthly limit > 5000
+A312: {"type": "QUERY", "sql": "SELECT * FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND c.monthly_limit > 5000"}
+
+Q313: Count active cards
+A313: {"type": "QUERY", "sql": "SELECT COUNT(*) FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND c.card_status = 'ACTIVE'"}
+
+Q314: Get interest rate of my Savings account
+A314: {"type": "QUERY", "sql": "SELECT interest_rate FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND a.account_type = 'SAVINGS'"}
+
+Q315: Show available balance for all accounts
+A315: {"type": "QUERY", "sql": "SELECT account_type, available_balance FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q316: List accounts with low balance (< 100)
+A316: {"type": "QUERY", "sql": "SELECT * FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND balance < 100"}
+
+Q317: Find accounts opened last year
+A317: {"type": "QUERY", "sql": "SELECT * FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND extract(year from opened_at) = extract(year from current_date) - 1"}
+
+Q318: Show closed accounts
+A318: {"type": "QUERY", "sql": "SELECT * FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND account_status = 'CLOSED'"}
+
+Q319: Total balance in Checking accounts
+A319: {"type": "QUERY", "sql": "SELECT SUM(balance) FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND account_type = 'CHECKING'"}
+
+Q320: Check overdraft limit
+A320: {"type": "QUERY", "sql": "SELECT overdraft_limit FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' LIMIT 1"}
+
+Q321: List joint accounts
+A321: {"type": "QUERY", "sql": "SELECT * FROM accounts a JOIN account_holders ah ON a.account_id = ah.account_id JOIN users u ON ah.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND ah.relationship = 'JOINT'"}
+
+Q322: Show primary account holder info
+A322: {"type": "QUERY", "sql": "SELECT u.first_name, u.last_name FROM users u JOIN account_holders ah ON u.user_id = ah.user_id WHERE ah.relationship = 'PRIMARY' AND ah.account_id = (SELECT account_id FROM accounts a JOIN users u2 ON a.user_id = u2.user_id WHERE u2.email = 'USER_EMAIL_PLACEHOLDER' LIMIT 1)"}
+
+Q323: Find accounts with metadata containing 'vacation'
+A323: {"type": "QUERY", "sql": "SELECT * FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND account_metadata->>'purpose' = 'vacation'"}
+
+Q324: Show accounts sorted by balance desc
+A324: {"type": "QUERY", "sql": "SELECT * FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' ORDER BY balance DESC"}
+
+Q325: List beneficiaries associated with my account
+A325: {"type": "QUERY", "sql": "SELECT * FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q326: Count verified beneficiaries
+A326: {"type": "QUERY", "sql": "SELECT COUNT(*) FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND is_verified = TRUE"}
+
+Q327: Find beneficiary by nickname 'Mom'
+A327: {"type": "QUERY", "sql": "SELECT * FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND nickname = 'Mom'"}
+
+Q328: Show beneficiaries at 'Chase Bank'
+A328: {"type": "QUERY", "sql": "SELECT * FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND bank_name LIKE '%Chase%'"}
+
+Q329: List recently added beneficiaries
+A329: {"type": "QUERY", "sql": "SELECT * FROM beneficiaries b JOIN users u ON b.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' ORDER BY created_at DESC LIMIT 5"}
+
+Q330: Show my recent login history
+A330: {"type": "QUERY", "sql": "SELECT last_login_at FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q331: List failed login attempts count
+A331: {"type": "QUERY", "sql": "SELECT failed_login_attempts FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q332: Is my email verified?
+A332: {"type": "QUERY", "sql": "SELECT email_verified FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q333: Show my profile address
+A333: {"type": "QUERY", "sql": "SELECT address FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q334: Get my phone number
+A334: {"type": "QUERY", "sql": "SELECT phone FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q335: Find audit logs for password changes
+A335: {"type": "QUERY", "sql": "SELECT * FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND action = 'PASSWORD_CHANGE'"}
+
+Q336: Show recent profile updates
+A336: {"type": "QUERY", "sql": "SELECT * FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND action = 'PROFILE_UPDATE'"}
+
+Q337: List active sessions (via audit logs)
+A337: {"type": "QUERY", "sql": "SELECT * FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND action = 'LOGIN' ORDER BY created_at DESC LIMIT 1"}
+
+Q338: Check if I have any blacklisted tokens
+A338: {"type": "QUERY", "sql": "SELECT * FROM blacklisted_tokens bt WHERE token IN (SELECT token FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER')"}
+
+Q339: Show logs for 'Fund Transfer' actions
+A339: {"type": "QUERY", "sql": "SELECT * FROM audit_logs al JOIN users u ON al.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND action = 'FUND_TRANSFER'"}
+
+Q340: List my banks (linked accounts)
+A340: {"type": "QUERY", "sql": "SELECT DISTINCT b.bank_name FROM banks b JOIN accounts a ON b.bank_id = a.bank_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q341: Show routing number of my bank
+A341: {"type": "QUERY", "sql": "SELECT b.routing_number FROM banks b JOIN accounts a ON b.bank_id = a.bank_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' LIMIT 1"}
+
+Q342: Find bank contact info
+A342: {"type": "QUERY", "sql": "SELECT b.contact_info FROM banks b JOIN accounts a ON b.bank_id = a.bank_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' LIMIT 1"}
+
+Q343: Get bank address
+A343: {"type": "QUERY", "sql": "SELECT b.address FROM banks b JOIN accounts a ON b.bank_id = a.bank_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' LIMIT 1"}
+
+Q344: Count accounts per bank
+A344: {"type": "QUERY", "sql": "SELECT b.bank_name, COUNT(*) FROM accounts a JOIN banks b ON a.bank_id = b.bank_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' GROUP BY b.bank_name"}
+
+Q345: Show total balance per bank
+A345: {"type": "QUERY", "sql": "SELECT b.bank_name, SUM(a.balance) FROM accounts a JOIN banks b ON a.bank_id = b.bank_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' GROUP BY b.bank_name"}
+
+Q346: List users with role 'MANAGER'
+A346: {"type": "QUERY", "sql": "SELECT username, email FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND role = 'MANAGER'"}
+
+Q347: Count total users (Admin)
+A347: {"type": "QUERY", "sql": "SELECT COUNT(*) FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q348: Show all banks in system
+A348: {"type": "QUERY", "sql": "SELECT bank_name, routing_number FROM banks"}
+
+Q349: List distinct account types supported
+A349: {"type": "QUERY", "sql": "SELECT UNNEST(ENUM_RANGE(NULL::account_type))"}
+
+Q350: Show distinct transaction types
+A350: {"type": "QUERY", "sql": "SELECT UNNEST(ENUM_RANGE(NULL::transaction_type))"}
+
+Q351: Find user by username 'jdoe'
+A351: {"type": "QUERY", "sql": "SELECT email, first_name FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND username = 'jdoe'"}
+
+Q352: List accounts created today
+A352: {"type": "QUERY", "sql": "SELECT * FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND created_at >= current_date"}
+
+Q353: Show high value transactions system-wide (Admin)
+A353: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND amount > 10000"}
+
+Q354: Count logins today
+A354: {"type": "QUERY", "sql": "SELECT COUNT(*) FROM audit_logs JOIN users u ON audit_logs.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND action = 'LOGIN' AND created_at >= current_date"}
+
+Q355: List blocked IPs from audit logs
+A355: {"type": "QUERY", "sql": "SELECT DISTINCT ip_address FROM audit_logs JOIN users u ON audit_logs.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND action = 'BLOCKED_IP'"}
+
+Q356: Show users created in last 7 days
+A356: {"type": "QUERY", "sql": "SELECT username, created_at FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND created_at >= NOW() - INTERVAL '7 days'"}
+
+Q357: Count active cards system-wide
+A357: {"type": "QUERY", "sql": "SELECT COUNT(*) FROM cards JOIN accounts a ON cards.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND card_status = 'ACTIVE'"}
+
+Q358: List beneficiaries not verified
+A358: {"type": "QUERY", "sql": "SELECT * FROM beneficiaries JOIN users u ON beneficiaries.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND is_verified = FALSE"}
+
+Q359: Show banks added recently
+A359: {"type": "QUERY", "sql": "SELECT * FROM banks ORDER BY created_at DESC LIMIT 5"}
+
+Q360: Find users with no phone number
+A360: {"type": "QUERY", "sql": "SELECT username FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND phone IS NULL"}
+
+Q361: List transactions without description
+A361: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND description IS NULL"}
+
+Q362: Show average balance of all accounts
+A362: {"type": "QUERY", "sql": "SELECT AVG(balance) FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q363: Count transactions by currency
+A363: {"type": "QUERY", "sql": "SELECT currency, COUNT(*) FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' GROUP BY currency"}
+
+Q364: List top 10 users by balance
+A364: {"type": "QUERY", "sql": "SELECT u.username, SUM(a.balance) as total_bal FROM users u JOIN accounts a ON u.user_id = a.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' GROUP BY u.username ORDER BY total_bal DESC LIMIT 10"}
+
+Q365: Show cards expiring next month
+A365: {"type": "QUERY", "sql": "SELECT * FROM cards JOIN accounts a ON cards.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND expiry_date >= date_trunc('month', current_date + interval '1 month') AND expiry_date < date_trunc('month', current_date + interval '2 months')"}
+
+Q366: List users with locked accounts (status SUSPENDED)
+A366: {"type": "QUERY", "sql": "SELECT u.username FROM users u JOIN accounts a ON u.user_id = a.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND a.account_status = 'SUSPENDED'"}
+
+Q367: Show audit logs by specific user id
+A367: {"type": "QUERY", "sql": "SELECT * FROM audit_logs JOIN users u ON audit_logs.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND user_id = 'UUID_PLACEHOLDER'"}
+
+Q368: Find transactions with notes
+A368: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND description LIKE '%note%'"}
+
+Q369: List accounts with negative balance
+A369: {"type": "QUERY", "sql": "SELECT * FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND balance < 0"}
+
+Q370: Show users who haven't logged in for a year
+A370: {"type": "QUERY", "sql": "SELECT username FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND last_login_at < NOW() - INTERVAL '1 year'"}
+
+Q371: Count joint accounts
+A371: {"type": "QUERY", "sql": "SELECT COUNT(*) FROM account_holders WHERE relationship = 'JOINT'"}
+
+Q372: List all Swift codes
+A372: {"type": "QUERY", "sql": "SELECT swift_code FROM banks WHERE swift_code IS NOT NULL"}
+
+Q373: Show transactions processed today
+A373: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND processed_at >= current_date"}
+
+Q374: Find users with specific first name 'Alice'
+A374: {"type": "QUERY", "sql": "SELECT * FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND first_name = 'Alice'"}
+
+Q375: List all table names in audit logs
+A375: {"type": "QUERY", "sql": "SELECT DISTINCT table_name FROM audit_logs JOIN users u ON audit_logs.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q376: Show max credit limit allowed
+A376: {"type": "QUERY", "sql": "SELECT MAX(credit_limit) FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q377: Count transactions with fees > 0
+A377: {"type": "QUERY", "sql": "SELECT COUNT(*) FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND fee_amount > 0"}
+
+Q378: List employees (role EMPLOYEE)
+A378: {"type": "QUERY", "sql": "SELECT username, email FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND role = 'EMPLOYEE'"}
+
+Q379: Show admin users
+A379: {"type": "QUERY", "sql": "SELECT username FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND role = 'ADMIN'"}
+
+Q380: Check balance of account ending in 1234
+A380: {"type": "QUERY", "sql": "SELECT balance FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND account_number LIKE '%1234'"}
+
+Q381: List transactions for merchant 'Amazon'
+A381: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND merchant_info->>'name' = 'Amazon'"}
+
+Q382: Show my user id
+A382: {"type": "QUERY", "sql": "SELECT user_id FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q383: List accounts with metadata
+A383: {"type": "QUERY", "sql": "SELECT * FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND account_metadata IS NOT NULL"}
+
+Q384: Count beneficiaries
+A384: {"type": "QUERY", "sql": "SELECT COUNT(*) FROM beneficiaries WHERE user_id = (SELECT user_id FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER')"}
+
+Q385: Show last 5 transactions
+A385: {"type": "QUERY", "sql": "SELECT * FROM transactions WHERE from_account_id IN (SELECT account_id FROM accounts WHERE user_id = (SELECT user_id FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER')) ORDER BY created_at DESC LIMIT 5"}
+
+Q386: Find deposits > 1000
+A386: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'DEPOSIT' AND amount > 1000"}
+
+Q387: List accounts with distinct currencies
+A387: {"type": "QUERY", "sql": "SELECT DISTINCT currency FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q388: Show all transaction statuses
+A388: {"type": "QUERY", "sql": "SELECT DISTINCT transaction_status FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q389: Count transactions per month
+A389: {"type": "QUERY", "sql": "SELECT date_trunc('month', created_at), COUNT(*) FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' GROUP BY 1"}
+
+Q390: List banks with 'Bank' in name
+A390: {"type": "QUERY", "sql": "SELECT bank_name FROM banks WHERE bank_name LIKE '%Bank%'"}
+
+Q391: Show users with unverified emails
+A391: {"type": "QUERY", "sql": "SELECT email FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND email_verified = FALSE"}
+
+Q392: Find cards with no daily limit
+A392: {"type": "QUERY", "sql": "SELECT * FROM cards JOIN accounts a ON cards.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND daily_limit IS NULL"}
+
+Q393: List transactions with merchant info
+A393: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND merchant_info IS NOT NULL"}
+
+Q394: Show audit logs for table 'users'
+A394: {"type": "QUERY", "sql": "SELECT * FROM audit_logs JOIN users u ON audit_logs.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND table_name = 'users'"}
+
+Q395: List accounts ordered by opened date
+A395: {"type": "QUERY", "sql": "SELECT * FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' ORDER BY opened_at"}
+
+Q396: Find users created in 2025
+A396: {"type": "QUERY", "sql": "SELECT * FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND extract(year from created_at) = 2025"}
+
+Q397: Show sum of all balances
+A397: {"type": "QUERY", "sql": "SELECT SUM(balance) FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q398: Count transactions with location info
+A398: {"type": "QUERY", "sql": "SELECT COUNT(*) FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND location_info IS NOT NULL"}
+
+Q399: List transactions with fees > $10
+A399: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND fee_amount > 10"}
+
+Q400: Show my role
+A400: {"type": "QUERY", "sql": "SELECT role FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q401: List all users who are not active.
+A401: {"type": "QUERY", "sql": "SELECT username, email FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND is_active = FALSE"}
+
+Q402: Show me users who have not verified their email.
+A402: {"type": "QUERY", "sql": "SELECT username, email FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND email_verified = FALSE"}
+
+Q403: Find transactions exceeding $10,000 for AML review.
+A403: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND amount > 10000"}
+
+Q404: List accounts with a negative balance.
+A404: {"type": "QUERY", "sql": "SELECT account_number, balance FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND balance < 0"}
+
+Q405: Show users with more than 3 failed login attempts.
+A405: {"type": "QUERY", "sql": "SELECT username, failed_login_attempts FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND failed_login_attempts > 3"}
+
+Q406: Identify accounts created in the last 24 hours.
+A406: {"type": "QUERY", "sql": "SELECT account_number, created_at FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND created_at >= NOW() - interval '24 hours'"}
+
+Q407: Count the number of active customers.
+A407: {"type": "QUERY", "sql": "SELECT COUNT(*) FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND role = 'CUSTOMER' AND is_active = TRUE"}
+
+Q408: List all bank branches.
+A408: {"type": "QUERY", "sql": "SELECT bank_name, address FROM banks"}
+
+Q409: Find users born before 1960.
+A409: {"type": "QUERY", "sql": "SELECT first_name, last_name FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND date_of_birth < '1960-01-01'"}
+
+Q410: Show cards that have been blocked.
+A410: {"type": "QUERY", "sql": "SELECT card_id, blocked_at FROM cards JOIN accounts a ON cards.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND blocked_at IS NOT NULL"}
+
+Q411: List all transactions with a specific reference number 'REF123'.
+A411: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND reference_number = 'REF123'"}
+
+Q412: Show me the operational currency for all transactions.
+A412: {"type": "QUERY", "sql": "SELECT DISTINCT currency FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q413: Count transactions grouped by status.
+A413: {"type": "QUERY", "sql": "SELECT transaction_status, COUNT(*) FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' GROUP BY transaction_status"}
+
+Q414: Find duplicate emails in the user base.
+A414: {"type": "QUERY", "sql": "SELECT email, COUNT(*) FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' GROUP BY email HAVING COUNT(*) > 1"}
+
+Q415: List all joint accounts.
+A415: {"type": "QUERY", "sql": "SELECT DISTINCT account_id FROM account_holders WHERE relationship = 'JOINT'"}
+
+Q416: Show audit logs for table 'users'.
+A416: {"type": "QUERY", "sql": "SELECT * FROM audit_logs JOIN users u ON audit_logs.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND table_name = 'users' ORDER BY created_at DESC LIMIT 50"}
+
+Q417: Who performed the last system action?
+A417: {"type": "QUERY", "sql": "SELECT user_id, action FROM audit_logs JOIN users u ON audit_logs.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' ORDER BY created_at DESC LIMIT 1"}
+
+Q418: List all distinct IP addresses accessed by a specific user.
+A418: {"type": "QUERY", "sql": "SELECT DISTINCT ip_address FROM audit_logs WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND user_id = (SELECT user_id FROM users WHERE username = 'jdoe')"}
+
+Q419: Find beneficiaries verified today.
+A419: {"type": "QUERY", "sql": "SELECT * FROM beneficiaries JOIN users u ON beneficiaries.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND is_verified = TRUE AND created_at >= CURRENT_DATE"}
+
+Q420: Show accounts with an overdraft limit set.
+A420: {"type": "QUERY", "sql": "SELECT account_number, overdraft_limit FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND overdraft_limit > 0"}
+
+Q421: List all credit cards.
+A421: {"type": "QUERY", "sql": "SELECT * FROM cards JOIN accounts a ON cards.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND card_type = 'CREDIT'"}
+
+Q422: Count expired cards.
+A422: {"type": "QUERY", "sql": "SELECT COUNT(*) FROM cards JOIN accounts a ON cards.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND expiry_date < CURRENT_DATE"}
+
+Q423: Show users residing in 'New York'.
+A423: {"type": "QUERY", "sql": "SELECT username FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND address->>'city' = 'New York'"}
+
+Q424: Find transactions with fees.
+A424: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND fee_amount > 0"}
+
+Q425: List accounts closed this month.
+A425: {"type": "QUERY", "sql": "SELECT account_number, closed_at FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND closed_at >= date_trunc('month', current_date)"}
+
+Q426: What is the total balance of all SAVINGS accounts?
+A426: {"type": "QUERY", "sql": "SELECT SUM(balance) FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND account_type = 'SAVINGS'"}
+
+Q427: Show recent password changes from audit logs.
+A427: {"type": "QUERY", "sql": "SELECT * FROM audit_logs JOIN users u ON audit_logs.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND action = 'PASSWORD_CHANGE'"}
+
+Q428: Find banks with routing number '123456789'.
+A428: {"type": "QUERY", "sql": "SELECT * FROM banks WHERE routing_number = '123456789'"}
+
+Q429: List active cards for account '10000001'.
+A429: {"type": "QUERY", "sql": "SELECT * FROM cards WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND account_id = (SELECT account_id FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE account_number = '10000001') AND card_status = 'ACTIVE'"}
+
+Q430: Show transactions where currency is not USD.
+A430: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND currency != 'USD'"}
+
+Q431: Identify users with no phone number.
+A431: {"type": "QUERY", "sql": "SELECT username FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND phone IS NULL"}
+
+Q432: List beneficiaries for user 'asmith'.
+A432: {"type": "QUERY", "sql": "SELECT * FROM beneficiaries WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND user_id = (SELECT user_id FROM users WHERE username = 'asmith')"}
+
+Q433: Check if a specific token is blacklisted.
+A433: {"type": "QUERY", "sql": "SELECT * FROM blacklisted_tokens WHERE token = 'SPECIFIC_TOKEN'"}
+
+Q434: Count blacklisted tokens expiring today.
+A434: {"type": "QUERY", "sql": "SELECT COUNT(*) FROM blacklisted_tokens WHERE expiry >= CURRENT_DATE AND expiry < CURRENT_DATE + 1"}
+
+Q435: Show transactions with merchant info.
+A435: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND merchant_info IS NOT NULL"}
+
+Q436: Find transactions located in 'Japan'.
+A436: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND location_info->>'country' = 'Japan'"}
+
+Q437: List all admin users.
+A437: {"type": "QUERY", "sql": "SELECT username, email FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND role = 'ADMIN'"}
+
+Q438: Show me user agents used for logins.
+A438: {"type": "QUERY", "sql": "SELECT DISTINCT user_agent FROM audit_logs JOIN users u ON audit_logs.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND action = 'LOGIN'"}
+
+Q439: Find accounts with specific interest rate 0.05.
+A439: {"type": "QUERY", "sql": "SELECT account_number FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND interest_rate = 0.05"}
+
+Q440: List all debit cards.
+A440: {"type": "QUERY", "sql": "SELECT * FROM cards JOIN accounts a ON cards.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND card_type = 'DEBIT'"}
+
+Q441: Show available balance for account '10000001'.
+A441: {"type": "QUERY", "sql": "SELECT available_balance FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND account_number = '10000001'"}
+
+Q442: Check if 'jdoe' is an active user.
+A442: {"type": "QUERY", "sql": "SELECT is_active FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND username = 'jdoe'"}
+
+Q443: List all transaction types used.
+A443: {"type": "QUERY", "sql": "SELECT DISTINCT transaction_type FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q444: Find large credit limit accounts (> 20000).
+A444: {"type": "QUERY", "sql": "SELECT account_number FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND credit_limit > 20000"}
+
+Q445: Show recently added beneficiaries.
+A445: {"type": "QUERY", "sql": "SELECT * FROM beneficiaries JOIN users u ON beneficiaries.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' ORDER BY created_at DESC LIMIT 10"}
+
+Q446: Count users by role.
+A446: {"type": "QUERY", "sql": "SELECT role, COUNT(*) FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' GROUP BY role"}
+
+Q447: Find accounts opened in 2024.
+A447: {"type": "QUERY", "sql": "SELECT * FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND opened_at >= '2024-01-01' AND opened_at < '2025-01-01'"}
+
+Q448: List distinct cities where users live.
+A448: {"type": "QUERY", "sql": "SELECT DISTINCT address->>'city' FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q449: Show blocked cards reasoning if recorded.
+A449: {"type": "QUERY", "sql": "SELECT card_id, blocked_at FROM cards JOIN accounts a ON cards.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND blocked_at IS NOT NULL"}
+
+Q450: Identify users with updated profiles recently.
+A450: {"type": "QUERY", "sql": "SELECT username FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND updated_at >= NOW() - interval '7 days'"}
+
+Q451: List all fee transactions.
+A451: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'FEE'"}
+
+Q452: Show daily limits for all cards associated with user 'jdoe'.
+A452: {"type": "QUERY", "sql": "SELECT c.daily_limit FROM cards c JOIN accounts a ON c.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND u.username = 'jdoe'"}
+
+Q453: Find transactions processed today.
+A453: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND processed_at >= CURRENT_DATE"}
+
+Q454: List scheduled transactions.
+A454: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND scheduled_at IS NOT NULL AND scheduled_at > NOW()"}
+
+Q455: Check if user 'asmith' has a verified email.
+A455: {"type": "QUERY", "sql": "SELECT email_verified FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND username = 'asmith'"}
+
+Q456: List account holders for account '10000002'.
+A456: {"type": "QUERY", "sql": "SELECT u.username FROM account_holders ah JOIN users u ON ah.user_id = u.user_id JOIN accounts a ON ah.account_id = a.account_id WHERE a.account_number = '10000002'"}
+
+Q457: Show me all entries in the banks table.
+A457: {"type": "QUERY", "sql": "SELECT * FROM banks"}
+
+Q458: Find accounts with metadata indicating 'VIP'.
+A458: {"type": "QUERY", "sql": "SELECT account_number FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND account_metadata->>'status' = 'VIP'"}
+
+Q459: List transactions describing 'Coffee'.
+A459: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND description ILIKE '%Coffee%'"}
+
+Q460: Show total fees collected this month.
+A460: {"type": "QUERY", "sql": "SELECT SUM(fee_amount) FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND processed_at >= date_trunc('month', current_date) AND transaction_type = 'FEE'"}
+
+Q461: Find users with specific last name 'Doe'.
+A461: {"type": "QUERY", "sql": "SELECT * FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND last_name = 'Doe'"}
+
+Q462: List contactless cards.
+A462: {"type": "QUERY", "sql": "SELECT * FROM cards JOIN accounts a ON cards.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND is_contactless = TRUE"}
+
+Q463: Show failed login count for 'jdoe'.
+A463: {"type": "QUERY", "sql": "SELECT failed_login_attempts FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND username = 'jdoe'"}
+
+Q464: Find transactions with null description.
+A464: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND description IS NULL"}
+
+Q465: List beneficiaries with 'Mom' as nickname.
+A465: {"type": "QUERY", "sql": "SELECT * FROM beneficiaries JOIN users u ON beneficiaries.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND nickname = 'Mom'"}
+
+Q466: Show all accounts linked to bank 'First National Bank'.
+A466: {"type": "QUERY", "sql": "SELECT a.account_number FROM accounts a JOIN users u ON a.user_id = u.user_id JOIN banks b ON a.bank_id = b.bank_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND b.bank_name = 'First National Bank'"}
+
+Q467: Find users created today.
+A467: {"type": "QUERY", "sql": "SELECT username FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND created_at >= CURRENT_DATE"}
+
+Q468: List audit logs for 'UPDATE' actions.
+A468: {"type": "QUERY", "sql": "SELECT * FROM audit_logs JOIN users u ON audit_logs.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND action LIKE 'UPDATE%'"}
+
+Q469: Show sum of all transaction amounts today.
+A469: {"type": "QUERY", "sql": "SELECT SUM(amount) FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND processed_at >= CURRENT_DATE"}
+
+Q470: Find cards with monthly limit > 10000.
+A470: {"type": "QUERY", "sql": "SELECT * FROM cards JOIN accounts a ON cards.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND monthly_limit > 10000"}
+
+Q471: List distinct transaction descriptions.
+A471: {"type": "QUERY", "sql": "SELECT DISTINCT description FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' LIMIT 100"}
+
+Q472: Show active users with verified emails.
+A472: {"type": "QUERY", "sql": "SELECT username FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND is_active = TRUE AND email_verified = TRUE"}
+
+Q473: Count beneficiaries per user.
+A473: {"type": "QUERY", "sql": "SELECT user_id, COUNT(*) FROM beneficiaries JOIN users u ON beneficiaries.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' GROUP BY user_id"}
+
+Q474: Find transactions processed between '2025-01-01' and '2025-02-01'.
+A474: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND processed_at >= '2025-01-01' AND processed_at < '2025-02-01'"}
+
+Q475: List accounts with type 'CHECKING'.
+A475: {"type": "QUERY", "sql": "SELECT * FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND account_type = 'CHECKING'"}
+
+Q476: Show users with no failed login attempts.
+A476: {"type": "QUERY", "sql": "SELECT username FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND failed_login_attempts = 0"}
+
+Q477: Find audit logs where old value is null.
+A477: {"type": "QUERY", "sql": "SELECT * FROM audit_logs JOIN users u ON audit_logs.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND old_values IS NULL"}
+
+Q478: List active beneficiaries.
+A478: {"type": "QUERY", "sql": "SELECT * FROM beneficiaries JOIN users u ON beneficiaries.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q479: Show transactions with exchange rate other than 1.
+A479: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND exchange_rate != 1.0"}
+
+Q480: Find accounts with minimum balance > 1000.
+A480: {"type": "QUERY", "sql": "SELECT account_number FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND minimum_balance > 1000"}
+
+Q481: List cards issuing in 2025.
+A481: {"type": "QUERY", "sql": "SELECT * FROM cards JOIN accounts a ON cards.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND issued_at >= '2025-01-01' AND issued_at < '2026-01-01'"}
+
+Q482: Show total number of audit logs.
+A482: {"type": "QUERY", "sql": "SELECT COUNT(*) FROM audit_logs JOIN users u ON audit_logs.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q483: Find users with updates in last hour.
+A483: {"type": "QUERY", "sql": "SELECT username FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND updated_at >= NOW() - interval '1 hour'"}
+
+Q484: List transactions with 'USD' currency.
+A484: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND currency = 'USD'"}
+
+Q485: Show distinct account statuses.
+A485: {"type": "QUERY", "sql": "SELECT DISTINCT account_status FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q486: Find banks with specific SWIFT code.
+A486: {"type": "QUERY", "sql": "SELECT * FROM banks WHERE swift_code = 'FNBNUS33'"}
+
+Q487: List authorized users on accounts.
+A487: {"type": "QUERY", "sql": "SELECT * FROM account_holders WHERE relationship = 'AUTHORIZED_USER'"}
+
+Q488: Show users with NULL last login.
+A488: {"type": "QUERY", "sql": "SELECT username FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND last_login_at IS NULL"}
+
+Q489: Find transactions with negative fee? (Should not happen but checking compliance).
+A489: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND fee_amount < 0"}
+
+Q490: List accounts held by user ID 'uuid-placeholder'.
+A490: {"type": "QUERY", "sql": "SELECT * FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND user_id = 'uuid-placeholder'"}
+
+Q491: Show number of cards per account.
+A491: {"type": "QUERY", "sql": "SELECT account_id, COUNT(*) FROM cards JOIN accounts a ON cards.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' GROUP BY account_id"}
+
+Q492: Find transactions with complex json location info.
+A492: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND location_info IS NOT NULL"}
+
+Q493: List users with role 'MANAGER'.
+A493: {"type": "QUERY", "sql": "SELECT username FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' AND role = 'MANAGER'"}
+
+Q494: Show audit logs for IP '127.0.0.1'.
+A494: {"type": "QUERY", "sql": "SELECT * FROM audit_logs JOIN users u ON audit_logs.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND ip_address = '127.0.0.1'"}
+
+Q495: Find accounts created today.
+A495: {"type": "QUERY", "sql": "SELECT * FROM accounts JOIN users u ON accounts.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND created_at >= CURRENT_DATE"}
+
+Q496: List cards expiring this month.
+A496: {"type": "QUERY", "sql": "SELECT * FROM cards JOIN accounts a ON cards.account_id = a.account_id JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND expiry_date >= date_trunc('month', current_date) AND expiry_date < date_trunc('month', current_date) + interval '1 month'"}
+
+Q497: Show distinct merchant categories processed.
+A497: {"type": "QUERY", "sql": "SELECT DISTINCT merchant_info->>'category' FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
+
+Q498: Find active transfers.
+A498: {"type": "QUERY", "sql": "SELECT * FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND transaction_type = 'TRANSFER' AND transaction_status = 'PENDING'"}
+
+Q499: List users sorted by creation date.
+A499: {"type": "QUERY", "sql": "SELECT username, created_at FROM users WHERE users.email = 'USER_EMAIL_PLACEHOLDER' ORDER BY created_at DESC"}
+
+Q500: Show count of all financial transactions (verified schema).
+A500: {"type": "QUERY", "sql": "SELECT COUNT(*) FROM transactions JOIN accounts a ON (transactions.from_account_id = a.account_id OR transactions.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'"}
