@@ -252,6 +252,45 @@ def query_rag(qa_chain, query, user_email=None):
     except Exception as e:
         return {"result": f"Error querying system: {e}", "source_documents": []}
 
+def summarize_results(llm, results, user_query):
+    """
+    Summarize database results into natural language using the LLM.
+    
+    Args:
+        llm: The ChatOllama instance (can be retrieved from qa_chain.combine_documents_chain.llm_chain.llm)
+        results: The JSON string or list/dict from the database.
+        user_query: The original question from the user.
+    """
+    try:
+        if not results or results == "[]" or results == "null":
+            return "I searched the database but found no matching records."
+
+        prompt = f"""You are a helpful Banking Assistant.
+        The user asked: "{user_query}"
+        
+        The database returned this RAW JSON data:
+        {results}
+        
+        INSTRUCTIONS:
+        1. Summarize the answer in natural language.
+        2. Do NOT mention "JSON", "database", or "raw data".
+        3. If it's a balance, format it as currency (e.g. $5,000.00).
+        4. If it's a list of transactions, bullet point the last 3-5 items nicely.
+        5. Be concise and friendly.
+        
+        Answer:"""
+        
+        response = llm.invoke(prompt)
+        
+        # Handle different response types from invoke (String vs AIMessage)
+        if hasattr(response, 'content'):
+            return response.content
+        return str(response)
+        
+    except Exception as e:
+        print(f"Error summarising results: {e}")
+        return f"I found some data: {results}"
+
 if __name__ == "__main__":
     print("--- Banking RAG System Initialization ---")
     

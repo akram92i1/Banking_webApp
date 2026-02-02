@@ -338,8 +338,135 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
 
             {/* Advice Tab */}
             {activeTab === 'advice' && (
-              <div className="flex items-center justify-center h-full text-gray-400 text-sm">
-                <p>Financial Analysis Module</p>
+              <div className="h-full overflow-y-auto p-4 space-y-6">
+                {/* Header Section */}
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                  <div className="relative z-10">
+                    <h3 className="text-lg font-bold mb-1">Financial Insights</h3>
+                    <p className="text-blue-100 text-xs">AI-Optimized Suggestions</p>
+
+                    <div className="mt-4 flex items-baseline gap-2">
+                      <span className="text-3xl font-bold">${financialAdvice?.weekly_spending?.toFixed(2) || '0.00'}</span>
+                      <span className="text-xs text-blue-200">spent this week</span>
+                    </div>
+                  </div>
+                  <div className="absolute right-0 top-0 opacity-10 transform translate-x-1/3 -translate-y-1/3">
+                    <Brain size={120} />
+                  </div>
+                </div>
+
+                {/* 1. Spending by Category */}
+                <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="p-1.5 bg-purple-100 rounded-lg">
+                      <TrendingDown className="w-4 h-4 text-purple-600" />
+                    </div>
+                    <h4 className="font-bold text-gray-800 text-sm">Spending by Category</h4>
+                  </div>
+
+                  {financialAdvice?.spending_by_category ? (
+                    <div className="space-y-3">
+                      {Object.entries(financialAdvice.spending_by_category).map(([category, amount], index) => {
+                        const maxVal = Math.max(...Object.values(financialAdvice.spending_by_category));
+                        const percent = (amount / maxVal) * 100;
+                        const colors = ['bg-blue-500', 'bg-purple-500', 'bg-pink-500', 'bg-green-500', 'bg-yellow-500'];
+
+                        return (
+                          <div key={category} className="space-y-1">
+                            <div className="flex justify-between text-xs text-gray-600">
+                              <span>{category}</span>
+                              <span className="font-medium">${amount.toFixed(2)}</span>
+                            </div>
+                            <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full ${colors[index % colors.length]}`}
+                                style={{ width: `${percent}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-center py-4 text-gray-400 text-xs">
+                      {isLoading ? "Analyzing spending..." : "No data available"}
+                    </div>
+                  )}
+                </div>
+
+                {/* 2. Grocery Savings */}
+                <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="p-1.5 bg-green-100 rounded-lg">
+                      <Sparkles className="w-4 h-4 text-green-600" />
+                    </div>
+                    <h4 className="font-bold text-gray-800 text-sm">Grocery Savings</h4>
+                  </div>
+
+                  {financialAdvice?.grocery_deals?.length > 0 ? (
+                    <div className="space-y-3">
+                      {financialAdvice.grocery_deals.map((deal, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-2 bg-green-50 rounded-lg border border-green-100">
+                          <div>
+                            <div className="font-medium text-gray-800 text-xs">{deal.item}</div>
+                            <div className="text-[10px] text-gray-500">{deal.store}</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-bold text-green-600 text-xs">{deal.price}</div>
+                            <div className="text-[10px] text-green-700 bg-green-200 px-1.5 py-0.5 rounded-full inline-block">{deal.discount}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-4 text-gray-400 text-xs">
+                      {isLoading ? "Finding deals..." : "No deals found nearby"}
+                    </div>
+                  )}
+
+                  {financialAdvice?.savings_suggestions && (
+                    <div className="mt-4 pt-3 border-t border-gray-100">
+                      <p className="text-xs text-gray-500 italic">"{financialAdvice.savings_suggestions[0]}"</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* 3. Finance News */}
+                <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="p-1.5 bg-orange-100 rounded-lg">
+                      <Wifi className="w-4 h-4 text-orange-600" />
+                    </div>
+                    <h4 className="font-bold text-gray-800 text-sm">Market News</h4>
+                  </div>
+
+                  {financialAdvice?.financial_news?.length > 0 ? (
+                    <div className="space-y-4">
+                      {financialAdvice.financial_news.map((news, idx) => (
+                        <div key={idx} className="border-b border-gray-50 last:border-0 pb-3 last:pb-0">
+                          <h5 className="font-medium text-gray-800 text-xs leading-tight mb-1">{news.title}</h5>
+                          <p className="text-[10px] text-gray-500 line-clamp-2">{news.summary}</p>
+                          <div className="mt-1 flex justify-end">
+                            <span className="text-[9px] text-gray-400 bg-gray-100 px-1.5 rounded">{news.source}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-4 text-gray-400 text-xs">
+                      {isLoading ? "Fetching news..." : "No news available"}
+                    </div>
+                  )}
+                </div>
+
+                {/* Refresh Button */}
+                <button
+                  onClick={getFinancialAdvice}
+                  disabled={isLoading}
+                  className="w-full py-2 bg-gray-50 hover:bg-gray-100 text-gray-500 text-xs rounded-lg transition-colors border border-gray-200"
+                >
+                  {isLoading ? "Updating..." : "Refresh Insights"}
+                </button>
               </div>
             )}
 
