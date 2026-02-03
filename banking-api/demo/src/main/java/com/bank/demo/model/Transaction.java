@@ -1,4 +1,5 @@
 package com.bank.demo.model;
+
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Map;
@@ -15,9 +16,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id ;
-import jakarta.persistence.IdClass ;
-import jakarta.persistence.JoinColumn ;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -25,7 +26,8 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "transactions")
-@Getter @Setter
+@Getter
+@Setter
 @IdClass(TransactionId.class)
 public class Transaction {
 
@@ -48,7 +50,7 @@ public class Transaction {
 
     @Column(name = "transaction_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)  // Hibernate 6+
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM) // Hibernate 6+
     private TransactionType transactionType;
 
     private BigDecimal amount;

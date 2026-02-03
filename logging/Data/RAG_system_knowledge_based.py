@@ -143,7 +143,8 @@ def execute_sql_query(sql_query):
         return json.dumps(data, indent=2)
         
     except Exception as e:
-        return json.dumps({"error": str(e)})
+        print(f"❌ [DB ERROR] {e}") # Log for admin/debugging
+        return json.dumps({"error": "Internal Database Error. Please contact support."})
     finally:
         if conn:
             conn.close()
@@ -272,12 +273,33 @@ def summarize_results(llm, results, user_query):
         {results}
         
         INSTRUCTIONS:
-        1. Summarize the answer in natural language.
-        2. Do NOT mention "JSON", "database", or "raw data".
-        3. If it's a balance, format it as currency (e.g. $5,000.00).
-        4. If it's a list of transactions, bullet point the last 3-5 items nicely.
-        5. Be concise and friendly.
-        
+        1.  **Analyze the User's Query**: Understand what they are looking for (e.g., specific amount, date, person).
+        2.  **Filter the Data**: Ignore technical fields like UUIDs (`703ad4...`), `created_at` timestamps (unless date is asked), or internal codes.
+        3.  **Answer Directly**: Start with a direct answer to the question.
+        4.  **Be Concise**: Do not repeat the same info. Do not say "Here are the details" if you just gave them.
+        5.  **Format**: 
+            - Use bolding for key values (e.g., **$2.50**).
+            - Use natural language sentences.
+            - Only use bullet points if there are MULTIPLE distinct transactions/items.
+
+        Example 1:
+        Query: "Did I get paid $500?"
+        Data: [{{ "amount": 500.00, "type": "DEPOSIT", "sender": "Work Inc", "date": "2023-10-01" }}]
+        Answer: "Yes, you received a deposit of **$500.00** from **Work Inc** on October 1st, 2023."
+
+        Example 2 (Complex):
+        Query: "Show my last 3 transactions"
+        Data: [...]
+        Answer: "Here are your last 3 transactions:
+        *   **$50.00** at Metro (Grocery) on Oct 10
+        *   **$12.50** at Uber on Oct 09
+        *   **$100.00** Transfer to Savings on Oct 08"
+
+        Context:
+        User Query: "{user_query}"
+        Data:
+        {results}
+
         Answer:"""
         
         response = llm.invoke(prompt)

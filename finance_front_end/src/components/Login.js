@@ -44,7 +44,7 @@ const Login = () => {
       console.log('🔐 Starting login process...');
       const result = await login(credentials);
       console.log('🔐 Login result:', result);
-      
+
       if (!result.success) {
         console.log('❌ Login failed:', result.message);
         setError(result.message || 'Login failed');
@@ -61,26 +61,20 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-        <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse animation-delay-2000"></div>
-        <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-pink-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse animation-delay-4000"></div>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-slate-900 relative overflow-hidden">
+      {/* Background Elements - Subtle Pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:20px_20px]"></div>
 
       <div className="max-w-md w-full mx-4 relative z-10">
-        <div className="glass-card rounded-3xl p-8 space-y-8 backdrop-blur-2xl border border-white/20 shadow-2xl animate-float">
+        <div className="glass-card rounded-3xl p-8 space-y-8 backdrop-blur-2xl border border-white/20 shadow-2xl">
           {/* Header with Enhanced Glass Effect */}
           <div className="text-center">
-            <div className="mx-auto w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center mb-6 shadow-2xl animate-pulse-soft">
+            <div className="mx-auto w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-slate-700 flex items-center justify-center mb-6 shadow-2xl">
               <span className="text-4xl">💎</span>
-              {/* Glow effect */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 opacity-50 blur-xl animate-pulse"></div>
             </div>
-            
+
             <h1 className="text-3xl font-bold text-glass mb-2">
-              <span className="bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
+              <span className="text-white">
                 Mini Finance
               </span>
             </h1>
@@ -102,7 +96,7 @@ const Login = () => {
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-                    <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                    <div className="w-6 h-6 rounded-lg bg-slate-700 flex items-center justify-center">
                       <FaUser className="h-3 w-3 text-white" />
                     </div>
                   </div>
@@ -127,7 +121,7 @@ const Login = () => {
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-                    <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center">
+                    <div className="w-6 h-6 rounded-lg bg-slate-700 flex items-center justify-center">
                       <FaLock className="h-3 w-3 text-white" />
                     </div>
                   </div>
@@ -147,7 +141,7 @@ const Login = () => {
                     className="absolute inset-y-0 right-0 pr-4 flex items-center z-10 glass-button rounded-r-2xl px-3 hover:bg-white/10 transition-all duration-300"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center">
+                    <div className="w-6 h-6 rounded-lg bg-slate-700 flex items-center justify-center">
                       {showPassword ? (
                         <FaEyeSlash className="h-3 w-3 text-white" />
                       ) : (
@@ -161,9 +155,9 @@ const Login = () => {
 
             {/* Error Message with Glass Effect */}
             {error && (
-              <div className="glass-card rounded-2xl p-4 border-red-400/30 bg-red-500/10 animate-float">
+              <div className="glass-card rounded-2xl p-4 border-red-400/30 bg-red-500/10">
                 <div className="flex items-center">
-                  <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-red-400 to-pink-500 flex items-center justify-center mr-3">
+                  <div className="w-6 h-6 rounded-lg bg-red-500 flex items-center justify-center mr-3">
                     <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -178,14 +172,8 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group relative w-full flex justify-center py-4 px-6 border border-transparent font-semibold rounded-2xl text-white bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-white/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none transition-all duration-300 overflow-hidden shadow-2xl"
+                className="group relative w-full flex justify-center py-4 px-6 border border-transparent font-semibold rounded-2xl text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg"
               >
-                {/* Button background glow */}
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 opacity-50 blur-xl"></div>
-                
-                {/* Shimmer effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                
                 <span className="relative z-10 flex items-center">
                   {isLoading ? (
                     <>

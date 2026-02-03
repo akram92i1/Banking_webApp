@@ -30,12 +30,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final AuthLoggingService authLoggingService;
 
     public JwtAuthenticationFilter(
-        JwtUtils jwtUtils,
-        UserDetailsService userDetailsService,
-        HandlerExceptionResolver handlerExceptionResolver,
-        TokenBlacklistService tokenBlacklistService,
-        AuthLoggingService authLoggingService 
-    ) {
+            JwtUtils jwtUtils,
+            UserDetailsService userDetailsService,
+            HandlerExceptionResolver handlerExceptionResolver,
+            TokenBlacklistService tokenBlacklistService,
+            AuthLoggingService authLoggingService) {
         System.out.println("--> JwtAuthenticationFilter Initialization with Clean Logging.");
         this.jwtUtils = jwtUtils;
         this.userDetailsService = userDetailsService;
@@ -46,26 +45,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-        @NonNull HttpServletRequest request,
-        @NonNull HttpServletResponse response,
-        @NonNull FilterChain filterChain
-    ) throws ServletException, IOException {
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain) throws ServletException, IOException {
 
         final String authHeader = request.getHeader("Authorization");
         String clientIP = getClientIpAddress(request);
         String path = request.getServletPath();
-        
+
         System.out.println("----> Client IP: " + clientIP);
         System.out.println("We are inside the doFilterInternal function .. ");
         System.out.println("----> Request path: " + path);
-        
+
         // Skip authentication for public endpoints
-        if (path.startsWith("/api/auth/login") || path.startsWith("/api/auth/test") || path.startsWith("/api/auth/logout")) {
+        if (path.startsWith("/api/auth/login") || path.startsWith("/api/auth/test")
+                || path.startsWith("/api/auth/logout")) {
             System.out.println("----> Public endpoint accessed: " + path);
             filterChain.doFilter(request, response);
             return;
         }
-        
+
         // Check for missing or invalid Authorization header
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             // Only log missing token for non-public endpoints that should have auth
@@ -76,25 +75,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             final String jwt = authHeader.substring(7);
-            
+
             // Check if token is blacklisted
             if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
                 System.out.println(">>> Blocked request with blacklisted token");
                 // Log blacklisted token usage - this is a security event worth logging
                 authLoggingService.logBlacklistedToken(request);
-                
+
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("Token has been revoked. Please log in again.");
                 return;
             }
-            
+
             final String userEmail = jwtUtils.getEmailFromToken(jwt);
             System.out.println("----> Extracted JWT: " + jwt);
             System.out.println("----> Extracted userEmail from JWT: " + userEmail);
-            
+
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             System.out.println("----> Authentication object: " + authentication);
-            
+
             if (userEmail != null && authentication == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
@@ -102,12 +101,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
-                            userDetails.getAuthorities()
-                    );
+                            userDetails.getAuthorities());
 
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                    
+
                     // Don't log every successful authentication - only log first login success
                     // The authentication success is already logged in authController.login()
                 } else {
@@ -117,20 +115,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             filterChain.doFilter(request, response);
-            
+
         } catch (Exception exception) {
             System.out.println("----> Exception in JWT filter: " + exception.getMessage());
-            
+
             // Only log critical authentication errors, not routine validation failures
             if (exception.getMessage().contains("signature") || exception.getMessage().contains("malformed")) {
                 authLoggingService.logAuthenticationError(exception.getMessage(), request);
             }
-            
+
             handlerExceptionResolver.resolveException(request, response, null, exception);
         }
     }
 
-    
     private String getClientIpAddress(HttpServletRequest request) {
         String xForwardedForHeader = request.getHeader("X-Forwarded-For");
         if (xForwardedForHeader == null || xForwardedForHeader.isEmpty()) {

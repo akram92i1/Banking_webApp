@@ -54,9 +54,9 @@ const TransactionHistoryCard = () => {
       return { amount: `-${formattedAmount}`, type: 'debit' };
     } else {
       // Default behavior for edge cases
-      return { 
-        amount: `${amount >= 0 ? '+' : '-'}${formattedAmount}`, 
-        type: amount >= 0 ? 'credit' : 'debit' 
+      return {
+        amount: `${amount >= 0 ? '+' : '-'}${formattedAmount}`,
+        type: amount >= 0 ? 'credit' : 'debit'
       };
     }
   };
@@ -65,7 +65,7 @@ const TransactionHistoryCard = () => {
     if (transaction.description) {
       return transaction.description;
     }
-    
+
     // Generate description based on transaction type
     switch (transaction.transactionType) {
       case 'TRANSFER':
@@ -83,10 +83,9 @@ const TransactionHistoryCard = () => {
 
   if (loading) {
     return (
-      <div className="glass-card rounded-3xl p-6 relative overflow-hidden animate-float">
-        {/* Loading background orb */}
-        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-xl animate-pulse-soft"></div>
-        
+      <div className="glass-card rounded-3xl p-6 relative overflow-hidden">
+        {/* Loading background orb removed */}
+
         <div className="relative z-10">
           <h2 className="text-xl font-semibold mb-6 text-glass flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center">
@@ -116,11 +115,9 @@ const TransactionHistoryCard = () => {
   }
 
   return (
-    <div className="glass-card rounded-3xl p-6 relative overflow-hidden group animate-float">
-      {/* Floating background elements */}
-      <div className="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-xl animate-pulse-soft"></div>
-      <div className="absolute -bottom-6 -left-6 w-16 h-16 bg-gradient-to-br from-emerald-400/20 to-cyan-400/20 rounded-full blur-lg animate-pulse-soft animation-delay-2000"></div>
-      
+    <div className="glass-card rounded-3xl p-6 relative overflow-hidden group">
+      {/* Floating background elements removed */}
+
       {/* Shimmer effect */}
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
 
@@ -158,17 +155,16 @@ const TransactionHistoryCard = () => {
             {transactions.map((tx, index) => {
               const { amount, type } = formatAmount(tx.amount, tx.transactionType, tx.fromAccount, tx.toAccount);
               return (
-                <div key={`${tx.transactionId}-${tx.createdAt}`} 
-                     className={`glass-card rounded-2xl p-4 hover:scale-102 transition-all duration-300 animate-float`}
-                     style={{animationDelay: `${index * 200}ms`}}>
+                <div key={`${tx.transactionId}-${tx.createdAt}`}
+                  className={`glass-card rounded-2xl p-4 hover:scale-102 transition-all duration-300`}
+                  style={{ animationDelay: `${index * 200}ms` }}>
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-3">
                       {/* Transaction type icon */}
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                        type === 'credit' 
-                          ? 'bg-gradient-to-br from-emerald-400 to-green-500' 
-                          : 'bg-gradient-to-br from-red-400 to-pink-500'
-                      } shadow-lg`}>
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${type === 'credit'
+                        ? 'bg-gradient-to-br from-emerald-400 to-green-500'
+                        : 'bg-gradient-to-br from-red-400 to-pink-500'
+                        } shadow-lg`}>
                         {type === 'credit' ? (
                           <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -179,25 +175,23 @@ const TransactionHistoryCard = () => {
                           </svg>
                         )}
                       </div>
-                      
+
                       <div>
                         <p className="font-semibold text-glass text-lg">{getTransactionDescription(tx)}</p>
                         <p className="text-sm text-glass-muted">{formatDate(tx.createdAt)}</p>
                         <div className="flex items-center mt-1">
-                          <div className={`w-2 h-2 rounded-full mr-2 ${
-                            tx.transactionStatus === 'COMPLETED' ? 'bg-green-400' :
+                          <div className={`w-2 h-2 rounded-full mr-2 ${tx.transactionStatus === 'COMPLETED' ? 'bg-green-400' :
                             tx.transactionStatus === 'PENDING' ? 'bg-yellow-400' : 'bg-red-400'
-                          }`}></div>
+                            }`}></div>
                           <p className="text-xs text-glass-muted uppercase tracking-wide">{tx.transactionStatus}</p>
                         </div>
                       </div>
                     </div>
-                    
-                    <div className={`text-lg font-bold px-3 py-1 rounded-xl ${
-                      type === 'credit' 
-                        ? 'text-emerald-300 bg-emerald-500/20' 
-                        : 'text-red-300 bg-red-500/20'
-                    }`}>
+
+                    <div className={`text-lg font-bold px-3 py-1 rounded-xl ${type === 'credit'
+                      ? 'text-emerald-300 bg-emerald-500/20'
+                      : 'text-red-300 bg-red-500/20'
+                      }`}>
                       {amount}
                     </div>
                   </div>

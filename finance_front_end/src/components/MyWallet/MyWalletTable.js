@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from '../../contexts/AuthContext';
 import bankingService from '../../services/bankingService';
+import { FaMoon, FaSun, FaSearch, FaSort, FaSortUp, FaSortDown, FaFilter } from 'react-icons/fa';
 
-const getStatusClass = (status) => {
+const getStatusClass = (status, theme) => {
+  const isDark = theme === 'dark';
   switch (status) {
     case "COMPLETED":
     case "SUCCESS":
-      return "text-green-600 bg-green-100";
+      return isDark ? "text-emerald-300 bg-emerald-500/20" : "text-emerald-700 bg-emerald-100";
     case "PENDING":
-      return "text-yellow-700 bg-yellow-100";
+      return isDark ? "text-yellow-300 bg-yellow-500/20" : "text-yellow-700 bg-yellow-100";
     case "CANCELLED":
     case "FAILED":
-      return "text-red-600 bg-red-100";
+      return isDark ? "text-red-300 bg-red-500/20" : "text-red-700 bg-red-100";
     default:
-      return "";
+      return isDark ? "text-slate-300 bg-slate-500/20" : "text-slate-700 bg-slate-100";
   }
 };
 
@@ -24,21 +26,29 @@ const MyWalletTable = () => {
   const [error, setError] = useState('');
   const [currentBalance, setCurrentBalance] = useState(0);
 
+  // New State for Data Table
+  const [theme, setTheme] = useState('dark'); // 'dark' or 'light'
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
+  const [filterType, setFilterType] = useState('ALL');
+
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
     try {
-      // Fetch transactions
-      const transactionsResult = await bankingService.getCurrentUserTransactions(20);
+      setLoading(true);
+      // Fetch more transactions to demonstrate pagination
+      const transactionsResult = await bankingService.getCurrentUserTransactions(50);
       if (transactionsResult.success) {
         setTransactions(transactionsResult.data);
       } else {
         setError(transactionsResult.message || 'Failed to fetch transactions');
       }
 
-      // Fetch current balance
       const accountsResult = await bankingService.getCurrentUserAccounts();
       if (accountsResult.success && accountsResult.data.length > 0) {
         const primaryAccount = accountsResult.data[0];
@@ -52,143 +62,126 @@ const MyWalletTable = () => {
     }
   };
 
+  // --- Helpers ---
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
-    });
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
   const formatTime = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    });
+    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
   };
 
   const formatAmount = (amount, transactionType, fromAccount, toAccount) => {
-    const formattedAmount = new Intl.NumberFormat('en-CA', {
-      style: 'currency',
-      currency: 'CAD'
-    }).format(Math.abs(amount || 0));
+    const val = parseFloat(amount || 0);
+    const formatted = new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(Math.abs(val));
 
-    // Determine if this is incoming or outgoing for the current user
     const currentUserEmail = user?.email;
+    const fromAccountEmail = fromAccount?.user?.email || fromAccount?.userEmail;
+    const toAccountEmail = toAccount?.user?.email || toAccount?.userEmail;
 
-    // Handle cases where fromAccount or toAccount might be null or have different structures
-    const fromAccountEmail = fromAccount?.user?.email || fromAccount?.userEmail || null;
-    const toAccountEmail = toAccount?.user?.email || toAccount?.userEmail || null;
+    // Determine sign
+    let sign = '+';
+    let isPositive = true;
 
-    const isIncoming = toAccountEmail === currentUserEmail;
-    const isOutgoing = fromAccountEmail === currentUserEmail;
-
-    if (isIncoming && !isOutgoing) {
-      return `+ ${formattedAmount}`;
-    } else if (isOutgoing && !isIncoming) {
-      return `- ${formattedAmount}`;
-    } else {
-      // For other transaction types like deposits, withdrawals
-      switch (transactionType) {
-        case 'DEPOSIT':
-          return `+ ${formattedAmount}`;
-        case 'WITHDRAWAL':
-          return `- ${formattedAmount}`;
-        default:
-          return `${amount >= 0 ? '+' : '-'} ${formattedAmount}`;
-      }
+    if (transactionType === 'WITHDRAWAL') {
+      sign = '-'; isPositive = false;
+    } else if (transactionType === 'DEPOSIT') {
+      sign = '+'; isPositive = true;
+    } else if (fromAccountEmail === currentUserEmail) {
+      sign = '-'; isPositive = false;
     }
+
+    return { text: `${sign} ${formatted}`, isPositive };
   };
 
-  const getTransactionDescription = (transaction) => {
-    if (transaction.description) {
-      return transaction.description;
+  const handleSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
     }
-
-    switch (transaction.transactionType) {
-      case 'TRANSFER':
-        return 'Transfer';
-      case 'DEPOSIT':
-        return 'Deposit';
-      case 'WITHDRAWAL':
-        return 'Withdrawal';
-      case 'PAYMENT':
-        return 'Payment';
-      case 'INTERAC':
-        return 'Transfer'; // Map INTERAC to Transfer since backend uses TRANSFER
-      default:
-        return 'Transaction';
-    }
-  };
-
-  const getPaymentType = (transactionType) => {
-    switch (transactionType) {
-      case 'TRANSFER':
-        return 'Bank Transfer';
-      case 'INTERAC':
-        return 'Bank Transfer'; // Map INTERAC to Bank Transfer since backend uses TRANSFER
-      case 'DEPOSIT':
-        return 'Deposit';
-      case 'WITHDRAWAL':
-        return 'Withdrawal';
-      case 'PAYMENT':
-        return 'Payment';
-      default:
-        return transactionType || 'Transaction';
-    }
-  };
-
-  // Calculate balance at time of transaction (simplified - in real app this would be stored)
-  const calculateBalanceAtTransaction = (transactionIndex) => {
-    return new Intl.NumberFormat('en-CA', {
-      style: 'currency',
-      currency: 'CAD'
-    }).format(currentBalance);
+    setSortConfig({ key, direction });
   };
 
   const handleTransactionAction = async (transactionId, status) => {
     try {
-      setLoading(true);
+      // Optimistic update could go here, but for safety we'll just reload
       const result = await bankingService.updateTransactionStatus(transactionId, status);
       if (result.success) {
-        // Refresh data
-        await fetchData();
+        fetchData();
       } else {
-        setError(result.message || 'Failed to update transaction status');
+        alert('Failed: ' + result.message);
       }
-    } catch (error) {
-      console.error('Transaction action error:', error);
-      setError('An error occurred while processing the transaction');
-    } finally {
-      setLoading(false);
+    } catch (e) {
+      alert('Error updating transaction');
     }
   };
 
-  if (loading) {
+  // --- Processing Data ---
+  let processedData = [...transactions];
+
+  // 1. Filter
+  if (filterType !== 'ALL') {
+    processedData = processedData.filter(t => t.transactionType === filterType);
+  }
+  if (searchTerm) {
+    const lower = searchTerm.toLowerCase();
+    processedData = processedData.filter(t =>
+      (t.description || '').toLowerCase().includes(lower) ||
+      (t.transactionType || '').toLowerCase().includes(lower) ||
+      (t.amount || '').toString().includes(lower)
+    );
+  }
+
+  // 2. Sort
+  processedData.sort((a, b) => {
+    const aValue = a[sortConfig.key] || '';
+    const bValue = b[sortConfig.key] || '';
+
+    if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+    if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  // 3. Paginate
+  const totalPages = Math.ceil(processedData.length / itemsPerPage);
+  const paginatedData = processedData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // --- Dynamic Styles ---
+  const styles = {
+    wrapper: theme === 'dark'
+      ? "glass-card rounded-3xl p-8 overflow-hidden relative"
+      : "bg-white rounded-3xl p-8 shadow-xl border border-slate-200 relative",
+    textPrimary: theme === 'dark' ? "text-glass" : "text-slate-800",
+    textSecondary: theme === 'dark' ? "text-glass-muted" : "text-slate-500",
+    textHeader: theme === 'dark' ? "text-glass-muted" : "text-slate-500",
+    input: theme === 'dark'
+      ? "glass-input text-glass border-white/10 placeholder-slate-400 focus:ring-blue-500/50"
+      : "bg-slate-50 border-slate-200 text-slate-800 placeholder-slate-400 focus:ring-blue-500/20",
+    tableHeaderRow: theme === 'dark' ? "border-b border-white/10" : "border-b border-slate-200 bg-slate-50/50",
+    tableRow: theme === 'dark' ? "border-b border-white/5 hover:bg-white/5" : "border-b border-slate-100 hover:bg-slate-50",
+    buttonPrimary: "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30",
+    buttonSecondary: theme === 'dark' ? "glass-button text-glass" : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50",
+    iconContainer: theme === 'dark' ? "bg-white/10 text-white" : "bg-blue-100 text-blue-600",
+  };
+
+  if (loading && transactions.length === 0) {
     return (
-      <div className="glass-card rounded-3xl p-8 overflow-hidden relative animate-float">
-        {/* Loading background orbs */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-2xl animate-pulse-soft"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-br from-blue-400/20 to-cyan-400/20 rounded-full blur-xl animate-pulse-soft animation-delay-2000"></div>
-
-        <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-400 via-pink-500 to-blue-600 flex items-center justify-center animate-shimmer">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-              </svg>
+      <div className={styles.wrapper}>
+        <div className="animate-pulse flex space-x-4">
+          <div className="flex-1 space-y-6 py-1">
+            <div className="h-4 bg-slate-400/20 rounded w-3/4"></div>
+            <div className="space-y-3">
+              <div className="grid grid-cols-3 gap-4">
+                <div className="h-4 bg-slate-400/20 rounded col-span-2"></div>
+                <div className="h-4 bg-slate-400/20 rounded col-span-1"></div>
+              </div>
+              <div className="h-4 bg-slate-400/20 rounded"></div>
             </div>
-            <h2 className="text-3xl font-bold text-glass">My Wallet</h2>
-          </div>
-
-          <div className="space-y-4">
-            <div className="h-6 bg-white/20 rounded-2xl w-full animate-shimmer"></div>
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-16 bg-white/10 rounded-2xl w-full animate-shimmer" style={{ animationDelay: `${i * 200}ms` }}></div>
-            ))}
           </div>
         </div>
       </div>
@@ -196,167 +189,205 @@ const MyWalletTable = () => {
   }
 
   return (
-    <div className="glass-card rounded-3xl p-8 overflow-hidden relative group animate-float">
-      {/* Floating background elements */}
-      <div className="absolute -top-8 -right-8 w-40 h-40 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-3xl animate-pulse-soft"></div>
-      <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-cyan-400/20 rounded-full blur-2xl animate-pulse-soft animation-delay-2000"></div>
-      <div className="absolute top-1/2 right-1/4 w-24 h-24 bg-gradient-to-br from-emerald-400/20 to-green-400/20 rounded-full blur-xl animate-pulse-soft animation-delay-4000"></div>
+    <div className={`${styles.wrapper} transition-colors duration-300`}>
 
-      {/* Shimmer effect */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-
-      <div className="relative z-10">
-        {/* Header with enhanced glass effect */}
-        <div className="flex items-center gap-4 mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-400 via-pink-500 to-blue-600 flex items-center justify-center shadow-2xl animate-pulse-soft">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-            </svg>
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-400 via-pink-500 to-blue-600 opacity-50 blur-xl"></div>
-          </div>
-          <div>
-            <h2 className="text-4xl font-bold text-glass bg-gradient-to-r from-white via-purple-100 to-pink-100 bg-clip-text text-transparent">
-              My Wallet
-            </h2>
-            <p className="text-glass-muted text-lg">Transaction History & Balance</p>
-          </div>
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+          <h2 className={`text-3xl font-bold mb-1 ${styles.textPrimary}`}>My Wallet</h2>
+          <p className={styles.textSecondary}>Manage your transactions</p>
         </div>
 
-        {error ? (
-          <div className="glass-card rounded-2xl p-6 border-red-400/30 bg-red-500/10 mb-6">
-            <div className="flex items-center text-red-300">
-              <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span className="font-medium">{error}</span>
-            </div>
-          </div>
-        ) : transactions.length === 0 ? (
-          <div className="glass-card rounded-3xl p-12 text-center">
-            <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-gray-400/20 to-gray-600/20 flex items-center justify-center mx-auto mb-6">
-              <svg className="w-12 h-12 text-glass-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <p className="text-2xl text-glass-muted font-medium">No transactions found</p>
-            <p className="text-glass-muted mt-2">Your transaction history will appear here</p>
-          </div>
-        ) : (
-          <>
-            {/* Modern glass table container */}
-            <div className="glass-card rounded-2xl overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="min-w-full text-sm text-left">
-                  <thead>
-                    <tr className="glass border-b border-white/10">
-                      <th className="px-6 py-4 text-xs font-semibold text-glass-muted uppercase tracking-wider">Date</th>
-                      <th className="px-6 py-4 text-xs font-semibold text-glass-muted uppercase tracking-wider">Time</th>
-                      <th className="px-6 py-4 text-xs font-semibold text-glass-muted uppercase tracking-wider">Description</th>
-                      <th className="px-6 py-4 text-xs font-semibold text-glass-muted uppercase tracking-wider">Type</th>
-                      <th className="px-6 py-4 text-xs font-semibold text-glass-muted uppercase tracking-wider">Amount</th>
-                      <th className="px-6 py-4 text-xs font-semibold text-glass-muted uppercase tracking-wider">Balance</th>
-                      <th className="px-6 py-4 text-xs font-semibold text-glass-muted uppercase tracking-wider">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {transactions.map((tx, index) => {
-                      // Check if current user is the recipient (incoming transaction)
-                      const currentUserEmail = user?.email;
-                      const toAccountEmail = tx.toAccount?.user?.email || tx.toAccount?.userEmail;
-                      const isIncoming = toAccountEmail === currentUserEmail;
-                      const isPending = (tx.transactionStatus || tx.status) === 'PENDING';
-                      const showActions = isIncoming && isPending;
-
-                      return (
-                        <tr key={`${tx.transactionId || tx.id || index}-${tx.createdAt || index}`}
-                          className="border-b border-white/5 hover:bg-white/5 transition-colors duration-200">
-                          <td className="px-6 py-4 text-glass font-medium">{formatDate(tx.createdAt || tx.processedAt || new Date().toISOString())}</td>
-                          <td className="px-6 py-4 text-glass-muted">{formatTime(tx.createdAt || tx.processedAt || new Date().toISOString())}</td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                                </svg>
-                              </div>
-                              <span className="text-glass font-medium">{getTransactionDescription(tx)}</span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="glass-card px-3 py-1 rounded-xl text-xs font-medium text-glass-muted">
-                              {getPaymentType(tx.transactionType)}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="font-bold text-lg text-glass">
-                              {formatAmount(tx.amount, tx.transactionType, tx.fromAccount, tx.toAccount)}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 text-glass font-medium">{calculateBalanceAtTransaction(index)}</td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-2">
-                              <span className={`px-3 py-1 rounded-xl text-xs font-semibold ${(tx.transactionStatus || tx.status || 'PENDING') === 'COMPLETED' ? 'bg-emerald-500/20 text-emerald-300' :
-                                (tx.transactionStatus || tx.status || 'PENDING') === 'PENDING' ? 'bg-yellow-500/20 text-yellow-300' :
-                                  'bg-red-500/20 text-red-300'
-                                }`}>
-                                {tx.transactionStatus || tx.status || 'PENDING'}
-                              </span>
-
-                              {showActions && (
-                                <div className="flex gap-1 ml-2">
-                                  <button
-                                    onClick={() => handleTransactionAction(tx.transactionId || tx.id, 'COMPLETED')}
-                                    className="p-1 rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/40 transition-colors"
-                                    title="Accept"
-                                  >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                  </button>
-                                  <button
-                                    onClick={() => handleTransactionAction(tx.transactionId || tx.id, 'CANCELLED')}
-                                    className="p-1 rounded-lg bg-red-500/20 text-red-300 hover:bg-red-500/40 transition-colors"
-                                    title="Refuse"
-                                  >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Enhanced glass pagination */}
-            <div className="flex justify-between items-center mt-8">
-              <button className="glass-button px-6 py-3 rounded-2xl text-glass font-medium hover:scale-105 transition-all duration-300">
-                ← Previous
-              </button>
-              <div className="flex items-center space-x-2">
-                {[1, 2, 3, 4].map((page, index) => (
-                  <button key={page}
-                    className={`w-10 h-10 rounded-xl font-semibold transition-all duration-300 ${index === 0
-                      ? 'bg-gradient-to-r from-blue-400 to-purple-500 text-white shadow-lg'
-                      : 'glass-button text-glass hover:scale-110'
-                      }`}>
-                    {page}
-                  </button>
-                ))}
-              </div>
-              <button className="glass-button px-6 py-3 rounded-2xl text-glass font-medium hover:scale-105 transition-all duration-300">
-                Next →
-              </button>
-            </div>
-          </>
-        )}
+        {/* Toggle Theme */}
+        <button
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          className={`p-3 rounded-xl transition-all ${theme === 'dark' ? 'bg-slate-800 text-yellow-400 hover:bg-slate-700' : 'bg-indigo-100 text-indigo-600 hover:bg-indigo-200'}`}
+          title="Toggle Theme"
+        >
+          {theme === 'dark' ? <FaSun className="w-5 h-5" /> : <FaMoon className="w-5 h-5" />}
+        </button>
       </div>
+
+      {/* Controls Bar */}
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        {/* Search */}
+        <div className="relative flex-1">
+          <FaSearch className={`absolute left-4 top-1/2 -translate-y-1/2 ${styles.textSecondary}`} />
+          <input
+            type="text"
+            placeholder="Search transactions..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className={`w-full pl-10 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all ${styles.input}`}
+          />
+        </div>
+
+        {/* Filters */}
+        <div className="flex gap-2">
+          {['ALL', 'TRANSFER', 'DEPOSIT'].map(type => (
+            <button
+              key={type}
+              onClick={() => setFilterType(type)}
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${filterType === type
+                ? styles.buttonPrimary
+                : styles.buttonSecondary
+                }`}
+            >
+              {type === 'ALL' ? 'All' : type.charAt(0) + type.slice(1).toLowerCase()}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Data Table */}
+      <div className={`rounded-2xl overflow-hidden border ${theme === 'dark' ? 'border-white/10' : 'border-slate-200'}`}>
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-left">
+            <thead>
+              <tr className={styles.tableHeaderRow}>
+                {['Date', 'Description', 'Type', 'Amount', 'Status'].map((header) => {
+                  const keyMap = { 'Date': 'createdAt', 'Description': 'description', 'Type': 'transactionType', 'Amount': 'amount', 'Status': 'status' };
+                  const sortKey = keyMap[header];
+
+                  return (
+                    <th
+                      key={header}
+                      onClick={() => handleSort(sortKey)}
+                      className={`px-6 py-4 text-xs font-semibold uppercase tracking-wider cursor-pointer select-none hover:opacity-80 transition-opacity ${styles.textHeader}`}
+                    >
+                      <div className="flex items-center gap-2">
+                        {header}
+                        {sortConfig.key === sortKey && (
+                          sortConfig.direction === 'asc' ? <FaSortUp /> : <FaSortDown />
+                        )}
+                        {sortConfig.key !== sortKey && <FaSort className="opacity-30" />}
+                      </div>
+                    </th>
+                  );
+                })}
+              </tr>
+            </thead>
+            <tbody className={theme === 'dark' ? "divide-y divide-white/5" : "divide-y divide-slate-100"}>
+              {paginatedData.length > 0 ? (
+                paginatedData.map((tx, idx) => {
+                  const { text: amountText, isPositive } = formatAmount(tx.amount, tx.transactionType, tx.fromAccount, tx.toAccount);
+
+                  // Determine if incoming (to show actions)
+                  const currentUserEmail = user?.email;
+                  const toAccountEmail = tx.toAccount?.user?.email || tx.toAccount?.userEmail;
+                  const isIncoming = toAccountEmail === currentUserEmail;
+
+                  return (
+                    <tr key={idx} className={`transition-colors duration-200 ${styles.tableRow}`}>
+                      <td className={`px-6 py-4 whitespace-nowrap ${styles.textPrimary}`}>
+                        <div className="font-medium">{formatDate(tx.createdAt)}</div>
+                        <div className={`text-xs ${styles.textSecondary}`}>{formatTime(tx.createdAt)}</div>
+                      </td>
+                      <td className={`px-6 py-4 ${styles.textPrimary}`}>
+                        <div className="flex items-center gap-3">
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${styles.iconContainer}`}>
+                            <span className="font-bold text-xs">{(tx.description || 'TX').charAt(0).toUpperCase()}</span>
+                          </div>
+                          <span className="font-medium truncate max-w-[150px]">{tx.description || 'No Description'}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`px-2 py-1 rounded-lg text-xs font-medium border ${theme === 'dark' ? 'border-white/10 bg-white/5 text-glass-muted' : 'border-slate-200 bg-slate-50 text-slate-600'}`}>
+                          {tx.transactionType}
+                        </span>
+                      </td>
+                      <td className={`px-6 py-4 font-bold ${isPositive ? 'text-emerald-500' : (theme === 'dark' ? 'text-glass' : 'text-slate-800')}`}>
+                        {amountText}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusClass(tx.transactionStatus || tx.status, theme)}`}>
+                            {tx.transactionStatus || tx.status || 'PENDING'}
+                          </span>
+
+                          {/* Action Buttons for Pending Incoming Transactions */}
+                          {isIncoming && (tx.transactionStatus || tx.status) === 'PENDING' && (
+                            <div className="flex gap-1">
+                              <button
+                                onClick={() => handleTransactionAction(tx.transactionId || tx.id, 'COMPLETED')}
+                                className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/40 transition-colors"
+                                title="Accept Transfer"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                              </button>
+                              <button
+                                onClick={() => handleTransactionAction(tx.transactionId || tx.id, 'CANCELLED')}
+                                className="p-1.5 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/40 transition-colors"
+                                title="Decline Transfer"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colspan="5" className={`px-6 py-12 text-center ${styles.textSecondary}`}>
+                    <div className="flex flex-col items-center gap-2">
+                      <FaFilter className="w-8 h-8 opacity-20" />
+                      <p>No transactions found matching your criteria</p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Pagination Controls */}
+      {processedData.length > 0 && (
+        <div className="flex justify-between items-center mt-6">
+          <div className={`text-sm ${styles.textSecondary}`}>
+            Showing <span className="font-bold">{Math.min((currentPage - 1) * itemsPerPage + 1, processedData.length)}</span> to <span className="font-bold">{Math.min(currentPage * itemsPerPage, processedData.length)}</span> of <span className="font-bold">{processedData.length}</span> results
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'} ${styles.buttonSecondary}`}
+            >
+              Previous
+            </button>
+            <div className="flex gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter(p => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
+                .map((p, i, arr) => (
+                  <React.Fragment key={p}>
+                    {i > 0 && arr[i - 1] !== p - 1 && <span className={`px-2 py-2 ${styles.textSecondary}`}>...</span>}
+                    <button
+                      onClick={() => setCurrentPage(p)}
+                      className={`w-10 h-10 rounded-xl font-bold transition-all ${currentPage === p ? styles.buttonPrimary : styles.buttonSecondary}`}
+                    >
+                      {p}
+                    </button>
+                  </React.Fragment>
+                ))
+              }
+            </div>
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'} ${styles.buttonSecondary}`}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

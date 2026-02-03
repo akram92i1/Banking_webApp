@@ -218,6 +218,12 @@ async def chat_endpoint(request: ChatRequest, authorization: Optional[str] = Hea
         extracted_user = extract_user_from_token(token)
         if extracted_user and extracted_user != "unknown_user":
             user_id = extracted_user
+        else:
+            print(f"{YELLOW}[WARN] Invalid or unparseable token. Rejecting request.{RESET}")
+            raise HTTPException(status_code=401, detail="Authentication required: Invalid token")
+    else:
+        print(f"{YELLOW}[WARN] No token provided. Authorization required.{RESET}")
+        raise HTTPException(status_code=401, detail="Authentication required: No token provided")
 
     # ANSI Color for Blue
     BLUE = "\033[94m"
@@ -265,7 +271,8 @@ async def chat_endpoint(request: ChatRequest, authorization: Optional[str] = Hea
         
         # Use simple formatting for errors
         if isinstance(result_data, dict) and "error" in result_data:
-             response_text = f"I encountered an error querying the database: {result_data['error']}"
+             logger.error(f"SQL Execution Error: {result_data['error']}")
+             response_text = "I encountered an internal error while accessing the data. Please contact support."
         else:
             # Use LLM to summarize the data
             # Note: app.state.rag_chain is a RetrievalQA chain. 

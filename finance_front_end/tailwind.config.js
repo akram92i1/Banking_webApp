@@ -6,13 +6,14 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        cream: "#F5FBF8",
+        cream: "#F5FBF8", // Keeping for legacy, but we will move to dark
+        "brand-dark": "#0f172a", // Slate 900
+        "brand-darker": "#020617", // Slate 950
+        "brand-card": "#1e293b", // Slate 800
+        "brand-accent": "#3b82f6", // Blue 500 (Professional Blue)
+        "brand-muted": "#64748b", // Slate 500
       },
       keyframes: {
-        float: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-10px)' },
-        },
         'fade-in-up': {
           '0%': { opacity: '0', transform: 'translateY(10px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
@@ -23,12 +24,11 @@ module.exports = {
         },
         thinking: {
           '0%': { transform: 'scale(1)', opacity: '1' },
-          '50%': { transform: 'scale(1.5)', opacity: '0.5' },
+          '50%': { transform: 'scale(1.05)', opacity: '0.8' }, // Subtle thinking
           '100%': { transform: 'scale(1)', opacity: '1' },
         }
       },
       animation: {
-        float: 'float 6s ease-in-out infinite',
         'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
         'pulse-soft': 'pulse-soft 3s ease-in-out infinite',
         'thinking': 'thinking 1.5s infinite ease-in-out',

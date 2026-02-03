@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { FaPaperPlane, FaTimes, FaEnvelope, FaDollarSign } from 'react-icons/fa';
 import bankingService from '../services/bankingService';
 
+import { useAuth } from '../contexts/AuthContext';
+
 const EmailTransfer = ({ isOpen, onClose, onTransferComplete }) => {
+  const { earnPoints } = useAuth();
   const [transferData, setTransferData] = useState({
     recipientEmail: '',
     amount: '',
@@ -52,21 +55,24 @@ const EmailTransfer = ({ isOpen, onClose, onTransferComplete }) => {
 
     try {
       const result = await bankingService.sendMoney(transferData);
-      
+
       if (result.success) {
-        setSuccess(`🎉 Email transfer sent successfully! ${transferData.recipientEmail} will receive a notification to accept $${transferData.amount}.`);
+        // Earn points for using the service
+        const earned = earnPoints(50); // Earn 50 points per transfer
+
+        setSuccess(`🎉 Email transfer sent successfully! ${transferData.recipientEmail} will receive a notification to accept $${transferData.amount}. (+50 Orbs earned!)`);
         setTransferData({
           recipientEmail: '',
           amount: '',
           description: '',
           transactionType: 'TRANSFER'
         });
-        
+
         // Notify parent component
         if (onTransferComplete) {
           onTransferComplete(result.data);
         }
-        
+
         // Close modal after 3 seconds to allow user to read success message
         setTimeout(() => {
           onClose();
@@ -85,31 +91,31 @@ const EmailTransfer = ({ isOpen, onClose, onTransferComplete }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="glass-card rounded-3xl p-6 w-full max-w-md mx-4 border border-white/10 relative overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-            <FaEnvelope className="text-blue-600 w-5 h-5" />
-            <h2 className="text-xl font-semibold text-gray-900">
+            <FaEnvelope className="text-blue-400 w-5 h-5" />
+            <h2 className="text-xl font-semibold text-glass">
               Send Money via Email
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-glass-muted hover:text-white transition-colors"
           >
             <FaTimes className="w-5 h-5" />
           </button>
         </div>
 
         {/* Info Banner */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-md text-sm mb-6">
+        <div className="bg-blue-500/10 border border-blue-400/20 text-blue-200 px-4 py-3 rounded-xl text-sm mb-6">
           <div className="flex items-center gap-2">
-            <FaEnvelope className="w-4 h-4" />
-            <span className="font-medium">Just like Interac e-Transfer!</span>
+            <FaEnvelope className="w-4 h-4 text-blue-400" />
+            <span className="font-medium text-blue-300">Just like Interac e-Transfer!</span>
           </div>
-          <p className="mt-1 text-xs text-blue-600">
+          <p className="mt-1 text-xs text-blue-400/80">
             Send money using just an email address. The recipient will be notified to accept the transfer.
           </p>
         </div>
@@ -117,7 +123,7 @@ const EmailTransfer = ({ isOpen, onClose, onTransferComplete }) => {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-glass-muted mb-2">
               <FaEnvelope className="inline w-4 h-4 mr-1" />
               Recipient Email *
             </label>
@@ -126,14 +132,14 @@ const EmailTransfer = ({ isOpen, onClose, onTransferComplete }) => {
               name="recipientEmail"
               value={transferData.recipientEmail}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="glass-input w-full px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-glass placeholder-slate-500"
               placeholder="recipient@example.com"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-glass-muted mb-2">
               <FaDollarSign className="inline w-4 h-4 mr-1" />
               Amount *
             </label>
@@ -144,30 +150,30 @@ const EmailTransfer = ({ isOpen, onClose, onTransferComplete }) => {
               min="0.01"
               value={transferData.amount}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="glass-input w-full px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-glass placeholder-slate-500"
               placeholder="0.00"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-glass-muted mb-2">
               Transfer Type *
             </label>
             <select
               name="transactionType"
               value={transferData.transactionType}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="glass-input w-full px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-glass bg-slate-900"
               required
             >
-              <option value="TRANSFER">📧 Transfer</option>
-              <option value="INTERNAL">🏦 Internal Transfer</option>
+              <option value="TRANSFER" className="bg-slate-900 text-glass">📧 Transfer</option>
+              <option value="INTERNAL" className="bg-slate-900 text-glass">🏦 Internal Transfer</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-glass-muted mb-2">
               Message (Optional)
             </label>
             <textarea
@@ -175,7 +181,7 @@ const EmailTransfer = ({ isOpen, onClose, onTransferComplete }) => {
               value={transferData.description}
               onChange={handleChange}
               rows="3"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="glass-input w-full px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-glass placeholder-slate-500 resize-none"
               placeholder="What's this transfer for? (e.g., Dinner split, rent payment)"
             />
           </div>
@@ -198,7 +204,7 @@ const EmailTransfer = ({ isOpen, onClose, onTransferComplete }) => {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              className="flex-1 px-4 py-3 border border-white/10 text-glass-muted rounded-xl hover:bg-white/5 transition-colors font-medium"
             >
               Cancel
             </button>

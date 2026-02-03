@@ -19,13 +19,13 @@ const ThinkingIndicator = () => {
   }, []);
 
   return (
-    <div className="flex items-center space-x-3 p-4 bg-white rounded-xl border border-gray-100 shadow-sm animate-fade-in-up w-fit">
+    <div className="flex items-center space-x-3 p-4 bg-slate-800 rounded-xl border border-slate-700 shadow-sm animate-fade-in-up w-fit">
       <div className="flex space-x-1">
         <div className="w-2 h-2 bg-blue-500 rounded-full animate-thinking" style={{ animationDelay: '0s' }}></div>
         <div className="w-2 h-2 bg-purple-500 rounded-full animate-thinking" style={{ animationDelay: '0.2s' }}></div>
         <div className="w-2 h-2 bg-pink-500 rounded-full animate-thinking" style={{ animationDelay: '0.4s' }}></div>
       </div>
-      <span className="text-xs font-medium text-gray-400 animate-pulse">{steps[step]}</span>
+      <span className="text-xs font-medium text-slate-400 animate-pulse">{steps[step]}</span>
     </div>
   );
 };
@@ -216,7 +216,7 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
       <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
         <button
           onClick={() => setIsOpen(true)}
-          className="relative w-14 h-14 sm:w-16 sm:h-16 group animate-float active:scale-95 transition-transform"
+          className="relative w-14 h-14 sm:w-16 sm:h-16 group active:scale-95 transition-transform"
         >
           {/* Enhanced Orb Button - Dark Mode Theme Compatible */}
           <div className="absolute inset-0 bg-blue-600 rounded-full blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
@@ -237,7 +237,7 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
 
   return (
     <div className={`fixed z-50 transition-all duration-300 flex flex-col overflow-hidden shadow-2xl
-      bg-white border border-gray-200
+      bg-slate-900 border border-slate-700
       /* Mobile Styles (Bottom Sheet) */
       inset-x-0 bottom-0 rounded-t-2xl
       ${isMinimized ? 'h-16' : 'h-[60vh]'}
@@ -276,10 +276,10 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
 
       {!isMinimized && (
         <>
-          {/* Content Area - Light Mode */}
-          <div className="flex-1 flex flex-col bg-slate-50 relative overflow-hidden">
-            {/* Light Background Pattern */}
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:20px_20px]"></div>
+          {/* Content Area - Dark Mode */}
+          <div className="flex-1 flex flex-col bg-slate-900 relative overflow-hidden">
+            {/* Dark Background Pattern */}
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:20px_20px]"></div>
 
             {/* Chat View */}
             {activeTab === 'chat' && (
@@ -296,8 +296,8 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
                           className={`px-4 py-3 rounded-2xl shadow-sm text-sm leading-relaxed ${message.sender === 'user'
                             ? 'bg-blue-600 text-white rounded-br-none'
                             : message.isError
-                              ? 'bg-red-50 text-red-800 border border-red-100'
-                              : 'bg-white text-gray-800 border border-gray-100 rounded-bl-none'
+                              ? 'bg-red-900/30 text-red-200 border border-red-800'
+                              : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none'
                             }`}
                         >
                           {message.text}
@@ -313,15 +313,15 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* Input Area - Light Mode */}
-                <div className="p-4 bg-white border-t border-gray-100 safe-area-bottom">
-                  <div className="flex gap-2 items-end bg-gray-50 border border-gray-200 rounded-xl p-2 focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all">
+                {/* Input Area - Dark Mode */}
+                <div className="p-4 bg-slate-800 border-t border-slate-700 safe-area-bottom">
+                  <div className="flex gap-2 items-end bg-slate-900 border border-slate-700 rounded-xl p-2 focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all">
                     <textarea
                       value={inputMessage}
                       onChange={(e) => setInputMessage(e.target.value)}
                       onKeyPress={handleKeyPress}
                       placeholder="Ask about finances..."
-                      className="flex-1 bg-transparent border-none text-sm text-gray-800 placeholder-gray-400 focus:ring-0 resize-none max-h-32 py-2 px-1"
+                      className="flex-1 bg-transparent border-none text-sm text-slate-200 placeholder-slate-500 focus:ring-0 resize-none max-h-32 py-2 px-1"
                       rows="1"
                     />
                     <button
@@ -356,12 +356,12 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
                 </div>
 
                 {/* 1. Spending by Category */}
-                <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                <div className="bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-700">
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="p-1.5 bg-purple-100 rounded-lg">
-                      <TrendingDown className="w-4 h-4 text-purple-600" />
+                    <div className="p-1.5 bg-purple-900/30 rounded-lg">
+                      <TrendingDown className="w-4 h-4 text-purple-300" />
                     </div>
-                    <h4 className="font-bold text-gray-800 text-sm">Spending by Category</h4>
+                    <h4 className="font-bold text-white text-sm">Spending by Category</h4>
                   </div>
 
                   {financialAdvice?.spending_by_category ? (
@@ -373,11 +373,11 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
 
                         return (
                           <div key={category} className="space-y-1">
-                            <div className="flex justify-between text-xs text-gray-600">
+                            <div className="flex justify-between text-xs text-slate-400">
                               <span>{category}</span>
-                              <span className="font-medium">${amount.toFixed(2)}</span>
+                              <span className="font-medium text-white">${amount.toFixed(2)}</span>
                             </div>
-                            <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-1.5 w-full bg-slate-700 rounded-full overflow-hidden">
                               <div
                                 className={`h-full rounded-full ${colors[index % colors.length]}`}
                                 style={{ width: `${percent}%` }}
@@ -388,38 +388,38 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
                       })}
                     </div>
                   ) : (
-                    <div className="text-center py-4 text-gray-400 text-xs">
+                    <div className="text-center py-4 text-slate-500 text-xs">
                       {isLoading ? "Analyzing spending..." : "No data available"}
                     </div>
                   )}
                 </div>
 
                 {/* 2. Grocery Savings */}
-                <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                <div className="bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-700">
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="p-1.5 bg-green-100 rounded-lg">
-                      <Sparkles className="w-4 h-4 text-green-600" />
+                    <div className="p-1.5 bg-green-900/30 rounded-lg">
+                      <Sparkles className="w-4 h-4 text-green-400" />
                     </div>
-                    <h4 className="font-bold text-gray-800 text-sm">Grocery Savings</h4>
+                    <h4 className="font-bold text-white text-sm">Grocery Savings</h4>
                   </div>
 
                   {financialAdvice?.grocery_deals?.length > 0 ? (
                     <div className="space-y-3">
                       {financialAdvice.grocery_deals.map((deal, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-2 bg-green-50 rounded-lg border border-green-100">
+                        <div key={idx} className="flex items-center justify-between p-2 bg-green-900/20 rounded-lg border border-green-800/50">
                           <div>
-                            <div className="font-medium text-gray-800 text-xs">{deal.item}</div>
-                            <div className="text-[10px] text-gray-500">{deal.store}</div>
+                            <div className="font-medium text-white text-xs">{deal.item}</div>
+                            <div className="text-[10px] text-slate-400">{deal.store}</div>
                           </div>
                           <div className="text-right">
-                            <div className="font-bold text-green-600 text-xs">{deal.price}</div>
-                            <div className="text-[10px] text-green-700 bg-green-200 px-1.5 py-0.5 rounded-full inline-block">{deal.discount}</div>
+                            <div className="font-bold text-green-400 text-xs">{deal.price}</div>
+                            <div className="text-[10px] text-green-200 bg-green-900/50 px-1.5 py-0.5 rounded-full inline-block">{deal.discount}</div>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-4 text-gray-400 text-xs">
+                    <div className="text-center py-4 text-slate-500 text-xs">
                       {isLoading ? "Finding deals..." : "No deals found nearby"}
                     </div>
                   )}
@@ -432,28 +432,28 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
                 </div>
 
                 {/* 3. Finance News */}
-                <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                <div className="bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-700">
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="p-1.5 bg-orange-100 rounded-lg">
-                      <Wifi className="w-4 h-4 text-orange-600" />
+                    <div className="p-1.5 bg-orange-900/30 rounded-lg">
+                      <Wifi className="w-4 h-4 text-orange-400" />
                     </div>
-                    <h4 className="font-bold text-gray-800 text-sm">Market News</h4>
+                    <h4 className="font-bold text-white text-sm">Market News</h4>
                   </div>
 
                   {financialAdvice?.financial_news?.length > 0 ? (
                     <div className="space-y-4">
                       {financialAdvice.financial_news.map((news, idx) => (
-                        <div key={idx} className="border-b border-gray-50 last:border-0 pb-3 last:pb-0">
-                          <h5 className="font-medium text-gray-800 text-xs leading-tight mb-1">{news.title}</h5>
-                          <p className="text-[10px] text-gray-500 line-clamp-2">{news.summary}</p>
+                        <div key={idx} className="border-b border-slate-700 last:border-0 pb-3 last:pb-0">
+                          <h5 className="font-medium text-slate-200 text-xs leading-tight mb-1">{news.title}</h5>
+                          <p className="text-[10px] text-slate-400 line-clamp-2">{news.summary}</p>
                           <div className="mt-1 flex justify-end">
-                            <span className="text-[9px] text-gray-400 bg-gray-100 px-1.5 rounded">{news.source}</span>
+                            <span className="text-[9px] text-slate-400 bg-slate-700 px-1.5 rounded">{news.source}</span>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-4 text-gray-400 text-xs">
+                    <div className="text-center py-4 text-slate-500 text-xs">
                       {isLoading ? "Fetching news..." : "No news available"}
                     </div>
                   )}
@@ -463,7 +463,7 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
                 <button
                   onClick={getFinancialAdvice}
                   disabled={isLoading}
-                  className="w-full py-2 bg-gray-50 hover:bg-gray-100 text-gray-500 text-xs rounded-lg transition-colors border border-gray-200"
+                  className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-400 text-xs rounded-lg transition-colors border border-slate-600"
                 >
                   {isLoading ? "Updating..." : "Refresh Insights"}
                 </button>
@@ -479,8 +479,8 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
 
           </div>
 
-          {/* Tab Bar - Light Mode */}
-          <div className="bg-white border-t border-gray-100 p-2 flex justify-around shrink-0 relative z-20 pb-safe">
+          {/* Tab Bar - Dark Mode */}
+          <div className="bg-slate-800 border-t border-slate-700 p-2 flex justify-around shrink-0 relative z-20 pb-safe">
             <button
               onClick={() => setActiveTab('chat')}
               className={`p-2 rounded-lg transition-colors flex flex-col items-center gap-1 ${activeTab === 'chat' ? 'text-blue-600 bg-blue-50' : 'text-gray-400 hover:text-gray-600'}`}

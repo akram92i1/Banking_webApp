@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { FaPaperPlane, FaTimes } from 'react-icons/fa';
 import bankingService from '../services/bankingService';
 
+import { useAuth } from '../contexts/AuthContext';
+
 const TransferMoney = ({ isOpen, onClose, onTransferComplete }) => {
+  const { earnPoints } = useAuth();
   const [transferData, setTransferData] = useState({
     recipientEmail: '',
     amount: '',
@@ -52,21 +55,24 @@ const TransferMoney = ({ isOpen, onClose, onTransferComplete }) => {
 
     try {
       const result = await bankingService.sendMoney(transferData);
-      
+
       if (result.success) {
-        setSuccess('Email transfer sent successfully! The recipient will be notified to accept the transfer.');
+        // Earn points
+        earnPoints(50);
+
+        setSuccess('Email transfer sent successfully! The recipient will be notified to accept the transfer. (+50 Orbs)');
         setTransferData({
           recipientEmail: '',
           amount: '',
           description: '',
           transactionType: 'TRANSFER'
         });
-        
+
         // Notify parent component
         if (onTransferComplete) {
           onTransferComplete(result.data);
         }
-        
+
         // Close modal after 2 seconds
         setTimeout(() => {
           onClose();
@@ -85,16 +91,16 @@ const TransferMoney = ({ isOpen, onClose, onTransferComplete }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="glass-card rounded-3xl p-6 w-full max-w-md mx-4 border border-white/10 relative overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className="text-xl font-semibold text-glass">
             Send Money via Email
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-glass-muted hover:text-white transition-colors"
           >
             <FaTimes className="w-5 h-5" />
           </button>
@@ -108,7 +114,7 @@ const TransferMoney = ({ isOpen, onClose, onTransferComplete }) => {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-glass-muted mb-1">
               Recipient Email *
             </label>
             <input
@@ -116,17 +122,17 @@ const TransferMoney = ({ isOpen, onClose, onTransferComplete }) => {
               name="recipientEmail"
               value={transferData.recipientEmail}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="glass-input w-full px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-glass placeholder-slate-500"
               placeholder="recipient@example.com"
               required
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-glass-muted mt-1">
               The recipient will receive a notification to accept the transfer
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-glass-muted mb-1">
               Amount *
             </label>
             <input
@@ -136,30 +142,30 @@ const TransferMoney = ({ isOpen, onClose, onTransferComplete }) => {
               min="0"
               value={transferData.amount}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="glass-input w-full px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-glass placeholder-slate-500"
               placeholder="0.00"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-glass-muted mb-1">
               Transfer Type *
             </label>
             <select
               name="transactionType"
               value={transferData.transactionType}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="glass-input w-full px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-glass bg-slate-900"
               required
             >
-              <option value="TRANSFER">Transfer</option>
-              <option value="INTERNAL">Internal Transfer</option>
+              <option value="TRANSFER" className="bg-slate-900 text-glass">Transfer</option>
+              <option value="INTERNAL" className="bg-slate-900 text-glass">Internal Transfer</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-glass-muted mb-1">
               Description (Optional)
             </label>
             <textarea
@@ -167,7 +173,7 @@ const TransferMoney = ({ isOpen, onClose, onTransferComplete }) => {
               value={transferData.description}
               onChange={handleChange}
               rows="3"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="glass-input w-full px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-glass placeholder-slate-500 resize-none"
               placeholder="What's this transfer for?"
             />
           </div>
@@ -190,14 +196,14 @@ const TransferMoney = ({ isOpen, onClose, onTransferComplete }) => {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+              className="flex-1 px-4 py-3 border border-white/10 text-glass-muted rounded-xl hover:bg-white/5 transition-colors font-medium"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+              className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-3 rounded-xl hover:shadow-lg hover:shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all font-medium"
             >
               {isLoading ? (
                 <>

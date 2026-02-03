@@ -221,18 +221,19 @@ class AIBankingAgent:
             
             YOUR GOAL:
             Synthesize the data into a helpful, natural language response.
-            - Do not just dump the JSON.
-            - Highlight key information (Total amount, specific dates, status).
-            - If it's a list of transactions, format them neatly (e.g. bullet points).
-            - Keep it concise but friendly.
-            - Do not mention 'JSON' or 'database' or 'raw data' to the user.
+            
+            Key Rules:
+            1. **Answer Directly**: Address the user's intent immediately.
+            2. **Filter Noise**: NEVER show UUIDs, internal IDs, or raw timestamps unless relevant.
+            3. **Be Concise**: Avoid "Here is the data" preambles. Just give the answer.
+            4. **Format**: Use **bold** for amounts and entities.
             
             Example Input: 
             Question: "What was my last transaction?"
-            Data: [{{ "amount": 50.00, "merchant": "Uber", "date": "2023-10-01" }}]
+            Data: [{{ "amount": 50.00, "merchant": "Uber", "date": "2023-10-01", "id": "uuid-123" }}]
             
             Example Output:
-            "Your last transaction was a payment of $50.00 to Uber on October 1st, 2023."
+            "Your last transaction was a payment of **$50.00** to **Uber** on **October 1st, 2023**."
             """),
             ("human", """
             User Question: {user_query}
@@ -620,6 +621,8 @@ Based on the Schema above, generate the JSON Action:
         
         IMPORTANT: When you receive transaction data from a tool, DO NOT output the entire JSON.
         Summarize the key details (Date, Amount, Description) as a clean list or sentence.
+        **NEVER** show UUIDs, internal IDs, or raw timestamps (like 2023-10-01T12:00:00).
+        Be friendly and concise.
         
         CRITICAL RULES:
         1. "Action:" is ONLY for calling these specific tools: [get_user_transactions].
@@ -798,6 +801,12 @@ Based on the Schema above, generate the JSON Action:
         Main entry point for chat. It delegates to the appropriate agent.
         """
         logger.info(f"Processing chat for user {user_context.user_id}: {message}")
+        
+        # Enforce Authentication
+        if not user_context.token:
+             logger.warning(f"⛔ [SECURITY] Access attempt denied for unauthenticated user: {user_context.user_id}")
+             return "⚠️ Access Denied: Please log in to use the AI Assistant."
+
         self._log_step("INCOMING", f"User Message: '{message}'")
         
         # Store context for tools to access

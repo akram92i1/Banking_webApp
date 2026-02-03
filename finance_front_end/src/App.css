@@ -1,110 +1,97 @@
-/* Glass Morphism Banking App Styles */
+/* Dark Banking App Styles */
+
+body {
+  background-color: #0f172a;
+  /* Slate 900 */
+  color: #f1f5f9;
+  /* Slate 100 */
+}
 
 .App {
   text-align: center;
+  min-height: 100vh;
+  background-color: #0f172a;
 }
 
-/* Glass effect utilities */
-.glass {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+/* Base Card Style - Solid Dark */
+.glass-card,
+.dark-card {
+  background: #1e293b;
+  /* Slate 800 */
+  border: 1px solid #334155;
+  /* Slate 700 */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+  border-radius: 0.5rem;
 }
 
-.glass-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
-  transition: all 0.3s ease;
+.glass-card:hover,
+.dark-card:hover {
+  background: #334155;
+  /* Slate 700 */
+  border-color: #475569;
+  /* Slate 600 */
+  /* transform: translateY(-2px); Removed floating feel, kept subtle lift or just color change */
 }
 
-.glass-card:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.3);
-}
-
-.glass-button {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
-}
-
-.glass-button:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px 0 rgba(31, 38, 135, 0.3);
-}
-
-.glass-input {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+.glass-button,
+.btn-primary {
+  background: #3b82f6;
+  /* Blue 500 */
   color: white;
-  transition: all 0.3s ease;
+  border: none;
+  font-weight: 600;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
 }
 
-.glass-input:focus {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.4);
+.glass-button:hover,
+.btn-primary:hover {
+  background: #2563eb;
+  /* Blue 600 */
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.glass-input,
+.input-dark {
+  background: #020617;
+  /* Slate 950 */
+  border: 1px solid #334155;
+  /* Slate 700 */
+  color: #f1f5f9;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+}
+
+.glass-input:focus,
+.input-dark:focus {
+  background: #020617;
+  border-color: #3b82f6;
+  /* Blue 500 */
   outline: none;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
 .glass-input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
+  color: #64748b;
+  /* Slate 500 */
 }
 
-/* Custom animations */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
+/* Utility Animations - Subtle Only */
 @keyframes pulse-soft {
-  0%, 100% {
-    opacity: 0.3;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.6;
-    transform: scale(1.05);
-  }
-}
 
-@keyframes shimmer {
-  0% {
-    background-position: -200px 0;
-  }
+  0%,
   100% {
-    background-position: 200px 0;
+    opacity: 1;
   }
-}
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+  50% {
+    opacity: 0.7;
+  }
 }
 
 .animate-pulse-soft {
-  animation: pulse-soft 4s ease-in-out infinite;
-}
-
-.animate-shimmer {
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.1),
-    transparent
-  );
-  background-size: 200px 100%;
-  animation: shimmer 2s infinite;
+  animation: pulse-soft 3s ease-in-out infinite;
 }
 
 /* Animation delays for staggered effects */
@@ -124,38 +111,34 @@
   animation-delay: 3s;
 }
 
-/* Scrollbar styling for glass effect */
+/* Scrollbar styling for Dark Theme */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
+  background: #0f172a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  transition: all 0.3s ease;
+  background: #334155;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.4);
+  background: #475569;
 }
 
-/* Text styles for glass theme */
+/* Text styles */
 .text-glass {
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  color: #f1f5f9;
 }
 
 .text-glass-muted {
-  color: rgba(255, 255, 255, 0.7);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  color: #94a3b8;
 }
 
-/* Legacy styles (keeping for compatibility) */
+/* Legacy styles */
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -186,7 +169,27 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Orbs Animation */
+@keyframes orb-float-glow {
+
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+  }
+
+  50% {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 0 25px rgba(168, 85, 247, 0.8), 0 0 10px rgba(236, 72, 153, 0.5);
+  }
+}
+
+.animate-orb {
+  animation: orb-float-glow 3s ease-in-out infinite;
 }

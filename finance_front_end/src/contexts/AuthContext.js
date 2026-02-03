@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const isAuth = authService.isAuthenticated();
         const storedUser = authService.getStoredUser();
-        
+
         if (isAuth && storedUser) {
           setIsAuthenticated(true);
           setUser(storedUser);
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       const result = await authService.login(credentials);
       console.log('🔄 AuthContext: Login service result:', result);
-      
+
       if (result.success) {
         console.log('✅ AuthContext: Setting user and authenticated state');
         setUser(result.user);
@@ -88,13 +88,27 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('user', JSON.stringify(updatedUser));
   };
 
+  const earnPoints = (amount) => {
+    if (!user) return;
+
+    console.log(`💎 AuthContext: Earning ${amount} points`);
+    const currentPoints = user.points || 0;
+    const newPoints = currentPoints + amount;
+
+    const updatedUser = { ...user, points: newPoints };
+    updateUser(updatedUser);
+
+    return newPoints;
+  };
+
   const value = {
     user,
     isAuthenticated,
     loading,
     login,
     logout,
-    updateUser
+    updateUser,
+    earnPoints
   };
 
   return (
