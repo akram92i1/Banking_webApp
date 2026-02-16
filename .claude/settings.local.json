@@ -10,7 +10,9 @@
       "Bash(python -m json.tool:*)",
       "Bash(pkill:*)",
       "Bash(taskkill:*)",
-      "Bash(ollama pull:*)"
+      "Bash(ollama pull:*)",
+      "Bash(psql:*)",
+      "Bash(docker exec:*)"
     ]
   }
 }

@@ -271,9 +271,10 @@ SECURITY RULES (MANDATORY - NEVER VIOLATE THESE):
 3. **SELECT ONLY**: ONLY generate SELECT statements. NEVER generate INSERT, UPDATE, DELETE, DROP, ALTER, TRUNCATE, CREATE, GRANT, or REVOKE statements.
 4. **NO UNION**: NEVER use UNION or UNION ALL.
 5. **NO MULTIPLE STATEMENTS**: NEVER include semicolons or multiple SQL statements.
-6. **NO OTHER USERS' DATA**: If the user asks to VIEW another user's data (e.g., "show me John's balance", "get asmith's profile"), REFUSE. Respond with: "I can only access your own account information. I cannot look up other users' data."
-   - EXCEPTION: If the user asks about their OWN transactions involving another person (e.g., "show my transactions with asmith", "did I send money to bob"), this IS allowed. Always scope the outer query to USER_EMAIL_PLACEHOLDER, and use a subquery to look up the other person's account_id for filtering.
-   - Example: {{ "sql": "SELECT t.amount, t.description FROM transactions t JOIN accounts a ON (t.from_account_id = a.account_id OR t.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND (t.description ILIKE '%asmith%' OR t.to_account_id IN (SELECT a2.account_id FROM accounts a2 JOIN users u2 ON a2.user_id = u2.user_id WHERE u2.username = 'asmith'))" }}
+6. **NO OTHER USERS' DATA**: If the user asks to VIEW another user's data (e.g., "show me John's balance", "get asmith's profile", "give me all transactions of asmith", "show asmith's transactions"), REFUSE. Respond with: "I can only access your own account information. I cannot look up other users' data."
+   - EXCEPTION: ONLY if the user explicitly says "MY transactions with [person]" or "did I send/receive money to/from [person]" — meaning the user is clearly asking about THEIR OWN transaction history filtered by a counterparty. The key words are "my", "I", "me" in combination with "with" or "to/from". If the user says "[person]'s transactions" or "transactions OF [person]", that is NOT this exception — REFUSE it.
+   - Example allowed: "show my transactions with asmith" → {{ "sql": "SELECT t.amount, t.description FROM transactions t JOIN accounts a ON (t.from_account_id = a.account_id OR t.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND (t.description ILIKE '%asmith%' OR t.to_account_id IN (SELECT a2.account_id FROM accounts a2 JOIN users u2 ON a2.user_id = u2.user_id WHERE u2.username = 'asmith'))" }}
+   - Example REFUSED: "give me all transactions of asmith", "show asmith's transactions" → REFUSE
 7. **NO SELECT ***: Always specify explicit column names. Never use SELECT *.
 
 Context:

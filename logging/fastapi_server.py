@@ -30,7 +30,7 @@ from pydantic import BaseModel, Field
 SCHEMA_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "databaseService", "banking_schema_attributes.md")
 
 # Database Configuration
-DATABASE_URL = "postgresql://bank_database_admin:admin123@localhost:5433/my_finance_db"
+DATABASE_URL = "postgresql://ai_agent_readonly:readonly_agent_secure_2024@localhost:5433/my_finance_db"
 
 # Setup Logging
 logging.basicConfig(level=logging.INFO)

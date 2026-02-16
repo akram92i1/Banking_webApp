@@ -39,4 +39,27 @@ GRANT SELECT ON TABLES TO ai_agent_readonly;
 -- Explicitly revoke any write permissions (safety net)
 REVOKE INSERT, UPDATE, DELETE, TRUNCATE ON ALL TABLES IN SCHEMA public FROM ai_agent_readonly;
 
+-- Add Row-Level Security (RLS) policies for tables that have RLS enabled.
+-- Without these policies, RLS blocks all rows for non-owner users by default.
+DO
+$$
+DECLARE
+    tbl RECORD;
+BEGIN
+    FOR tbl IN (
+        SELECT c.relname AS table_name
+        FROM pg_class c
+        JOIN pg_namespace n ON c.relnamespace = n.oid
+        WHERE c.relrowsecurity = true
+          AND c.relkind = 'r'
+          AND n.nspname = 'public'
+    ) LOOP
+        -- Drop existing policy if it exists, then create
+        EXECUTE format('DROP POLICY IF EXISTS ai_readonly_select ON %I', tbl.table_name);
+        EXECUTE format('CREATE POLICY ai_readonly_select ON %I FOR SELECT TO ai_agent_readonly USING (true)', tbl.table_name);
+        RAISE NOTICE 'Created RLS SELECT policy on %', tbl.table_name;
+    END LOOP;
+END
+$$;
+
 \echo 'Read-only AI agent user created successfully.'
