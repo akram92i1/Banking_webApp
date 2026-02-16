@@ -22,12 +22,12 @@ This guide explains how to insert initial data into your PostgreSQL database for
    ```sql
    INSERT INTO users (username, email, password_hash, first_name, last_name, phone, date_of_birth, ssn_hash, address, role, is_active, email_verified)
    VALUES
-   ('jdoe', 'jdoe@example.com', 'hashed_pw1', 'John', 'Doe', '+1234567890', '1990-01-01', 'ssn_hash1', '{"street":"123 Main St","city":"New York","zip":"10001"}', 'CUSTOMER', TRUE, TRUE),
-   ('asmith', 'asmith@example.com', 'hashed_pw2', 'Alice', 'Smith', '+1234567891', '1985-05-12', 'ssn_hash2', '{"street":"456 Oak Ave","city":"Los Angeles","zip":"90001"}', 'CUSTOMER', TRUE, TRUE),
+   ('jdoe', 'jdoe@example.com', 'pass1', 'John', 'Doe', '+1234567890', '1990-01-01', 'ssn_hash1', '{"street":"123 Main St","city":"New York","zip":"10001"}', 'CUSTOMER', TRUE, TRUE),
+   ('asmith', 'asmith@example.com', 'pass2', 'Alice', 'Smith', '+1234567891', '1985-05-12', 'ssn_hash2', '{"street":"456 Oak Ave","city":"Los Angeles","zip":"90001"}', 'CUSTOMER', TRUE, TRUE),
    -- Add more users as needed
    ;
    ```
-   > **Tip:** Replace `hashed_pwX` and `ssn_hashX` with actual hashed values.
+   > **Tip:** For local dev, passwords like `pass1` and `pass2` are auto-hashed by the Spring startup migration.
 
 2. **Run the SQL**  
    Execute the above statements in your PostgreSQL client or admin tool.

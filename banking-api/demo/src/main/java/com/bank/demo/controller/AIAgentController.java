@@ -50,7 +50,7 @@ public class AIAgentController {
     private SecurityLogAnalysisService securityLogAnalysisService;
     
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String AI_API_BASE_URL = "http://localhost:5001/api";
+    private final String AI_API_BASE_URL = "http://localhost:5000/api";
 
     @PostMapping("/chat")
     public ResponseEntity<Map<String, Object>> chatWithAI(

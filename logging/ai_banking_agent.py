@@ -23,13 +23,25 @@ from langchain_ollama import ChatOllama
 from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 from langchain_core.output_parsers import JsonOutputParser, PydanticOutputParser, StrOutputParser
 from pydantic import BaseModel, Field
-from langchain.memory import ConversationBufferWindowMemory
-from langchain.chains import LLMChain
-from langchain.agents import AgentType, initialize_agent, Tool
-from langchain.tools import BaseTool
-from langchain.schema import AgentAction, AgentFinish
-from langchain.agents import AgentOutputParser
-from langchain.schema.output_parser import StrOutputParser
+try:
+    from langchain.memory import ConversationBufferWindowMemory
+except ImportError:
+    from langchain_classic.memory import ConversationBufferWindowMemory
+try:
+    from langchain.chains import LLMChain
+except ImportError:
+    from langchain_classic.chains import LLMChain
+try:
+    from langchain.agents import AgentType, initialize_agent, Tool
+    from langchain.tools import BaseTool
+    from langchain.agents import AgentOutputParser
+except ImportError:
+    from langchain_classic.agents import AgentType, initialize_agent, Tool, AgentOutputParser
+    from langchain_core.tools import BaseTool
+try:
+    from langchain.schema import AgentAction, AgentFinish
+except ImportError:
+    from langchain_core.agents import AgentAction, AgentFinish
 
 import re
 
@@ -79,6 +91,8 @@ class FinancialAdvice(BaseModel):
     savings_suggestions: List[str] = Field(description="List of specific savings suggestions")
     grocery_deals: List[Dict[str, str]] = Field(description="List of grocery deals found")
     action_plan: str = Field(description="Step-by-step action plan")
+    spending_by_category: Dict[str, float] = Field(default_factory=dict, description="Spending breakdown by category")
+    financial_news: List[Dict[str, str]] = Field(default_factory=list, description="Relevant financial news items")
 
 class AIBankingAgent:
     """
@@ -771,7 +785,9 @@ Based on the Schema above, generate the JSON Action:
             recommended_reduction=target_reduction,
             savings_suggestions=llm_advice.get("savings_suggestions", []),
             grocery_deals=local_deals,
-            action_plan=llm_advice.get("action_plan", "Review and implement suggestions")
+            action_plan=llm_advice.get("action_plan", "Review and implement suggestions"),
+            spending_by_category=spending_data if isinstance(spending_data, dict) else {},
+            financial_news=llm_advice.get("financial_news", [])
         )
     
     def _log_step(self, step: str, details: str):
@@ -783,7 +799,7 @@ Based on the Schema above, generate the JSON Action:
         """Load the banking schema for context."""
         try:
             # Adjust path as needed, using the path confirmed by user
-            schema_path = r"e:\Banking_application\Banking_webApp\databaseService\banking_schema_attributes.md"
+            schema_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "databaseService", "banking_schema_attributes.md")
             if os.path.exists(schema_path):
                 self._log_step("LOAD_SCHEMA", f"Loaded schema from {schema_path}")
                 with open(schema_path, "r", encoding="utf-8") as f:

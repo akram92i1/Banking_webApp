@@ -1,17 +1,18 @@
 import os
+import re
 import json
 import asyncio
 import logging
 import requests
 import asyncpg
+import base64
 from typing import Dict, Any, List, Optional
-from datetime import datetime
 from datetime import datetime
 from contextlib import asynccontextmanager
 
 # Check if we need to add the current directory to sys.path for RAG imports
 import sys
-sys.path.append(os.path.dirname(os.path.abspath(__file__))) 
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 try:
     from Data.RAG_system_knowledge_based import setup_rag_system, query_rag, summarize_results
@@ -26,10 +27,7 @@ from pydantic import BaseModel, Field
 
 
 # --- CONFIGURATION ---
-OPENROUTER_API_KEY = "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"
-SITE_URL = "http://localhost:8000"
-SITE_NAME = "MyFastAPIApp"
-SCHEMA_PATH = r"e:\Banking_application\Banking_webApp\databaseService\banking_schema_attributes.md"
+SCHEMA_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "databaseService", "banking_schema_attributes.md")
 
 # Database Configuration
 DATABASE_URL = "postgresql://bank_database_admin:admin123@localhost:5433/my_finance_db"
@@ -37,6 +35,13 @@ DATABASE_URL = "postgresql://bank_database_admin:admin123@localhost:5433/my_fina
 # Setup Logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("FastAPIServer")
+
+# ANSI Colors (module-level so all functions can use them)
+BLUE = "\033[94m"
+GREEN = "\033[92m"
+RED = "\033[91m"
+YELLOW = "\033[93m"
+RESET = "\033[0m"
 
 # --- DATA MODELS ---
 class ChatRequest(BaseModel):
@@ -51,15 +56,23 @@ class FinancialAdviceRequest(BaseModel):
     target_reduction: Optional[float] = None
     token: Optional[str] = None
 
+class SecurityAnalysisRequest(BaseModel):
+    user_id: str = "admin"
+    location: str = "toronto"
+    log_file_path: Optional[str] = None
+    transaction_data: Optional[Dict[str, Any]] = None
+    security_context: Optional[Dict[str, Any]] = None
+    token: Optional[str] = None
+
+class SpendingAnalysisRequest(BaseModel):
+    user_id: str = "user001"
+    transactions: List[Dict[str, Any]] = []
+    time_period: str = "weekly"
+
 # --- APP LIFESPAN ---
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: Connect to DB
-    BLUE = "\033[94m"
-    GREEN = "\033[92m"
-    RED = "\033[91m"
-    RESET = "\033[0m"
-    
     print(f"{BLUE}--- STARTING FASTAPI SERVER ---{RESET}")
     print(f"{BLUE}Connecting to Database at {DATABASE_URL[:20]}...{RESET}")
     try:
@@ -68,7 +81,7 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"{RED}[ERROR] Database Connection Failed: {e}{RESET}")
         app.state.pool = None
-        
+
     # Startup: Initialize RAG System
     print(f"{BLUE}Initializing RAG System...{RESET}")
     if RAG_AVAILABLE:
@@ -83,7 +96,7 @@ async def lifespan(app: FastAPI):
         app.state.rag_chain = None
 
     yield
-    
+
     # Shutdown: Close DB
     print(f"{BLUE}--- SHUTTING DOWN ---{RESET}")
     if app.state.pool:
@@ -101,7 +114,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- GLOBAL STATE ---
 # --- GLOBAL STATE ---
 
 # Define structures locally to avoid strong dependency on ai_banking_agent (which imports pandas)
@@ -133,8 +145,6 @@ except Exception as e:
 
 # --- HELPER FUNCTIONS ---
 
-import base64
-
 def load_schema() -> str:
     """Load the banking schema markdown"""
     if os.path.exists(SCHEMA_PATH):
@@ -145,22 +155,22 @@ def load_schema() -> str:
 def extract_user_from_token(token: str) -> str:
     """
     Extracts the user ID (subject) from a JWT token without verifying signature.
-    Useful for logging and context context before passing to secured backend.
+    Useful for logging and context before passing to secured backend.
     """
     try:
         # JWT is header.payload.signature
         parts = token.split(".")
         if len(parts) < 2:
             return "unknown_user"
-        
+
         payload_b64 = parts[1]
         # Fix Base64 padding
         padding = '=' * (4 - len(payload_b64) % 4)
         payload_b64 += padding
-        
+
         payload_bytes = base64.urlsafe_b64decode(payload_b64)
         payload_data = json.loads(payload_bytes)
-        
+
         # Standard claims: 'sub' is usually user ID. 'preferred_username' is also common.
         return payload_data.get("sub") or payload_data.get("username") or "unknown_user"
     except Exception as e:
@@ -168,7 +178,26 @@ def extract_user_from_token(token: str) -> str:
         return "unknown_user"
 
 
-# Removed call_openrouter_brain - logic moved to internal_agent.process_user_intent
+def extract_token_from_header(request_token: Optional[str], authorization: Optional[str]) -> Optional[str]:
+    """Extract token from either request body or Authorization header."""
+    token = request_token
+    if not token and authorization:
+        if authorization.startswith("Bearer "):
+            token = authorization.split(" ")[1]
+        else:
+            token = authorization
+    return token
+
+
+def scrub_sensitive_data(text: str) -> str:
+    """Remove any hash-like patterns from LLM responses as a final safety net.
+    Catches hex strings (32+ chars) that look like password/SSN hashes."""
+    # Match hex strings that are 32+ characters (MD5, SHA-256, bcrypt, etc.)
+    scrubbed = re.sub(r'\b[a-fA-F0-9]{32,}\b', '[REDACTED]', text)
+    # Match bcrypt-style hashes ($2a$, $2b$, etc.)
+    scrubbed = re.sub(r'\$2[aby]?\$\d+\$[./A-Za-z0-9]{53}', '[REDACTED]', scrubbed)
+    return scrubbed
+
 
 async def get_user_email(user_id: str, pool) -> str:
     """
@@ -179,40 +208,34 @@ async def get_user_email(user_id: str, pool) -> str:
         return None
     try:
         async with pool.acquire() as conn:
-            # Assuming 'users' table has 'username' (which is user_id here) and 'email'
-            # Adjust column names if your schema is different!
-            # Based on schema in RAG file: users (user_id, username, email, phone, role...)
-            # If user_id passed to this func is actually the username:
-            row = await conn.fetchrow("SELECT email FROM users WHERE username = $1 OR user_id = $1", user_id)
+            row = await conn.fetchrow("SELECT email FROM users WHERE email = $1 OR username = $1 OR CAST(user_id AS TEXT) = $1", user_id)
             if row:
                 return row['email']
     except Exception as e:
         logger.error(f"Error fetching email for {user_id}: {e}")
     return None
 
-# Removed execute_raw_sql as RAG now handles SQL generation & execution internally
 
 # --- ROUTES ---
 
-@app.get("/health")
+@app.get("/api/health")
 async def health_check():
-    return {"status": "ok", "service": "fastapi-banking-agent"}
+    return {
+        "status": "healthy",
+        "service": "fastapi-banking-agent",
+        "timestamp": datetime.now().isoformat()
+    }
+
 
 @app.post("/api/chat")
 async def chat_endpoint(request: ChatRequest, authorization: Optional[str] = Header(None)):
     """
-    Main Entry Point.
-    1. Calls OpenRouter to classify.
-    2. Routes to appropriate internal function.
+    Main Chat Entry Point.
+    Routes to RAG system for knowledge-based responses.
     """
-    token = request.token
-    if not token and authorization:
-        if authorization.startswith("Bearer "):
-            token = authorization.split(" ")[1]
-        else:
-            token = authorization
+    token = extract_token_from_header(request.token, authorization)
 
-    # Extract User ID from Token (Security Best Practice)
+    # Extract User ID from Token
     user_id = request.user_id
     if token:
         extracted_user = extract_user_from_token(token)
@@ -225,123 +248,99 @@ async def chat_endpoint(request: ChatRequest, authorization: Optional[str] = Hea
         print(f"{YELLOW}[WARN] No token provided. Authorization required.{RESET}")
         raise HTTPException(status_code=401, detail="Authentication required: No token provided")
 
-    # ANSI Color for Blue
-    BLUE = "\033[94m"
-    YELLOW = "\033[93m"
-    RESET = "\033[0m"
     print(f"\n[INFO] [FASTAPI] Incoming Chat from {BLUE}{user_id}{RESET}: '{request.message}'")
     logger.info(f"Incoming Chat: {request.message}")
-            
-    
+
     # 1. Build User Context (kept for logging/stub)
     user_context = UserContext(
         user_id=user_id,
-        role=UserRole.USER, 
+        role=UserRole.USER,
         location="unknown",
         preferences={},
         transaction_history=[],
         token=token
     )
-    
+
     # 2. Get User Email for RAG
     user_email = await get_user_email(user_id, app.state.pool)
     if not user_email:
-        # Fallback if email not found, though RAG might fail for personal queries
         print(f"{YELLOW}[WARN] Could not find email for user {user_id}. utilizing user_id as fallback.{RESET}")
-        user_email = user_id # Fallback, though RAG expects email for replacement
+        user_email = user_id
 
     # 3. Call RAG Agent
     if not app.state.rag_chain:
-        return {"response": "AI Service (RAG) is currently unavailable."}
+        return {"response": "AI Service (RAG) is currently unavailable.", "timestamp": datetime.now().isoformat()}
 
     print(f"   [FASTAPI] calling RAG Agent for {user_email}...")
-    
+
     # Run the synchronous RAG query in a thread
     rag_response = await asyncio.to_thread(query_rag, app.state.rag_chain, request.message, user_email)
-    
+
     print(f"[DEBUG] RAG Response: {rag_response}")
 
     # 4. Handle Response
     if rag_response.get("is_sql"):
-        # It was a SQL query result
         result_data = rag_response.get("result")
-        
-        # Format the JSON result for display
+
         print(f"   [FASTAPI] Summarizing SQL results for user...")
-        
-        # Use simple formatting for errors
+
         if isinstance(result_data, dict) and "error" in result_data:
              logger.error(f"SQL Execution Error: {result_data['error']}")
              response_text = "I encountered an internal error while accessing the data. Please contact support."
         else:
-            # Use LLM to summarize the data
-            # Note: app.state.rag_chain is a RetrievalQA chain. 
-            # We access the underlying LLM via .combine_documents_chain.llm_chain.llm
-            # Or just create a new ChatOllama if needed, but reusing is better.
             try:
                 llm = app.state.rag_chain.combine_documents_chain.llm_chain.llm
                 response_text = await asyncio.to_thread(
-                    summarize_results, 
-                    llm, 
-                    result_data, 
+                    summarize_results,
+                    llm,
+                    result_data,
                     request.message
                 )
             except Exception as e:
                 print(f"[ERROR] Summarization failed: {e}")
-                # Fallback to raw data
-                response_text = f"Found records: {result_data}"
+                # SECURITY: Never send raw DB data to client
+                response_text = "I found some information but had trouble formatting it. Please try rephrasing your question."
 
-        return {"response": response_text}
+        # SECURITY: Scrub any hash-like patterns from the response
+        response_text = scrub_sensitive_data(response_text)
+        return {"response": response_text, "timestamp": datetime.now().isoformat()}
     else:
-        # Normal chat response
-        return {"response": rag_response.get("result", "I couldn't generate a response.")}
+        response_text = rag_response.get("result", "I couldn't generate a response.")
+        response_text = scrub_sensitive_data(response_text)
+        return {"response": response_text, "timestamp": datetime.now().isoformat()}
+
 
 @app.post("/api/user/financial-advice")
 async def manual_advice_endpoint(request: FinancialAdviceRequest, authorization: Optional[str] = Header(None)):
     """Direct advice endpoint (Legacy/Direct Access)"""
-    # ANSI Color for Blue
-    BLUE = "\033[94m"
-    RESET = "\033[0m"
-    
     try:
-        # Extract Token
-        token = request.token
-        if not token and authorization:
-            if authorization.startswith("Bearer "):
-                token = authorization.split(" ")[1]
-            else:
-                token = authorization
-        
+        token = extract_token_from_header(request.token, authorization)
+
         # Extract User ID from Token
-        user_id = request.user_id # Fallback
+        user_id = request.user_id
         if token:
             extracted_user = extract_user_from_token(token)
             if extracted_user and extracted_user != "unknown_user":
                 user_id = extracted_user
-        
+
         print(f"\n[INFO] [FASTAPI] Financial Advice Request for {BLUE}{user_id}{RESET}")
 
-        
         real_transactions = []
         if token:
              headers = {"Authorization": f"Bearer {token}"}
              try:
                  print("   [INTERNAL] Fetching transactions from Spring API...")
-                 # Verify port 8082 or 8080. Previous code used 8082.
                  response = requests.get(f"http://localhost:8082/api/transactions/current-user?limit=100", headers=headers, timeout=5)
                  if response.status_code == 200:
                      real_transactions = response.json()
                      print(f"   [INTERNAL] Got {len(real_transactions)} transactions.")
              except Exception as e:
                  print(f"   [INTERNAL] Transaction fetch failed: {e}")
-        
+
         # Calculate Spending
         spending_data = {}
         if real_transactions:
-            now = datetime.now()
-            # Simple weekly aggregation
-            # ... (Logic copied from Flask)
-            pass # Simplified for resilience, relying on Agent to analyze list.
+            pass  # Simplified for resilience, relying on Agent to analyze list.
         else:
              spending_data = request.spending_data or {
                 'week1': 120.50, 'week2': 145.30, 'week3': 135.80, 'week4': 160.20
@@ -350,22 +349,22 @@ async def manual_advice_endpoint(request: FinancialAdviceRequest, authorization:
         user_context = UserContext(
             user_id=user_id,
             role=UserRole.USER,
-            location="toronto", # Default
+            location="toronto",
             preferences={},
             transaction_history=real_transactions,
             token=token
         )
-        
+
         if internal_agent:
             print("   [INTERNAL] Calling Agent for Advice...")
-            
+
             advice = await internal_agent.provide_financial_advice(
                 user_context=user_context,
                 spending_data=spending_data,
                 category=request.category,
                 target_reduction=request.target_reduction
             )
-            
+
             return {
                 "success": True,
                 "advice": {
@@ -375,8 +374,8 @@ async def manual_advice_endpoint(request: FinancialAdviceRequest, authorization:
                     "savings_suggestions": advice.savings_suggestions,
                     "grocery_deals": advice.grocery_deals,
                     "action_plan": advice.action_plan,
-                    "spending_by_category": advice.spending_by_category,
-                    "financial_news": advice.financial_news
+                    "spending_by_category": getattr(advice, 'spending_by_category', {}),
+                    "financial_news": getattr(advice, 'financial_news', [])
                 },
                 "real_data": {
                     "transaction_count": len(real_transactions),
@@ -385,14 +384,161 @@ async def manual_advice_endpoint(request: FinancialAdviceRequest, authorization:
                 },
                 "timestamp": datetime.now().isoformat()
             }
-            
+
     except Exception as e:
         logger.error(f"Advice Error: {e}")
-        return {"success": False, "error": str(e)}
+        return {"success": False, "error": str(e), "timestamp": datetime.now().isoformat()}
 
-    return {"status": "error", "message": "Agent not initialized"}
+    return {"success": False, "error": "AI Agent not initialized. Ensure Ollama is running.", "timestamp": datetime.now().isoformat()}
+
+
+@app.post("/api/admin/security-analysis")
+async def admin_security_analysis(request: SecurityAnalysisRequest, authorization: Optional[str] = Header(None)):
+    """Admin endpoint for comprehensive security analysis."""
+    try:
+        token = extract_token_from_header(request.token, authorization)
+
+        user_id = request.user_id
+        if token:
+            extracted_user = extract_user_from_token(token)
+            if extracted_user and extracted_user != "unknown_user":
+                user_id = extracted_user
+
+        print(f"\n[INFO] [FASTAPI] Security Analysis Request from {BLUE}{user_id}{RESET}")
+
+        if not internal_agent:
+            return {"success": False, "error": "AI Agent not available. Ensure Ollama is running.", "timestamp": datetime.now().isoformat()}
+
+        admin_context = UserContext(
+            user_id=user_id,
+            role=UserRole.ADMIN,
+            location=request.location,
+            preferences={},
+            transaction_history=[],
+            token=token
+        )
+
+        result = await internal_agent.analyze_security_threats(
+            log_file_path=request.log_file_path,
+            transaction_data=request.transaction_data,
+            user_context=admin_context
+        )
+
+        return {
+            "success": True,
+            "analysis": {
+                "threat_detected": result.threat_detected,
+                "threat_type": result.threat_type,
+                "confidence_score": result.confidence_score,
+                "severity": result.severity,
+                "recommendation": result.recommendation,
+                "explanation": result.explanation
+            },
+            "system_data": request.security_context or {},
+            "timestamp": datetime.now().isoformat()
+        }
+
+    except Exception as e:
+        logger.error(f"Security Analysis Error: {e}")
+        return {"success": False, "error": str(e), "timestamp": datetime.now().isoformat()}
+
+
+@app.get("/api/admin/dashboard")
+async def admin_dashboard():
+    """Get admin security dashboard data."""
+    try:
+        if not internal_agent:
+            return {"success": False, "error": "AI Agent not available. Ensure Ollama is running.", "timestamp": datetime.now().isoformat()}
+
+        dashboard_data = await asyncio.to_thread(
+            internal_agent.security_agent.get_security_dashboard
+        )
+
+        return {
+            "success": True,
+            "dashboard": dashboard_data,
+            "timestamp": datetime.now().isoformat()
+        }
+
+    except Exception as e:
+        logger.error(f"Dashboard Error: {e}")
+        return {"success": False, "error": str(e), "timestamp": datetime.now().isoformat()}
+
+
+@app.get("/api/grocery-deals/{location}")
+async def get_grocery_deals(location: str):
+    """Get grocery deals for a specific location."""
+    try:
+        if not internal_agent:
+            return {"success": False, "error": "AI Agent not available.", "timestamp": datetime.now().isoformat()}
+
+        deals = await asyncio.to_thread(internal_agent._get_grocery_deals, location)
+
+        return {
+            "success": True,
+            "location": location,
+            "deals": deals,
+            "timestamp": datetime.now().isoformat()
+        }
+
+    except Exception as e:
+        logger.error(f"Grocery Deals Error: {e}")
+        return {"success": False, "error": str(e), "timestamp": datetime.now().isoformat()}
+
+
+@app.post("/api/user/spending-analysis")
+async def analyze_user_spending(request: SpendingAnalysisRequest):
+    """Analyze user spending patterns from transaction history."""
+    try:
+        transactions = request.transactions
+
+        # Analyze spending patterns
+        total_spending = 0.0
+        categories = {}
+
+        for transaction in transactions:
+            amount_raw = transaction.get('amount', '0')
+            if isinstance(amount_raw, str):
+                amount = float(amount_raw.replace('$', '').replace('-', '').replace('+', ''))
+            else:
+                amount = abs(float(amount_raw))
+            total_spending += amount
+
+            category = transaction.get('description', 'Other')
+            categories[category] = categories.get(category, 0) + amount
+
+        spending_analysis = {
+            "total_spending": total_spending,
+            "transaction_count": len(transactions),
+            "categories": categories,
+            "trends": "spending_increasing" if len(transactions) > 0 else "no_data",
+            "recommendations": [
+                "Consider setting a weekly budget limit",
+                "Look for recurring subscriptions you can cancel",
+                "Compare prices before making purchases"
+            ]
+        }
+
+        return {
+            "success": True,
+            "analysis": spending_analysis,
+            "timestamp": datetime.now().isoformat()
+        }
+
+    except Exception as e:
+        logger.error(f"Spending Analysis Error: {e}")
+        return {"success": False, "error": str(e), "timestamp": datetime.now().isoformat()}
+
 
 if __name__ == "__main__":
     import uvicorn
-    # Use lifespan logic
+    print("--- Starting AI Banking Agent FastAPI Server ---")
+    print("Available endpoints:")
+    print("   GET  /api/health")
+    print("   POST /api/chat")
+    print("   POST /api/user/financial-advice")
+    print("   POST /api/admin/security-analysis")
+    print("   GET  /api/admin/dashboard")
+    print("   GET  /api/grocery-deals/{location}")
+    print("   POST /api/user/spending-analysis")
     uvicorn.run("fastapi_server:app", host="0.0.0.0", port=5000, reload=True)

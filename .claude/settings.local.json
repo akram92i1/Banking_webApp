@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(pip install:*)",
+      "Bash(python -c:*)",
+      "Bash(pip show:*)",
+      "Bash(python -m pip install:*)",
+      "Bash(curl:*)",
+      "Bash(python -m json.tool:*)",
+      "Bash(pkill:*)",
+      "Bash(taskkill:*)",
+      "Bash(ollama pull:*)"
+    ]
+  }
+}

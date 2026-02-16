@@ -1,8 +1,9 @@
 import os
 import sys
+import re
 import json
 import psycopg2
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Tuple
 from decimal import Decimal
 
 # Ensure we can import from parent directories if needed, though mostly using installed packages
@@ -10,7 +11,10 @@ from decimal import Decimal
 # sys.path.append(current_dir)
 
 from langchain_community.document_loaders import TextLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+try:
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
+except ImportError:
+    from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 # Try importing from new libraries first, fall back to community
 try:
@@ -19,8 +23,11 @@ except ImportError:
     from langchain_community.embeddings import OllamaEmbeddings
     from langchain_community.chat_models import ChatOllama
 
-from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
+try:
+    from langchain.chains import RetrievalQA
+except ImportError:
+    from langchain_classic.chains import RetrievalQA
+from langchain_core.prompts import PromptTemplate
 
 # Configuration
 MODEL_NAME = "gemma3:4b"  # For generation
@@ -32,21 +39,93 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 KNOWLEDGE_BASE_PATH = os.path.join(BASE_DIR, "banking_ai_scenarios.txt")
 DB_DIR = os.path.join(BASE_DIR, "faiss_index")
 
-# Database Configuration
+# Database Configuration (read-only user for AI agent - principle of least privilege)
 DB_HOST = "localhost"
 DB_PORT = "5433"
 DB_NAME = "my_finance_db"
-DB_USER = "bank_database_admin"
-DB_PASS = "admin123"
+DB_USER = "ai_agent_readonly"
+DB_PASS = "readonly_agent_secure_2024"
 
-# Banking Schema
+# Banking Schema (only safe columns listed - sensitive columns like password_hash, ssn_hash, card_number_hash are excluded)
 BANKING_SCHEMA = """
-## 🧑‍💼 `users` (user_id, username, email, phone, role...)
-## 💰 `accounts` (account_id, user_id, account_number, balance, available_balance, account_type...)
-## 🔄 `transactions` (transaction_id, from_account_id, to_account_id, amount, description, transaction_status, processed_at...)
-## 💳 `cards` (card_id, account_id, card_number_hash, daily_limit, monthly_limit...)
-## 🧾 `beneficiaries` (beneficiary_id, user_id, account_number, bank_name...)
+## `users` (user_id, username, email, phone, role, first_name, last_name, address, is_active, created_at, updated_at)
+## `accounts` (account_id, user_id, account_number, balance, available_balance, account_type, account_status, interest_rate, credit_limit, overdraft_limit, opened_at)
+## `transactions` (transaction_id, from_account_id, to_account_id, amount, description, transaction_type, transaction_status, processed_at, fee_amount, currency, reference_number)
+## `cards` (card_id, account_id, card_type, card_status, daily_limit, monthly_limit, expiry_date, is_contactless, issued_at, blocked_at)
+## `beneficiaries` (beneficiary_id, user_id, beneficiary_name, account_number, bank_name, routing_number, nickname, is_verified, relationship, created_at)
 """
+
+# --- SECURITY CONSTANTS ---
+BLOCKED_COLUMNS = {
+    "password_hash", "ssn_hash", "card_number_hash", "cvv_hash", "pin_hash",
+    "secret_question", "secret_answer", "security_answer", "token", "refresh_token"
+}
+
+DANGEROUS_KEYWORDS = [
+    "INSERT", "UPDATE", "DELETE", "DROP", "ALTER", "TRUNCATE",
+    "CREATE", "GRANT", "REVOKE", "EXEC", "EXECUTE"
+]
+
+def validate_sql_query(sql_query: str) -> Tuple[bool, str]:
+    """
+    Validate a SQL query for security before execution.
+    Returns (is_valid, error_message).
+    """
+    sql_upper = sql_query.upper().strip()
+
+    # 1. Must be a SELECT statement
+    if not sql_upper.startswith("SELECT"):
+        return False, "Only SELECT queries are allowed."
+
+    # 2. Block dangerous keywords (word-boundary match)
+    for keyword in DANGEROUS_KEYWORDS:
+        if re.search(r'\b' + keyword + r'\b', sql_upper):
+            return False, f"Forbidden SQL keyword detected: {keyword}"
+
+    # 3. No multiple statements (semicolons)
+    # Remove semicolons that are inside string literals before checking
+    stripped = re.sub(r"'[^']*'", "", sql_query)
+    if ";" in stripped:
+        return False, "Multiple SQL statements are not allowed."
+
+    # 4. No UNION (prevents UNION-based exfiltration)
+    if re.search(r'\bUNION\b', sql_upper):
+        return False, "UNION queries are not allowed."
+
+    # 5. Must contain the user email placeholder (user scoping)
+    if "USER_EMAIL_PLACEHOLDER" not in sql_query:
+        return False, "Query must be scoped to the authenticated user (missing USER_EMAIL_PLACEHOLDER)."
+
+    # 6. Block SELECT * (must use explicit column names)
+    if re.search(r'\bSELECT\s+\*', sql_upper):
+        return False, "SELECT * is not allowed. Please specify explicit column names."
+
+    # 7. Block sensitive columns (strip string literals first to avoid false positives)
+    sql_no_strings = re.sub(r"'[^']*'", "", sql_query)
+    for col in BLOCKED_COLUMNS:
+        if re.search(r'\b' + col + r'\b', sql_no_strings.lower()):
+            return False, f"Access to column '{col}' is forbidden."
+
+    # 8. Enforce row limit (cap at 50 even if LLM specifies higher)
+    limit_match = re.search(r'\bLIMIT\s+(\d+)', sql_upper)
+    if limit_match:
+        limit_val = int(limit_match.group(1))
+        if limit_val > 50:
+            sql_query = re.sub(r'\bLIMIT\s+\d+', 'LIMIT 50', sql_query, flags=re.IGNORECASE)
+    else:
+        sql_query = sql_query.rstrip().rstrip(";") + " LIMIT 50"
+
+    return True, sql_query
+
+
+def sanitize_db_results(data: List[Dict]) -> List[Dict]:
+    """Strip sensitive columns from database results as a safety net."""
+    for row in data:
+        keys_to_remove = [k for k in row if k.lower() in BLOCKED_COLUMNS]
+        for k in keys_to_remove:
+            del row[k]
+    return data
+
 
 def load_documents(file_path):
     """Load the knowledge base document."""
@@ -108,8 +187,9 @@ def get_or_create_vector_db(texts=None, force_recreate=False):
     
     return vector_db
 
-def execute_sql_query(sql_query):
-    """Execute SQL query against the database and return JSON."""
+def execute_sql_query(sql_query, params=None):
+    """Execute SQL query against the database and return JSON.
+    Uses parameterized queries to prevent SQL injection."""
     conn = None
     try:
         conn = psycopg2.connect(
@@ -120,12 +200,12 @@ def execute_sql_query(sql_query):
             password=DB_PASS
         )
         cursor = conn.cursor()
-        cursor.execute(sql_query)
-        
+        cursor.execute(sql_query, params)
+
         # Get column names
         colnames = [desc[0] for desc in cursor.description]
         results = cursor.fetchall()
-        
+
         # Convert to list of dicts
         data = []
         for row in results:
@@ -139,11 +219,14 @@ def execute_sql_query(sql_query):
                 else:
                     row_dict[colnames[i]] = val
             data.append(row_dict)
-            
+
+        # Layer 4: Sanitize results - strip sensitive columns
+        data = sanitize_db_results(data)
+
         return json.dumps(data, indent=2)
-        
+
     except Exception as e:
-        print(f"❌ [DB ERROR] {e}") # Log for admin/debugging
+        print(f"[DB ERROR] {e}") # Log for admin/debugging
         return json.dumps({"error": "Internal Database Error. Please contact support."})
     finally:
         if conn:
@@ -164,8 +247,8 @@ def setup_rag_system(force_recreate_db=True):
         # 4. LLM
         llm = ChatOllama(model=MODEL_NAME)
         
-        # 5. Prompt
-        template = """You are an AI Banking Assistant. 
+        # 5. Prompt (Security-hardened)
+        template = """You are an AI Banking Assistant.
 You have two sources of information:
 1. The provided RAG Context (Banking Policies).
 2. The Database Schema (User Data).
@@ -180,7 +263,18 @@ INSTRUCTIONS:
   - Return ONLY a JSON object with the key "sql".
   - Use the placeholder 'USER_EMAIL_PLACEHOLDER' for the user's email.
   - **IMPORTANT**: Use PostgreSQL syntax (e.g., `date_trunc`, `ILIKE`, `CURRENT_DATE`, `NOW()`). Do NOT use MySQL syntax like `DATE_SUB` or `CURDATE()`.
-  - Example: {{ "sql": "SELECT * FROM users WHERE email = 'USER_EMAIL_PLACEHOLDER'" }}
+  - Example: {{ "sql": "SELECT account_type, balance, available_balance FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER'" }}
+
+SECURITY RULES (MANDATORY - NEVER VIOLATE THESE):
+1. **USER SCOPING**: EVERY SQL query MUST include `WHERE u.email = 'USER_EMAIL_PLACEHOLDER'` or `WHERE email = 'USER_EMAIL_PLACEHOLDER'`. You may ONLY return data belonging to the authenticated user.
+2. **FORBIDDEN COLUMNS**: NEVER include these columns in any SELECT: password_hash, ssn_hash, card_number_hash, cvv_hash, pin_hash, secret_question, secret_answer. If the user asks for any of these, politely refuse.
+3. **SELECT ONLY**: ONLY generate SELECT statements. NEVER generate INSERT, UPDATE, DELETE, DROP, ALTER, TRUNCATE, CREATE, GRANT, or REVOKE statements.
+4. **NO UNION**: NEVER use UNION or UNION ALL.
+5. **NO MULTIPLE STATEMENTS**: NEVER include semicolons or multiple SQL statements.
+6. **NO OTHER USERS' DATA**: If the user asks to VIEW another user's data (e.g., "show me John's balance", "get asmith's profile"), REFUSE. Respond with: "I can only access your own account information. I cannot look up other users' data."
+   - EXCEPTION: If the user asks about their OWN transactions involving another person (e.g., "show my transactions with asmith", "did I send money to bob"), this IS allowed. Always scope the outer query to USER_EMAIL_PLACEHOLDER, and use a subquery to look up the other person's account_id for filtering.
+   - Example: {{ "sql": "SELECT t.amount, t.description FROM transactions t JOIN accounts a ON (t.from_account_id = a.account_id OR t.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND (t.description ILIKE '%asmith%' OR t.to_account_id IN (SELECT a2.account_id FROM accounts a2 JOIN users u2 ON a2.user_id = u2.user_id WHERE u2.username = 'asmith'))" }}
+7. **NO SELECT ***: Always specify explicit column names. Never use SELECT *.
 
 Context:
 {context}
@@ -210,11 +304,11 @@ Answer:"""
         return None
 
 def query_rag(qa_chain, query, user_email=None):
-    """Query the RAG system."""
+    """Query the RAG system with security validation."""
     try:
         response = qa_chain.invoke({"query": query})
         result_text = response["result"]
-        
+
         # Check if result looks like JSON SQL
         if "sql" in result_text or "USER_EMAIL_PLACEHOLDER" in result_text:
             try:
@@ -224,17 +318,44 @@ def query_rag(qa_chain, query, user_email=None):
                     clean_json = clean_json.split("```json")[1].split("```")[0].strip()
                 elif "```" in clean_json:
                     clean_json = clean_json.split("```")[1].split("```")[0].strip()
-                
-                 # If simple text is just the JSON
+
+                # If simple text is just the JSON
                 if clean_json.startswith("{") and clean_json.endswith("}"):
                     data = json.loads(clean_json)
                     if "sql" in data:
                         sql_query = data["sql"]
+
+                        # --- LAYER 2: Validate the SQL query ---
+                        is_valid, validation_result = validate_sql_query(sql_query)
+                        if not is_valid:
+                            print(f"\n[SECURITY] SQL BLOCKED: {validation_result}")
+                            print(f"[SECURITY] Blocked query: {sql_query}")
+                            return {
+                                "result": "I'm sorry, but I cannot process that request. " + validation_result,
+                                "source_documents": [],
+                                "is_sql": False
+                            }
+                        # validation_result contains the (possibly LIMIT-appended) query
+                        sql_query = validation_result
+
                         if user_email:
-                            # Replace the placeholder with the actual email
-                            sql_query = sql_query.replace("USER_EMAIL_PLACEHOLDER", user_email)
-                            print(f"\n[Executing SQL]: {sql_query}")
-                            db_result = execute_sql_query(sql_query)
+                            # --- LAYER 3: Parameterized queries ---
+                            # psycopg2 uses %s for params but also interprets % as format specifiers.
+                            # ILIKE '%text%' would break because %t is seen as a specifier.
+                            # Fix: replace placeholder with a temp token, escape all %, then swap token for %s.
+                            placeholder_count = sql_query.count("USER_EMAIL_PLACEHOLDER")
+                            TEMP_TOKEN = "__PSYCOPG2_PARAM__"
+                            # Step 1: Replace placeholder (with and without quotes) with temp token
+                            sql_query = sql_query.replace("'USER_EMAIL_PLACEHOLDER'", TEMP_TOKEN)
+                            sql_query = sql_query.replace("USER_EMAIL_PLACEHOLDER", TEMP_TOKEN)
+                            # Step 2: Escape all literal % as %% (for ILIKE patterns etc.)
+                            sql_query = sql_query.replace("%", "%%")
+                            # Step 3: Replace temp token with %s (psycopg2 parameter)
+                            sql_query = sql_query.replace(TEMP_TOKEN, "%s")
+                            params = tuple([user_email] * placeholder_count)
+
+                            print(f"\n[Executing SQL]: {sql_query} with params={params}")
+                            db_result = execute_sql_query(sql_query, params)
                             return {
                                 "result": db_result,
                                 "source_documents": [],
@@ -242,9 +363,9 @@ def query_rag(qa_chain, query, user_email=None):
                             }
                         else:
                             return {"result": "Error: User email required for this query.", "source_documents": []}
-            except Exception as e:
+            except json.JSONDecodeError as e:
                 print(f"Failed to parse SQL JSON: {e}")
-        
+
         return {
             "result": result_text,
             "source_documents": response["source_documents"],
@@ -311,7 +432,7 @@ def summarize_results(llm, results, user_query):
         
     except Exception as e:
         print(f"Error summarising results: {e}")
-        return f"I found some data: {results}"
+        return "I found some information but had trouble formatting it. Please try rephrasing your question."
 
 if __name__ == "__main__":
     print("--- Banking RAG System Initialization ---")

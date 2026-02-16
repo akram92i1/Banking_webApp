@@ -14,3 +14,4 @@ services:
       - ./Banking_databse.sql:/docker-entrypoint-initdb.d/01-schema.sql
       - ./data_insertion.sql:/docker-entrypoint-initdb.d/02-users.sql
       - ./grant_privileges_to_user.sql:/docker-entrypoint-initdb.d/01-grant_privileges.sql
+      - ./grant_ai_agent_readonly.sql:/docker-entrypoint-initdb.d/03-grant_ai_readonly.sql
