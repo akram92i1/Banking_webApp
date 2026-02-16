@@ -10,7 +10,7 @@ from decimal import Decimal
 # sys.path.append(current_dir)
 
 from langchain_community.document_loaders import TextLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 # Try importing from new libraries first, fall back to community
 try:
@@ -19,8 +19,8 @@ except ImportError:
     from langchain_community.embeddings import OllamaEmbeddings
     from langchain_community.chat_models import ChatOllama
 
-from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
+from langchain_classic.chains.retrieval_qa.base import RetrievalQA
+from langchain_core.prompts import PromptTemplate
 
 # Configuration
 MODEL_NAME = "gemma3:4b"  # For generation
@@ -34,7 +34,7 @@ DB_DIR = os.path.join(BASE_DIR, "faiss_index")
 
 # Database Configuration
 DB_HOST = "localhost"
-DB_PORT = "5433"
+DB_PORT = "5432"
 DB_NAME = "my_finance_db"
 DB_USER = "bank_database_admin"
 DB_PASS = "admin123"

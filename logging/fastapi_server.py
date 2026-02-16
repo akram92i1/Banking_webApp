@@ -32,7 +32,7 @@ SITE_NAME = "MyFastAPIApp"
 SCHEMA_PATH = r"e:\Banking_application\Banking_webApp\databaseService\banking_schema_attributes.md"
 
 # Database Configuration
-DATABASE_URL = "postgresql://bank_database_admin:admin123@localhost:5433/my_finance_db"
+DATABASE_URL = "postgresql://bank_database_admin:admin123@localhost:5432/my_finance_db"
 
 # Setup Logging
 logging.basicConfig(level=logging.INFO)

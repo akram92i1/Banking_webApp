@@ -63,6 +63,9 @@ Thumbs.db
 
 # Python
 /logging/venv/
+/logging/ai_agent_Env/
+/logging/ai_agent_requirement.txt
+/logging/ai_agent_venv/
 
 # Misc
 *.swp
