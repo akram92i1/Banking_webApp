@@ -1,14 +1,9 @@
-
 # Node.js dependencies
 auth-service/node_modules/
 frontend/node_modules/
-
-# Java build files
-banking-api/target/
-banking-api/.class# Node.js dependencies
-auth-service/node_modules/
-frontend/node_modules/
 finance_front_end/node_modules/
+finance_mobile_app/node_modules/
+finance_mobile_app/.expo/
 
 # Java build files
 banking-api/target/
@@ -36,33 +31,9 @@ Thumbs.db
 **/.docker/
 **/Dockerfile~
 
-# Misc
-*.swppath
-banking-api/.project
-banking-api/.settings/
-
-# Environment files
-*.env
-
-# Logs
-*.log
-logs/
-logging/logs/
-
-# OS generated files
-.DS_Store
-Thumbs.db
-
-# IDE files
-.vscode/
-.idea/
-
-# Docker artifacts
-**/.docker/
-**/Dockerfile~
-
 # Python
 /logging/venv/
+/logging/ai_agent_Env/
 
 # Misc
 *.swp

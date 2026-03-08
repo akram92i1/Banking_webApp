@@ -17,6 +17,12 @@ import pandas as pd
 import numpy as np
 import requests
 from pathlib import Path
+try:
+    from duckduckgo_search import DDGS
+    DDGS_AVAILABLE = True
+except ImportError:
+    DDGS_AVAILABLE = False
+
 
 # LangChain imports
 from langchain_ollama import ChatOllama
@@ -223,6 +229,9 @@ class AIBankingAgent:
             Spending Category: {category}
             Target Reduction: {target_reduction}
             Local Grocery Deals: {local_deals}
+            
+            Global Market News & Trends:
+            {market_news_context}
             
             Provide financial advice in JSON format.
             """)
@@ -684,6 +693,127 @@ Based on the Schema above, generate the JSON Action:
         """Get grocery deals for a specific location"""
         location_key = location.lower()
         return self.grocery_stores.get(location_key, [])
+
+    def _perform_market_research(self, location: str, interest_topics: List[str] = None) -> str:
+        """
+        Perform active market research using DuckDuckGo Search.
+        Returns a summarized string context of findings.
+        """
+        if not DDGS_AVAILABLE:
+            return "Market research unavailable (duckduckgo-search not installed)."
+
+        if not interest_topics:
+            interest_topics = ["grocery", "inflation", "interest rates"]
+        
+        research_context = []
+        logger.info(f"Performing market research for {location} on {interest_topics}")
+        
+        try:
+            with DDGS() as ddgs:
+                # 1. Grocery Deals using Flipp API
+                if "grocery" in interest_topics:
+                    import requests
+                    
+                    CITY_POSTAL_CODES = {
+                        "montreal": "H2Z1E9", "toronto": "M5V2A8", "vancouver": "V6B2W2",
+                        "calgary": "T2P2G8", "ottawa": "K1P5G4", "edmonton": "T5J2Z2",
+                        "quebec": "G1R2B5", "halifax": "B3J3A5", "winnipeg": "R3C1R3"
+                    }
+                    loc_lower = location.lower()
+                    postal_code = "H2Z1E9" # Default
+                    for city, postal in CITY_POSTAL_CODES.items():
+                        if city in loc_lower:
+                            postal_code = postal
+                            break
+                            
+                    flyers_url = f"https://backflipp.wishabi.com/flipp/flyers?locale=en-ca&postal_code={postal_code}"
+                    headers = {
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                        "Accept": "application/json"
+                    }
+                    target_stores = ["maxi", "iga", "super c", "metro", "provigo", "walmart"]
+                    
+                    try:
+                        resp = requests.get(flyers_url, headers=headers, timeout=10)
+                        if resp.status_code == 200:
+                            flyers = resp.json().get("flyers", [])
+                            found_flyers = []
+                            seen_merchants = set()
+                            
+                            for f in flyers:
+                                merchant = f.get("merchant", "").lower()
+                                if merchant in seen_merchants: continue
+                                for store in target_stores:
+                                    if store in merchant:
+                                        found_flyers.append({"id": f.get("id"), "merchant": f.get("merchant")})
+                                        seen_merchants.add(merchant)
+                                        break
+                                        
+                            flyer_section_parts = []
+                            for f in found_flyers[:4]:
+                                fid = f["id"]
+                                merchant_name = f["merchant"]
+                                items_url = f"https://backflipp.wishabi.com/flipp/flyers/{fid}?locale=en-ca"
+                                item_resp = requests.get(items_url, headers=headers, timeout=10)
+                                if item_resp.status_code == 200:
+                                    items = item_resp.json().get("items", [])
+                                    deal_lines = []
+                                    for item in items:
+                                        name = item.get("name", "").strip()
+                                        price = item.get("price") or item.get("current_price") or item.get("price_text")
+                                        if name and price and not item.get("is_clipped"):
+                                            price_str = str(price)
+                                            if not price_str.startswith("$"):
+                                                price_str = f"${price_str}"
+                                            pre_text = item.get("pre_price_text")
+                                            if pre_text:
+                                                price_str = f"{pre_text.strip()} {price_str}"
+                                            post_text = item.get("post_price_text")
+                                            if post_text:
+                                                price_str = f"{price_str} {post_text.strip()}"
+                                            deal_lines.append(f"- **{name}**: {price_str}")
+                                    if deal_lines:
+                                        flyer_section_parts.append(f"\n**{merchant_name} Flyer Deals:**\n" + "\n".join(deal_lines[:20]))
+                                        
+                            if flyer_section_parts:
+                                research_context.append(f"### Grocery Flyer Deals – {location}:\n" + "\n".join(flyer_section_parts))
+                            else:
+                                research_context.append(f"### Grocery News:\n- No specific flyer deals found online for {location}.")
+                        else:
+                            research_context.append(f"### Grocery News:\n- Error fetching flyer directory for {location}.")
+                    except Exception as e:
+                        logger.error(f"Flipp API Failed: {e}")
+                        research_context.append(f"### Grocery News:\n- Market research API error for {location}.")
+                
+                # 2. Inflation / Cost of Living (Country level usually)
+                if "inflation" in interest_topics:
+                    query = f"inflation rate food energy Canada {datetime.now().strftime('%Y')}"
+                    results = list(ddgs.text(query, max_results=3))
+                    if results:
+                        summary = "\n".join([f"- {r['title']}: {r['body']}" for r in results[:2]])
+                        research_context.append(f"### Economic Trends:\n{summary}")
+                    else:
+                        research_context.append(f"### Economic Trends:\n- No recent inflation news found.")
+
+                # 3. Savings/Interest Rates
+                if "interest rates" in interest_topics:
+                    query = f"best savings account interest rates Canada {datetime.now().strftime('%Y')}"
+                    results = list(ddgs.text(query, max_results=3))
+                    if results:
+                        summary = "\n".join([f"- {r['title']}: {r['body']}" for r in results[:2]])
+                        research_context.append(f"### Interest Rates:\n{summary}")
+                    else:
+                        research_context.append(f"### Interest Rates:\n- No current interest rate news found.")
+                        
+        except Exception as e:
+            logger.error(f"Market Research Failed: {e}")
+            return f"Error gathering market news: {str(e)}"
+            
+        if not research_context:
+            return "Market research completed but no relevant news was found."
+            
+        return "\n\n".join(research_context)
+
     
     async def analyze_security_threats(self, 
                                      log_file_path: str = None,
@@ -767,7 +897,10 @@ Based on the Schema above, generate the JSON Action:
         # 3. Get local grocery deals
         local_deals = self._get_grocery_deals(user_context.location)
         
-        # 4. Use LLM for personalized advice
+        # 4. Perform Market Research
+        market_news = await asyncio.to_thread(self._perform_market_research, user_context.location)
+
+        # 5. Use LLM for personalized advice
         advice_chain = self.financial_advisory_prompt | self.llm | JsonOutputParser()
         
         llm_advice = await advice_chain.ainvoke({
@@ -775,7 +908,8 @@ Based on the Schema above, generate the JSON Action:
             "spending_data": json.dumps(spending_data),
             "category": category,
             "target_reduction": target_reduction,
-            "local_deals": json.dumps(local_deals)
+            "local_deals": json.dumps(local_deals),
+            "market_news_context": market_news
         })
         
         # 5. Structure the response

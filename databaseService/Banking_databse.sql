@@ -254,3 +254,32 @@ LEFT JOIN accounts fa ON t.from_account_id = fa.account_id
 LEFT JOIN accounts ta ON t.to_account_id = ta.account_id
 WHERE t.created_at >= CURRENT_DATE - INTERVAL '30 days'
 ORDER BY t.created_at DESC; 
+
+-- Mock Banking Simulator Tables
+CREATE TABLE IF NOT EXISTS mock_bank_accounts (
+    account_id SERIAL PRIMARY KEY,
+    user_id VARCHAR(255) UNIQUE NOT NULL,
+    balance NUMERIC(15, 2) DEFAULT 5000.00
+);
+
+CREATE TABLE IF NOT EXISTS mock_transactions (
+    transaction_id SERIAL PRIMARY KEY,
+    user_id VARCHAR(255) NOT NULL,
+    amount NUMERIC(15, 2) NOT NULL,
+    merchant VARCHAR(255),
+    category VARCHAR(255),
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS saving_goals (
+    goal_id SERIAL PRIMARY KEY,
+    user_id VARCHAR(255) UNIQUE NOT NULL,
+    weekly_budget NUMERIC(15, 2) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS virtual_investments (
+    investment_id SERIAL PRIMARY KEY,
+    user_id VARCHAR(255) UNIQUE NOT NULL,
+    total_invested NUMERIC(15, 2) DEFAULT 0.00,
+    symbol VARCHAR(50) DEFAULT 'SPY'
+);

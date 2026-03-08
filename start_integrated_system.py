@@ -40,7 +40,7 @@ def check_database_connection():
     try:
         conn = psycopg2.connect(
             host='localhost',
-            port=5433,
+            port=5432,
             database='my_finance_db',
             user='bank_database_admin',
             password='admin123'
@@ -104,7 +104,7 @@ def main():
     
     # Check if database is running
     if not check_database_connection():
-        print_status("Please ensure PostgreSQL database is running on localhost:5433", "ERROR")
+        print_status("Please ensure PostgreSQL database is running on localhost:5432", "ERROR")
         print_status("You can start it with: cd databaseService && docker-compose up -d", "INFO")
         return False
     
@@ -176,7 +176,7 @@ def main():
     print_status("=" * 60, "INFO")
     
     services_status = [
-        ("Database (PostgreSQL)", "http://localhost:5433", check_database_connection()),
+        ("Database (PostgreSQL)", "http://localhost:5432", check_database_connection()),
         ("Banking API", "http://localhost:8082/api/health", check_service("http://localhost:8082/api/health", "Banking API")),
         ("AI Agent API", "http://localhost:5001/api/health", check_service("http://localhost:5001/api/health", "AI Agent API")),
         ("React Frontend", "http://localhost:3000", check_service("http://localhost:3000", "React Frontend"))

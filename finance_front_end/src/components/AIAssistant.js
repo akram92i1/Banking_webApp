@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageCircle, Brain, TrendingDown, Shield, Send, X, Minimize2, Wifi, WifiOff, Sparkles, Lock, Database } from 'lucide-react';
+import { MessageCircle, Brain, TrendingDown, Shield, Send, X, Minimize2, Wifi, WifiOff, Sparkles, Lock, Database, Target } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import aiService from '../services/aiService';
+import SavingsSimulator from './SavingsSimulator';
 
 const ThinkingIndicator = () => {
   const [step, setStep] = useState(0);
@@ -41,15 +43,22 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
   const [securityData, setSecurityData] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('checking');
   const [serviceInfo, setServiceInfo] = useState(null);
+
+  // New States for Advice Chat
+  const [adviceMessages, setAdviceMessages] = useState([]);
+  const [inputAdviceMessage, setInputAdviceMessage] = useState('');
+  const adviceMessagesEndRef = useRef(null);
+
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    adviceMessagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isLoading]);
+  }, [messages, adviceMessages, isLoading]);
 
   useEffect(() => {
     // Initialize AI service and check connection
@@ -77,6 +86,13 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
           sender: 'ai',
           timestamp: new Date(),
           serviceStatus: health
+        }]);
+
+        setAdviceMessages([{
+          id: 1,
+          text: "🛒 Hello! I am your Grocery Planning Assistant. What is your weekly budget and how often do you shop?",
+          sender: 'ai',
+          timestamp: new Date()
         }]);
 
       } catch (error) {
@@ -146,6 +162,53 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
     } finally {
       setIsLoading(false);
       setInputMessage('');
+    }
+  };
+
+  const sendAdviceMessage = async () => {
+    if (!inputAdviceMessage.trim()) return;
+
+    const userMessage = {
+      id: adviceMessages.length + 1,
+      text: inputAdviceMessage,
+      sender: 'user',
+      timestamp: new Date()
+    };
+
+    setAdviceMessages(prev => [...prev, userMessage]);
+    setIsLoading(true);
+
+    try {
+      const userContext = { userId, userRole, location };
+
+      const [result] = await Promise.all([
+        aiService.adviceChat(inputAdviceMessage, userContext),
+        new Promise(resolve => setTimeout(resolve, 1500))
+      ]);
+
+      const aiMessage = {
+        id: adviceMessages.length + 2,
+        text: result.response,
+        sender: 'ai',
+        timestamp: new Date(),
+        source: result.source
+      };
+
+      setAdviceMessages(prev => [...prev, aiMessage]);
+
+    } catch (error) {
+      console.error('Advice chat error:', error);
+      const errorMessage = {
+        id: adviceMessages.length + 2,
+        text: `Error: ${error.message}. Please retry.`,
+        sender: 'ai',
+        timestamp: new Date(),
+        isError: true
+      };
+      setAdviceMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+      setInputAdviceMessage('');
     }
   };
 
@@ -244,7 +307,7 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
       
       /* Desktop Styles (Floating Widget) */
       sm:inset-auto sm:bottom-6 sm:right-6 sm:rounded-2xl
-      sm:${isMinimized ? 'w-64 h-16' : 'w-80 h-[600px] max-h-[600px] max-w-[320px]'}
+      sm:${isMinimized ? 'w-64 h-16' : 'w-96 h-[700px] max-h-[80vh] max-w-[400px]'}
     `}>
       {/* Header - Dark Gradient for Contrast */}
       <div className="bg-slate-900 text-white p-4 flex items-center justify-between shadow-lg shrink-0">
@@ -293,14 +356,14 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
                     >
                       <div className={`flex flex-col max-w-[85%] ${message.sender === 'user' ? 'items-end' : 'items-start'}`}>
                         <div
-                          className={`px-4 py-3 rounded-2xl shadow-sm text-sm leading-relaxed ${message.sender === 'user'
-                            ? 'bg-blue-600 text-white rounded-br-none'
+                          className={`px-4 py-3 rounded-2xl shadow-sm text-sm leading-relaxed prose prose-sm max-w-none ${message.sender === 'user'
+                            ? 'bg-blue-600 text-white rounded-br-none prose-invert'
                             : message.isError
                               ? 'bg-red-900/30 text-red-200 border border-red-800'
-                              : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none'
+                              : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none prose-invert'
                             }`}
                         >
-                          {message.text}
+                          <ReactMarkdown>{message.text}</ReactMarkdown>
                         </div>
                         <span className="text-[10px] text-gray-400 mt-1 px-1">
                           {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {message.sender === 'ai' ? 'AI Agent' : 'You'}
@@ -338,135 +401,68 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
 
             {/* Advice Tab */}
             {activeTab === 'advice' && (
-              <div className="h-full overflow-y-auto p-4 space-y-6">
-                {/* Header Section */}
-                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
-                  <div className="relative z-10">
-                    <h3 className="text-lg font-bold mb-1">Financial Insights</h3>
-                    <p className="text-blue-100 text-xs">AI-Optimized Suggestions</p>
-
-                    <div className="mt-4 flex items-baseline gap-2">
-                      <span className="text-3xl font-bold">${financialAdvice?.weekly_spending?.toFixed(2) || '0.00'}</span>
-                      <span className="text-xs text-blue-200">spent this week</span>
-                    </div>
-                  </div>
-                  <div className="absolute right-0 top-0 opacity-10 transform translate-x-1/3 -translate-y-1/3">
-                    <Brain size={120} />
-                  </div>
-                </div>
-
-                {/* 1. Spending by Category */}
-                <div className="bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-700">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="p-1.5 bg-purple-900/30 rounded-lg">
-                      <TrendingDown className="w-4 h-4 text-purple-300" />
-                    </div>
-                    <h4 className="font-bold text-white text-sm">Spending by Category</h4>
-                  </div>
-
-                  {financialAdvice?.spending_by_category ? (
-                    <div className="space-y-3">
-                      {Object.entries(financialAdvice.spending_by_category).map(([category, amount], index) => {
-                        const maxVal = Math.max(...Object.values(financialAdvice.spending_by_category));
-                        const percent = (amount / maxVal) * 100;
-                        const colors = ['bg-blue-500', 'bg-purple-500', 'bg-pink-500', 'bg-green-500', 'bg-yellow-500'];
-
-                        return (
-                          <div key={category} className="space-y-1">
-                            <div className="flex justify-between text-xs text-slate-400">
-                              <span>{category}</span>
-                              <span className="font-medium text-white">${amount.toFixed(2)}</span>
-                            </div>
-                            <div className="h-1.5 w-full bg-slate-700 rounded-full overflow-hidden">
-                              <div
-                                className={`h-full rounded-full ${colors[index % colors.length]}`}
-                                style={{ width: `${percent}%` }}
-                              ></div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="text-center py-4 text-slate-500 text-xs">
-                      {isLoading ? "Analyzing spending..." : "No data available"}
-                    </div>
-                  )}
-                </div>
-
-                {/* 2. Grocery Savings */}
-                <div className="bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-700">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="p-1.5 bg-green-900/30 rounded-lg">
-                      <Sparkles className="w-4 h-4 text-green-400" />
-                    </div>
-                    <h4 className="font-bold text-white text-sm">Grocery Savings</h4>
-                  </div>
-
-                  {financialAdvice?.grocery_deals?.length > 0 ? (
-                    <div className="space-y-3">
-                      {financialAdvice.grocery_deals.map((deal, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-2 bg-green-900/20 rounded-lg border border-green-800/50">
-                          <div>
-                            <div className="font-medium text-white text-xs">{deal.item}</div>
-                            <div className="text-[10px] text-slate-400">{deal.store}</div>
-                          </div>
-                          <div className="text-right">
-                            <div className="font-bold text-green-400 text-xs">{deal.price}</div>
-                            <div className="text-[10px] text-green-200 bg-green-900/50 px-1.5 py-0.5 rounded-full inline-block">{deal.discount}</div>
-                          </div>
+              <div className="flex flex-col h-full relative z-10">
+                {/* Messages List */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                  {adviceMessages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in-up`}
+                    >
+                      <div className={`flex flex-col max-w-[85%] ${message.sender === 'user' ? 'items-end' : 'items-start'}`}>
+                        <div
+                          className={`px-4 py-3 rounded-2xl shadow-sm text-sm leading-relaxed prose prose-sm max-w-none ${message.sender === 'user'
+                            ? 'bg-green-600 text-white rounded-br-none prose-invert'
+                            : message.isError
+                              ? 'bg-red-900/30 text-red-200 border border-red-800'
+                              : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none prose-invert'
+                            }`}
+                        >
+                          <ReactMarkdown>{message.text}</ReactMarkdown>
                         </div>
-                      ))}
+                        <span className="text-[10px] text-gray-400 mt-1 px-1">
+                          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {message.sender === 'ai' ? 'Grocery Planner' : 'You'}
+                        </span>
+                      </div>
                     </div>
-                  ) : (
-                    <div className="text-center py-4 text-slate-500 text-xs">
-                      {isLoading ? "Finding deals..." : "No deals found nearby"}
-                    </div>
-                  )}
+                  ))}
 
-                  {financialAdvice?.savings_suggestions && (
-                    <div className="mt-4 pt-3 border-t border-gray-100">
-                      <p className="text-xs text-gray-500 italic">"{financialAdvice.savings_suggestions[0]}"</p>
-                    </div>
-                  )}
+                  {isLoading && <ThinkingIndicator />}
+                  <div ref={adviceMessagesEndRef} />
                 </div>
 
-                {/* 3. Finance News */}
-                <div className="bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-700">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="p-1.5 bg-orange-900/30 rounded-lg">
-                      <Wifi className="w-4 h-4 text-orange-400" />
-                    </div>
-                    <h4 className="font-bold text-white text-sm">Market News</h4>
+                {/* Input Area - Dark Mode */}
+                <div className="p-4 bg-slate-800 border-t border-slate-700 safe-area-bottom">
+                  <div className="flex gap-2 items-end bg-slate-900 border border-slate-700 rounded-xl p-2 focus-within:ring-2 focus-within:ring-green-500/20 focus-within:border-green-500 transition-all">
+                    <textarea
+                      value={inputAdviceMessage}
+                      onChange={(e) => setInputAdviceMessage(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          sendAdviceMessage();
+                        }
+                      }}
+                      placeholder="Discuss grocery planning..."
+                      className="flex-1 bg-transparent border-none text-sm text-slate-200 placeholder-slate-500 focus:ring-0 resize-none max-h-32 py-2 px-1"
+                      rows="1"
+                    />
+                    <button
+                      onClick={sendAdviceMessage}
+                      disabled={!inputAdviceMessage.trim() || isLoading}
+                      className="bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                    >
+                      <Send className="w-4 h-4" />
+                    </button>
                   </div>
-
-                  {financialAdvice?.financial_news?.length > 0 ? (
-                    <div className="space-y-4">
-                      {financialAdvice.financial_news.map((news, idx) => (
-                        <div key={idx} className="border-b border-slate-700 last:border-0 pb-3 last:pb-0">
-                          <h5 className="font-medium text-slate-200 text-xs leading-tight mb-1">{news.title}</h5>
-                          <p className="text-[10px] text-slate-400 line-clamp-2">{news.summary}</p>
-                          <div className="mt-1 flex justify-end">
-                            <span className="text-[9px] text-slate-400 bg-slate-700 px-1.5 rounded">{news.source}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-4 text-slate-500 text-xs">
-                      {isLoading ? "Fetching news..." : "No news available"}
-                    </div>
-                  )}
                 </div>
+              </div>
+            )}
 
-                {/* Refresh Button */}
-                <button
-                  onClick={getFinancialAdvice}
-                  disabled={isLoading}
-                  className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-400 text-xs rounded-lg transition-colors border border-slate-600"
-                >
-                  {isLoading ? "Updating..." : "Refresh Insights"}
-                </button>
+            {/* Simulator Tab */}
+            {activeTab === 'simulator' && (
+              <div className="flex-1 overflow-y-auto w-full max-w-none p-0 bg-slate-900 pointer-events-auto">
+                <SavingsSimulator userId={userId} />
               </div>
             )}
 
@@ -497,13 +493,23 @@ const AIAssistant = ({ userRole = 'user', userId = 'user001', location = 'toront
                 <span className="text-[10px] font-medium">Security</span>
               </button>
             ) : (
-              <button
-                onClick={() => setActiveTab('advice')}
-                className={`p-2 rounded-lg transition-colors flex flex-col items-center gap-1 ${activeTab === 'advice' ? 'text-green-600 bg-green-50' : 'text-gray-400 hover:text-gray-600'}`}
-              >
-                <TrendingDown className="w-5 h-5" />
-                <span className="text-[10px] font-medium">Advice</span>
-              </button>
+              <>
+                <button
+                  onClick={() => setActiveTab('advice')}
+                  className={`p-2 rounded-lg transition-colors flex flex-col items-center gap-1 ${activeTab === 'advice' ? 'text-green-600 bg-green-50' : 'text-gray-400 hover:text-gray-600'}`}
+                >
+                  <TrendingDown className="w-5 h-5" />
+                  <span className="text-[10px] font-medium">Advice</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('simulator')}
+                  className={`p-2 rounded-lg transition-colors flex flex-col items-center gap-1 ${activeTab === 'simulator' ? 'text-emerald-500 bg-emerald-500/10' : 'text-gray-400 hover:text-gray-600'}`}
+                >
+                  <Target className="w-5 h-5" />
+                  <span className="text-[10px] font-medium">Simulator</span>
+                </button>
+              </>
             )}
           </div>
         </>

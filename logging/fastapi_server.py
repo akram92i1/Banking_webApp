@@ -16,10 +16,18 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 try:
     from Data.RAG_system_knowledge_based import setup_rag_system, query_rag, summarize_results
+    from Data.RAG_system_Grocery_knowledge_bases import setup_grocery_rag_system, query_grocery_rag
     RAG_AVAILABLE = True
 except ImportError as e:
     print(f"Error importing RAG system: {e}")
     RAG_AVAILABLE = False
+
+try:
+    import mock_banking_service
+    MOCK_AVAILABLE = True
+except ImportError as e:
+    print(f"Error importing Mock Banking system: {e}")
+    MOCK_AVAILABLE = False
 
 from fastapi import FastAPI, HTTPException, Request, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -30,7 +38,7 @@ from pydantic import BaseModel, Field
 SCHEMA_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "databaseService", "banking_schema_attributes.md")
 
 # Database Configuration
-DATABASE_URL = "postgresql://ai_agent_readonly:readonly_agent_secure_2024@localhost:5433/my_finance_db"
+DATABASE_URL = "postgresql://ai_agent_readonly:readonly_agent_secure_2024@localhost:5432/my_finance_db"
 
 # Setup Logging
 logging.basicConfig(level=logging.INFO)
@@ -65,7 +73,7 @@ class SecurityAnalysisRequest(BaseModel):
     token: Optional[str] = None
 
 class SpendingAnalysisRequest(BaseModel):
-    user_id: str = "user001"
+    email: str
     transactions: List[Dict[str, Any]] = []
     time_period: str = "weekly"
 
@@ -78,6 +86,10 @@ async def lifespan(app: FastAPI):
     try:
         app.state.pool = await asyncpg.create_pool(DATABASE_URL)
         print(f"{GREEN}[SUCCESS] Database Connected Successfully!{RESET}")
+        
+        if MOCK_AVAILABLE:
+            await mock_banking_service.init_simulator_tables()
+            
     except Exception as e:
         print(f"{RED}[ERROR] Database Connection Failed: {e}{RESET}")
         app.state.pool = None
@@ -87,13 +99,19 @@ async def lifespan(app: FastAPI):
     if RAG_AVAILABLE:
         # Run synchronous RAG setup in a separate thread
         app.state.rag_chain = await asyncio.to_thread(setup_rag_system)
+        app.state.grocery_rag_chain = await asyncio.to_thread(lambda: setup_grocery_rag_system(force_recreate_db=False))
         if app.state.rag_chain:
              print(f"{GREEN}[SUCCESS] RAG System Initialized!{RESET}")
         else:
              print(f"{RED}[ERROR] RAG System Initialization Failed.{RESET}")
+        if app.state.grocery_rag_chain:
+             print(f"{GREEN}[SUCCESS] Grocery RAG System Initialized!{RESET}")
+        else:
+             print(f"{RED}[ERROR] Grocery RAG System Initialization Failed.{RESET}")
     else:
         print(f"{RED}[WARNING] RAG System not available (Import Error).{RESET}")
         app.state.rag_chain = None
+        app.state.grocery_rag_chain = None
 
     yield
 
@@ -105,6 +123,10 @@ async def lifespan(app: FastAPI):
 
 # --- APP SETUP ---
 app = FastAPI(title="Banking AI Microservice", lifespan=lifespan)
+
+# Add Mock Banking Router
+if MOCK_AVAILABLE:
+    app.include_router(mock_banking_service.router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -279,7 +301,33 @@ async def chat_endpoint(request: ChatRequest, authorization: Optional[str] = Hea
     print(f"[DEBUG] RAG Response: {rag_response}")
 
     # 4. Handle Response
-    if rag_response.get("is_sql"):
+    if rag_response.get("is_research"):
+        print(f"   [FASTAPI] Research Intent Detected. Fetching market news...")
+        research_data = rag_response.get("result", {})
+        
+        # Extract parameters from LLM's JSON 
+        topics = research_data.get("research", ["grocery", "inflation"])
+        if not isinstance(topics, list):
+            topics = [str(topics)]
+            
+        location = research_data.get("location", "Montreal") # Default or extract from user context if available
+        
+        try:
+            # Use the internal agent's active research capability
+            if internal_agent:
+                research_context = await asyncio.to_thread(internal_agent._perform_market_research, location, topics)
+                
+                # Format a nice response
+                response_text = f"Here is the latest market research for {location}:\n\n{research_context}"
+            else:
+                response_text = "Market research agent is currently unavailable."
+        except Exception as e:
+            logger.error(f"Market Research Error: {e}")
+            response_text = "I encountered an error while fetching market news. Please try again."
+            
+        return {"response": response_text, "timestamp": datetime.now().isoformat()}
+
+    elif rag_response.get("is_sql"):
         result_data = rag_response.get("result")
 
         print(f"   [FASTAPI] Summarizing SQL results for user...")
@@ -529,6 +577,39 @@ async def analyze_user_spending(request: SpendingAnalysisRequest):
         logger.error(f"Spending Analysis Error: {e}")
         return {"success": False, "error": str(e), "timestamp": datetime.now().isoformat()}
 
+
+@app.post("/api/advice-chat")
+async def advice_chat_endpoint(request: ChatRequest, authorization: Optional[str] = Header(None)):
+    """
+    Advice Chat Entry Point.
+    Routes to Grocery RAG system for meal planning and budget advice.
+    """
+    token = extract_token_from_header(request.token, authorization)
+    user_id = request.user_id
+    if token:
+        extracted_user = extract_user_from_token(token)
+        if extracted_user and extracted_user != "unknown_user":
+            user_id = extracted_user
+
+    print(f"\n[INFO] [FASTAPI] Incoming Advice Chat from {BLUE}{user_id}{RESET}: '{request.message}'")
+    
+    if not app.state.grocery_rag_chain:
+        return {"response": "Grocery Advice System is currently unavailable.", "timestamp": datetime.now().isoformat()}
+
+    # Check if this is the start of a session or a general question
+    msg_lower = request.message.lower()
+    needs_questions = False
+    if "budget" not in msg_lower and "$" not in msg_lower:
+        needs_questions = True
+        
+    if needs_questions and len(msg_lower.split()) < 10:
+        # Prompt the user for details
+        return {"response": "I'd love to help you with your grocery meal planning! Could you tell me what your budget is, and how often you shop (e.g. weekly, bi-weekly)?", "timestamp": datetime.now().isoformat()}
+
+    rag_response = await asyncio.to_thread(query_grocery_rag, app.state.grocery_rag_chain, request.message)
+    response_text = rag_response.get("result", "I couldn't generate a response.")
+    
+    return {"response": response_text, "timestamp": datetime.now().isoformat()}
 
 if __name__ == "__main__":
     import uvicorn

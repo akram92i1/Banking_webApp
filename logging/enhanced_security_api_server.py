@@ -25,7 +25,7 @@ CORS(app)  # Enable CORS for React frontend
 # Database configuration
 DB_CONFIG = {
     'host': 'localhost',
-    'port': 5433,
+    'port': 5432,
     'database': 'my_finance_db',
     'user': 'bank_database_admin',
     'password': 'admin123'

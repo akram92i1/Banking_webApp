@@ -63,3 +63,64 @@ END
 $$;
 
 \echo 'Read-only AI agent user created successfully.'
+
+-- =====================================================
+-- Row Level Security (RLS) Policies
+-- =====================================================
+-- Important: Even with SELECT privileges, RLS policies can hide rows.
+-- We must explicitly allow the ai_agent_readonly user to see ALL rows.
+
+DO
+$$
+BEGIN
+    -- Policy for users table
+    IF NOT EXISTS (
+        SELECT FROM pg_policies 
+        WHERE tablename = 'users' AND policyname = 'ai_agent_read_all'
+    ) THEN
+        CREATE POLICY ai_agent_read_all ON users
+            FOR SELECT
+            TO ai_agent_readonly
+            USING (true);
+    END IF;
+
+    -- Policy for transactions table
+    IF NOT EXISTS (
+        SELECT FROM pg_policies 
+        WHERE tablename = 'transactions' AND policyname = 'ai_agent_read_all'
+    ) THEN
+        CREATE POLICY ai_agent_read_all ON transactions
+            FOR SELECT
+            TO ai_agent_readonly
+            USING (true);
+    END IF;
+
+     -- Policy for beneficiaries table
+    IF NOT EXISTS (
+        SELECT FROM pg_policies 
+        WHERE tablename = 'beneficiaries' AND policyname = 'ai_agent_read_all'
+    ) THEN
+        CREATE POLICY ai_agent_read_all ON beneficiaries
+            FOR SELECT
+            TO ai_agent_readonly
+            USING (true);
+    END IF;
+
+    -- Policy for blacklisted_tokens
+    IF NOT EXISTS (
+        SELECT FROM pg_policies 
+        WHERE tablename = 'blacklisted_tokens' AND policyname = 'ai_agent_read_all'
+    ) THEN
+        CREATE POLICY ai_agent_read_all ON blacklisted_tokens
+            FOR SELECT
+            TO ai_agent_readonly
+            USING (true);
+    END IF;
+
+    -- Ensure RLS is enabled on these tables to enforce policies (just in case)
+    -- If RLS was NOT enabled, the user would see everything anyway because of GRANT SELECT.
+    -- But since they see nothing, RLS is likely enabled.
+    
+    RAISE NOTICE 'RLS policies for ai_agent_readonly applied.';
+END
+$$;

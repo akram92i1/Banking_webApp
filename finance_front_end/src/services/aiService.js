@@ -117,6 +117,29 @@ const aiService = {
     }
   },
 
+  // Chat with Advice AI Agent
+  async adviceChat(message, userContext = {}) {
+    try {
+      const response = await aiApi.post('/advice-chat', {
+        message,
+        user_id: userContext.userId || 'user001',
+        user_role: userContext.userRole || 'user',
+        location: userContext.location || 'toronto',
+        preferences: userContext.preferences || {}
+      });
+
+      return {
+        success: true,
+        response: response.data.response,
+        source: 'ai_agent_advice',
+        timestamp: response.data.timestamp
+      };
+    } catch (error) {
+      console.error('Advice Chat failed:', error);
+      throw new Error(`Advice Chat service unavailable: ${error.response?.data?.error || error.message}`);
+    }
+  },
+
   // Get Financial Advice
   async getFinancialAdvice(userContext = {}) {
     try {
@@ -239,7 +262,7 @@ const aiService = {
 
         // Fallback to AI agent with transaction data
         const response = await aiApi.post('/user/spending-analysis', {
-          user_id: userContext.userId || 'user001',
+          email: userContext.email || userContext.userId || 'user@example.com',
           transactions: userContext.transactions || []
         });
 

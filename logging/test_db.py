@@ -3,7 +3,7 @@ import asyncpg
 import logging
 
 # Database Configuration
-DATABASE_URL = "postgresql://bank_database_admin:admin123@localhost:5433/my_finance_db"
+DATABASE_URL = "postgresql://bank_database_admin:admin123@localhost:5432/my_finance_db"
 
 async def test_connection():
     print(f"Testing connection to: {DATABASE_URL}")
@@ -15,4 +15,4 @@ async def test_connection():
         print(f"FAILURE: Connection Failed: {e}")
 
 if __name__ == "__main__":
-    asyncio.run(test_connection())
+    asyncio.run(test_connection())  

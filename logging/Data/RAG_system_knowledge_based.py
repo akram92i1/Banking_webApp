@@ -41,7 +41,7 @@ DB_DIR = os.path.join(BASE_DIR, "faiss_index")
 
 # Database Configuration (read-only user for AI agent - principle of least privilege)
 DB_HOST = "localhost"
-DB_PORT = "5433"
+DB_PORT = "5432"
 DB_NAME = "my_finance_db"
 DB_USER = "ai_agent_readonly"
 DB_PASS = "readonly_agent_secure_2024"
@@ -258,6 +258,8 @@ Database Schema:
 
 INSTRUCTIONS:
 - If the user asks about general banking info (policies, fees, how-to), use the **Context**.
+- If the user asks about market news, grocery deals, or inflation, return a JSON object with a "research" key.
+  - Example: {{ "research": ["grocery", "inflation"], "location": "Montreal" }}
 - If the user asks for PERSONAL data (balance, transactions, profile), generate a **SQL QUERY**.
 - For SQL queries:
   - Return ONLY a JSON object with the key "sql".
@@ -273,7 +275,7 @@ SECURITY RULES (MANDATORY - NEVER VIOLATE THESE):
 5. **NO MULTIPLE STATEMENTS**: NEVER include semicolons or multiple SQL statements.
 6. **NO OTHER USERS' DATA**: If the user asks to VIEW another user's data (e.g., "show me John's balance", "get asmith's profile", "give me all transactions of asmith", "show asmith's transactions"), REFUSE. Respond with: "I can only access your own account information. I cannot look up other users' data."
    - EXCEPTION: ONLY if the user explicitly says "MY transactions with [person]" or "did I send/receive money to/from [person]" — meaning the user is clearly asking about THEIR OWN transaction history filtered by a counterparty. The key words are "my", "I", "me" in combination with "with" or "to/from". If the user says "[person]'s transactions" or "transactions OF [person]", that is NOT this exception — REFUSE it.
-   - Example allowed: "show my transactions with asmith" → {{ "sql": "SELECT t.amount, t.description FROM transactions t JOIN accounts a ON (t.from_account_id = a.account_id OR t.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND (t.description ILIKE '%asmith%' OR t.to_account_id IN (SELECT a2.account_id FROM accounts a2 JOIN users u2 ON a2.user_id = u2.user_id WHERE u2.username = 'asmith'))" }}
+   - Example allowed: "show my transactions with asmith" → {{ "sql": "SELECT t.amount, t.description, t.processed_at, (SELECT username FROM users ud JOIN accounts ad ON ad.user_id = ud.user_id WHERE ad.account_id = t.to_account_id) as recipient FROM transactions t JOIN accounts a ON (t.from_account_id = a.account_id OR t.to_account_id = a.account_id) JOIN users u ON a.user_id = u.user_id WHERE u.email = 'USER_EMAIL_PLACEHOLDER' AND (t.description ILIKE '%asmith%' OR t.to_account_id IN (SELECT a2.account_id FROM accounts a2 JOIN users u2 ON a2.user_id = u2.user_id WHERE u2.username = 'asmith'))" }}
    - Example REFUSED: "give me all transactions of asmith", "show asmith's transactions" → REFUSE
 7. **NO SELECT ***: Always specify explicit column names. Never use SELECT *.
 
@@ -311,7 +313,7 @@ def query_rag(qa_chain, query, user_email=None):
         result_text = response["result"]
 
         # Check if result looks like JSON SQL
-        if "sql" in result_text or "USER_EMAIL_PLACEHOLDER" in result_text:
+        if "sql" in result_text or "USER_EMAIL_PLACEHOLDER" in result_text or "research" in result_text:
             try:
                 # Try validation/extraction of JSON
                 clean_json = result_text.strip()
@@ -323,6 +325,16 @@ def query_rag(qa_chain, query, user_email=None):
                 # If simple text is just the JSON
                 if clean_json.startswith("{") and clean_json.endswith("}"):
                     data = json.loads(clean_json)
+                    
+                    # --- NEW: Check for research intent ---
+                    if "research" in data:
+                        return {
+                            "result": data,
+                            "source_documents": [],
+                            "is_sql": False,
+                            "is_research": True
+                        }
+                        
                     if "sql" in data:
                         sql_query = data["sql"]
 
@@ -397,8 +409,9 @@ def summarize_results(llm, results, user_query):
         INSTRUCTIONS:
         1.  **Analyze the User's Query**: Understand what they are looking for (e.g., specific amount, date, person).
         2.  **Filter the Data**: Ignore technical fields like UUIDs (`703ad4...`), `created_at` timestamps (unless date is asked), or internal codes.
-        3.  **Answer Directly**: Start with a direct answer to the question.
-        4.  **Be Concise**: Do not repeat the same info. Do not say "Here are the details" if you just gave them.
+        3.  **Trust the Data**: If the database returned records, they ARE the matches for the user's query, even if the description seems generic or lacks the specific name asked for.
+        4.  **Answer Directly**: Start with a direct answer to the question.
+        5.  **Be Concise**: Do not repeat the same info. Do not say "Here are the details" if you just gave them.
         5.  **Format**: 
             - Use bolding for key values (e.g., **$2.50**).
             - Use natural language sentences.
