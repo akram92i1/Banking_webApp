@@ -150,7 +150,25 @@ class AIBankingAgent:
         self.grocery_stores = self._load_grocery_store_data()
         self.failed_tools = {}
         
+        # Pre-load flyer data for the RAG system
+        self._preload_grocery_deals_for_rag()
+        
         logger.info(f"AI Banking Agent initialized with model: {ollama_model}")
+    
+    def _preload_grocery_deals_for_rag(self):
+        """Fetch and save grocery flyer data to Data/flyers for RAG processing before agent starts."""
+        print("\n" + "="*50)
+        print("🔄 [STARTUP] Updating flyer data for RAG system... Please wait.")
+        try:
+            from verify_research_only import fetch_flipp_grocery_deals
+            locations = ["Montreal", "Toronto", "Vancouver"]
+            for loc in locations:
+                fetch_flipp_grocery_deals(loc)
+            print("✅ [STARTUP] Flyer data updated successfully and stored in Data/flyers/.")
+        except Exception as e:
+            print(f"❌ [STARTUP] Failed to update flyer data: {e}")
+            logger.error(f"Failed to preload grocery deals: {e}")
+        print("="*50 + "\n")
     
     def _initialize_prompts(self):
         """
@@ -526,13 +544,17 @@ Based on the Schema above, generate the JSON Action:
         
         class GroceryDealsTool(BaseTool):
             name: str = "find_local_grocery_deals"
-            description: str = "Find local grocery deals and discounts"
+            description: str = "Search local grocery flyers for deals on specific products. Input should be a specific product name (e.g., 'beef', 'apples')."
             parent: Any = Field(default=None, exclude=True)
             
-            def _run(self, location: str) -> str:
-                """Find grocery deals in user's area"""
-                deals = self.parent._get_grocery_deals(location)
-                return json.dumps(deals, indent=2)
+            def _run(self, query: str) -> str:
+                """Find grocery deals in user's area for a specific query"""
+                try:
+                    location = self.parent.user_context.location
+                    deals = self.parent._search_grocery_flyers_rag(location, query)
+                    return deals
+                except Exception as e:
+                    return f"Error searching grocery deals: {str(e)}"
 
         class GetTransactionsTool(BaseTool):
             name: str = "get_user_transactions"
@@ -642,23 +664,23 @@ Based on the Schema above, generate the JSON Action:
         You MUST REFUSE any query unrelated to personal finance, spending, budgets, transaction history, or grocery deals.
         If a user asks about the weather, sports, cooking, or general knowledge, politely decline.
         
-        IMPORTANT: When you receive transaction data from a tool, DO NOT output the entire JSON.
-        Summarize the key details (Date, Amount, Description) as a clean list or sentence.
+        IMPORTANT: When you receive transaction or grocery data from a tool, DO NOT output the entire JSON or raw text.
+        Summarize the key details (Date, Amount, Description, or Product Deals) concisely.
         **NEVER** show UUIDs, internal IDs, or raw timestamps (like 2023-10-01T12:00:00).
         Be friendly and concise.
         
         CRITICAL RULES:
-        1. "Action:" is ONLY for calling these specific tools: [get_user_transactions].
-        2. For any questions about transactions, use the `get_user_transactions` tool.
-        3. If a tool fails with the error "Error: The banking API is currently unavailable. Please try again later.", inform the user about the failure and stop trying to use the tool.
-        4. If you see a JSON list or "SUCCESS" in the Observation, YOU HAVE THE DATA. DO NOT call the tool again.
+        1. "Action:" is ONLY for calling these specific tools: [get_user_transactions, find_local_grocery_deals].
+        2. For any questions about transactions, use `get_user_transactions`. For grocery deals or availability, use `find_local_grocery_deals` with the product name as input.
+        3. If a tool fails with an error, inform the user about the failure and stop trying to use the tool.
+        4. If you see data requested in the Observation, YOU HAVE THE DATA. DO NOT call the tool again.
         5. IMMEDIATELY output "Final Answer:" with your summary.
         6. **STOP LOOPING**: Once you have the data, you are FORBIDDEN from using "Action:". You MUST use "Final Answer:".
         
         You have access to the following tools:"""
 
         self.advisory_agent_chain = initialize_agent(
-            tools=[self.get_transactions_tool],
+            tools=[self.get_transactions_tool, self.grocery_deals_tool],
             llm=self.llm,
             agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION,
             memory=self.memory,
@@ -693,6 +715,48 @@ Based on the Schema above, generate the JSON Action:
         """Get grocery deals for a specific location"""
         location_key = location.lower()
         return self.grocery_stores.get(location_key, [])
+
+    def _search_grocery_flyers_rag(self, location: str, query: str) -> str:
+        """Search local text files for product queries for the RAG system."""
+        import glob
+        import os
+        results = []
+        search_term = query.lower().strip()
+        flyer_dir = "Data/flyers"
+        
+        if not os.path.exists(flyer_dir):
+            return f"No flyer data available for {location}."
+            
+        location_lower = location.lower()
+        files = glob.glob(f"{flyer_dir}/*_{location.title()}.txt")
+        # Fallback if case doesn't match
+        if not files:
+            all_files = glob.glob(f"{flyer_dir}/*.txt")
+            files = [f for f in all_files if location_lower in f.lower()]
+            
+        if not files:
+            return f"No flyers found for location: {location}."
+            
+        for file_path in files:
+            merchant = os.path.basename(file_path).split('_')[0] 
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    lines = f.readlines()
+                    deals_found = []
+                    for line in lines:
+                        if search_term in line.lower():
+                            deals_found.append(line.strip())
+                    if deals_found:
+                        results.append(f"**{merchant}**:")
+                        # Limit to top 5 deals per merchant so we don't overwhelm LLM context
+                        results.extend(deals_found[:5])
+            except Exception as e:
+                logger.error(f"Error reading flyer {file_path}: {e}")
+                
+        if not results:
+            return f"No deals found for '{query}' in {location} flyers."
+            
+        return "\n".join(results)
 
     def _perform_market_research(self, location: str, interest_topics: List[str] = None) -> str:
         """

@@ -596,16 +596,6 @@ async def advice_chat_endpoint(request: ChatRequest, authorization: Optional[str
     if not app.state.grocery_rag_chain:
         return {"response": "Grocery Advice System is currently unavailable.", "timestamp": datetime.now().isoformat()}
 
-    # Check if this is the start of a session or a general question
-    msg_lower = request.message.lower()
-    needs_questions = False
-    if "budget" not in msg_lower and "$" not in msg_lower:
-        needs_questions = True
-        
-    if needs_questions and len(msg_lower.split()) < 10:
-        # Prompt the user for details
-        return {"response": "I'd love to help you with your grocery meal planning! Could you tell me what your budget is, and how often you shop (e.g. weekly, bi-weekly)?", "timestamp": datetime.now().isoformat()}
-
     rag_response = await asyncio.to_thread(query_grocery_rag, app.state.grocery_rag_chain, request.message)
     response_text = rag_response.get("result", "I couldn't generate a response.")
     
