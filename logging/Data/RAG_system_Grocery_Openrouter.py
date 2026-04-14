@@ -8,10 +8,15 @@ except ImportError:
 from langchain_community.vectorstores import FAISS
 
 try:
-    from langchain_ollama import OllamaEmbeddings, ChatOllama
+    from langchain_ollama import OllamaEmbeddings
 except ImportError:
     from langchain_community.embeddings import OllamaEmbeddings
-    from langchain_community.chat_models import ChatOllama
+
+try:
+    from langchain_openai import ChatOpenAI
+except ImportError:
+    # Fallback to older package location if needed
+    from langchain_community.chat_models import ChatOpenAI
 
 try:
     from langchain.chains import RetrievalQA
@@ -20,7 +25,8 @@ except ImportError:
 from langchain_core.prompts import PromptTemplate
 
 # Configuration
-MODEL_NAME = "gemma3:4b"
+MODEL_NAME = "meta-llama/llama-3.1-8b-instruct" # OpenRouter Model
+OPENROUTER_API_KEY = "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"
 EMBEDDING_MODEL_NAME = "nomic-embed-text"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FLYERS_DIR = os.path.join(BASE_DIR, "flyers")
@@ -141,7 +147,14 @@ def setup_grocery_rag_system(force_recreate_db=False):
             return None
             
         qa_chains = {}
-        llm = ChatOllama(model=MODEL_NAME, temperature=0.1)
+        
+        # OpenRouter Chat Model
+        llm = ChatOpenAI(
+            model=MODEL_NAME, 
+            openai_api_key=OPENROUTER_API_KEY,
+            openai_api_base="https://openrouter.ai/api/v1",
+            temperature=0.1
+        )
         
         template = """You are a helpful and budget-conscious AI Grocery and Meal Planning Assistant.
 You have access to the latest grocery flyers and deals in the provided Context.
@@ -234,7 +247,7 @@ def query_grocery_rag(qa_chains, query):
         return {"result": f"Error querying Grocery RAG system: {e}", "source_documents": []}
 
 if __name__ == "__main__":
-    print("--- Grocery RAG System Initialization (Multi-Store) ---")
+    print("--- Grocery RAG System Initialization (Multi-Store OpenRouter Version) ---")
     qa_chains = setup_grocery_rag_system(force_recreate_db=True)
     if qa_chains:
         print(f"\nWelcome to the Grocery Meal Planner! Loaded Vector DBs for: {', '.join(qa_chains.keys())} (type 'exit' to quit)")

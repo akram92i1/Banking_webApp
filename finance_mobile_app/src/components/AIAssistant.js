@@ -6,24 +6,24 @@ import Markdown from 'react-native-markdown-display';
 import aiService from '../services/aiService';
 
 // Tabs Component for the bottom
-const TabBar = ({ activeTab, setActiveTab }) => (
+const TabBar = ({ activeTab, onSwitchTab }) => (
     <View className="bg-slate-800 border-t border-slate-700 p-2 flex-row justify-around safe-area-bottom">
         <TouchableOpacity
-            onPress={() => setActiveTab('chat')}
+            onPress={() => onSwitchTab('chat')}
             className={`p-2 rounded-lg items-center ${activeTab === 'chat' ? 'bg-blue-600/20' : ''}`}
         >
             <Ionicons name="chatbubbles" size={24} color={activeTab === 'chat' ? '#60a5fa' : '#94a3b8'} />
             <Text className={`text-[10px] mt-1 ${activeTab === 'chat' ? 'text-blue-400 font-bold' : 'text-slate-500'}`}>Chat</Text>
         </TouchableOpacity>
         <TouchableOpacity
-            onPress={() => setActiveTab('advice')}
+            onPress={() => onSwitchTab('advice')}
             className={`p-2 rounded-lg items-center ${activeTab === 'advice' ? 'bg-emerald-500/20' : ''}`}
         >
             <Ionicons name="trending-up" size={24} color={activeTab === 'advice' ? '#34d399' : '#94a3b8'} />
             <Text className={`text-[10px] mt-1 ${activeTab === 'advice' ? 'text-emerald-400 font-bold' : 'text-slate-500'}`}>Advice</Text>
         </TouchableOpacity>
         <TouchableOpacity
-            onPress={() => setActiveTab('simulator')}
+            onPress={() => onSwitchTab('simulator')}
             className={`p-2 rounded-lg items-center ${activeTab === 'simulator' ? 'bg-purple-500/20' : ''}`}
         >
             <Ionicons name="calculator" size={24} color={activeTab === 'simulator' ? '#c084fc' : '#94a3b8'} />
@@ -63,6 +63,10 @@ export default function AIAssistant({ userRole = 'user', userId = 'user001', loc
     const [adviceMessages, setAdviceMessages] = useState([]);
     const [inputMessage, setInputMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    
+    // Agent Switching States
+    const [isLoadingAgent, setIsLoadingAgent] = useState(false);
+    const [agentLoadingMsg, setAgentLoadingMsg] = useState('Initializing AI System...');
     const [connectionStatus, setConnectionStatus] = useState('checking');
 
     // Animations
@@ -94,8 +98,15 @@ export default function AIAssistant({ userRole = 'user', userId = 'user001', loc
     const initializeAI = async () => {
         try {
             setConnectionStatus('checking');
+            setIsLoadingAgent(true);
+            setAgentLoadingMsg('Starting Finance Agent...');
+            
             const health = await aiService.checkHealth();
+            // Pre-warm the default finance agent
+            await aiService.activateAgent('finance');
+            
             setConnectionStatus('connected');
+            setIsLoadingAgent(false);
 
             setMessages([{
                 id: 1,
@@ -106,25 +117,44 @@ export default function AIAssistant({ userRole = 'user', userId = 'user001', loc
 
             setAdviceMessages([{
                 id: 1,
-                text: "🛒 Hello! I am your Financial Advisor. What is your weekly budget and how often do you shop?",
+                text: "🛒 Hello! I am your Grocery & Savings Agent. What is your weekly budget and how often do you shop?",
                 sender: 'ai',
                 timestamp: new Date()
             }]);
         } catch (error) {
             setConnectionStatus('error');
+            setIsLoadingAgent(false);
             setMessages([{ id: 1, text: "⚠️ Neural Link Unstable. Retrying connection...", sender: 'ai', timestamp: new Date(), isError: true }]);
         }
     };
+    
+    const handleSwitchTab = async (newTab) => {
+        if (newTab === activeTab) return;
+        
+        setActiveTab(newTab);
+        
+        // When switching to a specific agent, wake it up and put the other to sleep
+        if (newTab === 'chat' || newTab === 'advice') {
+            setIsLoadingAgent(true);
+            const agentName = newTab === 'advice' ? 'Grocery Agent' : 'Finance Agent';
+            const apiTarget = newTab === 'advice' ? 'grocery' : 'finance';
+            
+            setAgentLoadingMsg(`Mounting ${agentName} into memory...`);
+            await aiService.activateAgent(apiTarget);
+            setIsLoadingAgent(false);
+        }
+    };
 
-    const sendMessage = async (isAdvice = false) => {
-        if (!inputMessage.trim()) return;
+    const sendMessage = async (isAdvice = false, directMessageText = null) => {
+        const textToSend = directMessageText || inputMessage;
+        if (!textToSend.trim()) return;
 
-        const userMessage = { id: Date.now(), text: inputMessage, sender: 'user', timestamp: new Date() };
+        const userMessage = { id: Date.now(), text: textToSend, sender: 'user', timestamp: new Date() };
 
         if (isAdvice) setAdviceMessages(prev => [...prev, userMessage]);
         else setMessages(prev => [...prev, userMessage]);
 
-        setInputMessage('');
+        if (!directMessageText) setInputMessage('');
         setIsLoading(true);
 
         try {
@@ -181,6 +211,48 @@ export default function AIAssistant({ userRole = 'user', userId = 'user001', loc
         );
     };
 
+    const renderMessageContent = (msg) => {
+        if (msg.sender === 'user') {
+            return <Text className="text-white text-[15px] leading-6">{msg.text}</Text>;
+        }
+
+        if (msg.text && msg.text.includes('- [ ]')) {
+            const lines = msg.text.split('\n');
+            const markdownLines = [];
+            const checkOptions = [];
+
+            lines.forEach((line) => {
+                if (line.trim().startsWith('- [ ]')) {
+                    checkOptions.push(line.replace('- [ ]', '').trim());
+                } else {
+                    markdownLines.push(line);
+                }
+            });
+
+            return (
+                <View>
+                    <Markdown style={{ ...markdownStyles, strong: { color: activeTab === 'advice' ? '#34d399' : '#60a5fa' } }}>
+                        {markdownLines.join('\n')}
+                    </Markdown>
+                    <View className="mt-3 space-y-2">
+                        {checkOptions.map((opt, idx) => (
+                            <TouchableOpacity
+                                key={idx}
+                                onPress={() => sendMessage(activeTab === 'advice', `I choose: ${opt}`)}
+                                className={`flex-row items-center p-3 rounded-lg border ${activeTab === 'advice' ? 'border-emerald-500/40 bg-emerald-500/10' : 'border-blue-500/40 bg-blue-500/10'}`}
+                            >
+                                <Ionicons name="square-outline" size={20} color={activeTab === 'advice' ? '#34d399' : '#60a5fa'} />
+                                <Text className="text-white ml-3 flex-1 font-medium">{opt}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </View>
+            );
+        }
+
+        return <Markdown style={{ ...markdownStyles, strong: { color: activeTab === 'advice' ? '#34d399' : '#60a5fa' } }}>{msg.text}</Markdown>;
+    };
+
     const renderChatList = (chats, scrollView) => (
         <ScrollView
             ref={scrollView}
@@ -194,13 +266,9 @@ export default function AIAssistant({ userRole = 'user', userId = 'user001', loc
                         ? (activeTab === 'advice' ? 'bg-emerald-600 rounded-tr-sm' : 'bg-blue-600 rounded-tr-sm')
                         : msg.isError
                             ? 'bg-red-500/20 border border-red-500/30 rounded-tl-sm'
-                            : 'bg-slate-800 border border-slate-700 rounded-tl-sm'
+                            : 'bg-slate-800 border border-slate-700/50 rounded-tl-sm'
                         }`}>
-                        {msg.sender === 'user' ? (
-                            <Text className="text-white text-[15px] leading-6">{msg.text}</Text>
-                        ) : (
-                            <Markdown style={{ ...markdownStyles, strong: { color: activeTab === 'advice' ? '#34d399' : '#60a5fa' } }}>{msg.text}</Markdown>
-                        )}
+                        {renderMessageContent(msg)}
                     </View>
                     <Text className={`text-[10px] text-slate-500 mt-1 ${msg.sender === 'user' ? 'text-right' : 'text-left'}`}>
                         {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {msg.sender === 'ai' ? 'AI' : 'You'}
@@ -275,6 +343,17 @@ export default function AIAssistant({ userRole = 'user', userId = 'user001', loc
                                         <Text className="text-slate-500 text-center mt-2">Mobile implementation coming soon.</Text>
                                     </View>
                                 )}
+                                
+                                {/* Loading Agent Overlay */}
+                                {isLoadingAgent && (
+                                    <View className="absolute inset-0 bg-slate-900/80 items-center justify-center z-50">
+                                        <View className="bg-slate-800 p-6 rounded-2xl items-center border border-slate-700 shadow-2xl">
+                                            <ThinkingIndicator />
+                                            <Text className="text-white font-medium text-center mt-2">{agentLoadingMsg}</Text>
+                                            <Text className="text-slate-400 text-xs text-center mt-1">Sleeping dormant models...</Text>
+                                        </View>
+                                    </View>
+                                )}
                             </View>
 
                             {/* Input Area (Only for chat and advice) */}
@@ -305,7 +384,7 @@ export default function AIAssistant({ userRole = 'user', userId = 'user001', loc
                             )}
 
                             {/* Tab Bar Container */}
-                            <TabBar activeTab={activeTab} setActiveTab={setActiveTab} />
+                            <TabBar activeTab={activeTab} onSwitchTab={handleSwitchTab} />
                         </KeyboardAvoidingView>
                     </SafeAreaView>
                 </View>

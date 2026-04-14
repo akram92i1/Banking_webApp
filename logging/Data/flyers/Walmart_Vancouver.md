@@ -1,0 +1,503 @@
+Grocery Flyer Deals for Walmart in Vancouver
+==================================================
+
+- **Washcloth**: $0.97
+- **Mina halal boneless chicken thighs 8-pack**: $7.97
+- **Vim cleaners**: $4.26
+- **Scotch-Brite sponges 3-pack**: $4.64
+- **Miss Vickie's chips**: $3.77
+- **UFC coconut water**: $2.98
+- **MAINSTAYS™ 3 Drawer dresser**: $109.97
+- **Becel plant-based bricks**: $4.48
+- **Coffee mate liquid coffee enhancer**: $4.97
+- **Christie RITZ original crackers**: $2.48
+- **Michelina's frozen entrees**: $1.47
+- **Nintendo Switch Rematch wireless controller**: $54.96
+- **TurboTax standard 2025**: $44.98
+- **Downy fabric softener 60 loads, scented beads 141 g or fabric rinse 23 loads**: $4.97
+- **Chef Boyardee pasta**: $1.54
+- **Air Wick refills 3-pack**: $12.47
+- **Air Wick Vibrant 2-pack refills**: $12.47
+- **Windex trigger sprays**: $4.47
+- **MAINSTAYS Hand towel**: $2.47
+- **Delicious Kitchen jasmine rice 8 kg**: $15.98
+- **Armstrong cheese block 400 g**: $4.98
+- **Swanson chicken broth 412 mL**: $0.98
+- **Great Value appetizers**: $8.96
+- **Aylmer canned tomatoes**: $1.97
+- **Colgate Optic White**: $3.47
+- **John Frieda shampoo, conditioner or styling products**: $9.98
+- **John Frieda shampoo styling products**: $9.98
+- **One Paw Essential 3-piece dog walking set with wipes, collapsible bowl and treat holder**: $9.98
+- **Head & Shoulders Shampoo or 2-in-1**: $12.12
+- **One Paw Essential 3-piece dog walking set with wipes, collapsible bowl and treat holder**: $9.98
+- **Safety cone plush dog toys**: $14.97
+- **One Paw stainless steel dog bowls**: $19.97
+- **Suave body wash**: $3.97
+- **L'Oréal Paris Hair Expertise shampoo or conditioner**: $11.56
+- **One paw stainless steel dog bowls**: $19.97
+- **CoverGirl Clean Fresh Jammy lip mask**: $10.97
+- **Reveal natural wet cat food in broth**: $1.88
+- **Nivea body wash**: $4.98
+- **Garnier Fructis shampoo 370 mL or conditioner 354 mL**: $3.97
+- **CoverGirl Squishy lip glaze 15 mL**: $10.97
+- **VitaLife dog treats**: $21.97
+- **Samosa and Sweet Factory apna taste perra**: $6.47
+- **Becel margarine or plant-based bricks**: $4.48
+- **Nongshim noodles**: $4.98
+- **Solid bath towel**: $3.97
+- **Frank's RedHot hot sauce**: $3.77
+- **Open stock flat or fitted sheets**: $11.94
+- **Dog toys**: $4.97
+- **Tee or active shorts**: $6.0
+- **Nivea Derma comfort roll-on deodorant**: $4.48
+- **Dog toys**: $4.97
+- **Head & Shoulders 2-in-1**: $12.12
+- **Athletic Works Slim-fit tee**: $10.0
+- **Nivea body wash**: $4.98
+- **CeraVe moisturizer**: $23.96
+- **Fancy Feast Gems mousse paté wet cat food variety pack**: $17.73
+- **Pedigree Dentastix dog treats**: $11.98
+- **Bikaji gulab jamun**: $4.24
+- **Swanson water chestnuts**: $0.98
+- **Vileda Easywring spin mop and bucket system**: $38.47
+- **Royale 2-ply bathroom tissue 30-pack**: $19.96
+- **Dawn dish soap**: $10.97
+- **Catit wet cat food**: $1.98
+- **One Paw Charlie XL dog bed**: $79.98
+- **Miss Vickie's chips**: $3.77
+- **Cesar wet dog food**: $14.97
+- **Purina ONE dry dog food**: $26.98
+- **The Pink Stuff cleaners**: $6.97
+- **Verka besan gram flour**: $4.97
+- **Dr. Oetker Giuseppe Pizzeria stuffed crust frozen pizza**: $7.47
+- **Pillsbury Pizza Pops**: $2.88
+- **Pacifica Glow Baby pads**: $20.96
+- **Mr. Clean multisurface cleaner**: $3.97
+- **Palmolive dish soap**: $1.97
+- **Long squash**: $1.97
+- **Infants' Sleepers**: $10.0
+- **Lotte Milkis drink**: $2.98
+- **Reveal natural wet cat food in broth**: $1.88
+- **Granadilla passion fruit**: $1.98
+- **Bounty Select-A-Size paper towels 6 = 12 rolls**: $14.98
+- **Nivea Derma comfort roll-on deodorant**: $4.48
+- **Garnier Serum**: $15.97
+- **Royal Chinet 10.38" dinner plates**: $19.97
+- **Olay Regenerist face treatments**: $54.96
+- **Frontier Bakery kulcha**: $3.67
+- **Kids athletic slip-on sneakers**: $19.0
+- **Native lotion**: $16.98
+- **Jamieson mega size vitamin B12, D3 or magnesium**: $17.97
+- **Swiffer Duster 6' starter kit**: $15.97
+- **Popsicle original novelties**: $3.98
+- **Finish Quantum Ultramax 60s or Ultimate 72s**: $19.77
+- **Catit wet cat food**: $1.98
+- **Reversible comforter**: $19.88
+- **Sally Hansen Miracle Gel nail polish**: $11.96
+- **Blue Lizard mineral sunscreen SPF 50**: $14.98
+- **K-Express Essentials Plus single-serve coffee maker**: $69.98
+- **Verka dahi yogurt**: $3.98
+- **Tilda basmati rice**: $13.27
+- **Kids' athletic sneakers**: $12.0
+- **La Grille spices**: $4.97
+- **Tee or active shorts**: $6.0
+- **Great Value milk chocolate bar**: $1.97
+- **Mr. Clean multisurface cleaner**: $3.97
+- **Weiman specialty cleaners**: $6.97
+- **Lay's chips**: $3.47
+- **Great Value appetizers**: $8.96
+- **Yoplait Yop drinkable yogurt**: $0.88
+- **Large white eggs**: $6.54
+- **Precise pain relief cream 113 g**: $15.78
+- **Always liners**: $13.47
+- **3M Command strips or hooks value pack**: $11.0
+- **Siwin dumpling**: $3.98
+- **Your Fresh Market Atlantic salmon portion**: $18.09
+- **Simply lemonade**: $5.48
+- **Frontier Bakery Kulcha**: $3.67
+- **Saporito extra virgin olive oil**: $8.47
+- **Your Fresh Market™ whole white mushrooms**: $2.44
+- **Your Fresh Market™ mini muffins**: $4.44
+- **Your Fresh Market potato wedges**: $6.18
+- **Inaba Churu lickable cat treats**: $19.94
+- **Neutrogena sunscreen**: $15.97
+- **Pedigree Vitality+ dry dog food**: $42.98
+- **D'Italiano sliced bread**: $2.98
+- **Reser's side dishes**: $6.28
+- **Natural Bakery rye bread**: $2.98
+- **Great Value tuna**: $0.98
+- **Nutri-Grain bars, Pop-Tarts or Rice Krispies squares**: $2.88
+- **Siwin dumplings**: $3.98
+- **Lemons**: $0.86
+- **Your Fresh Market™ cremini mushrooms**: $2.44
+- **D'Italiano sliced bread**: $2.98
+- **Reser's side dishes**: $6.28
+- **Nanak paneer**: $3.98
+- **Scrubbing Bubbles foam cleaner**: $4.47
+- **COLOR WOW Extra Strength Dream Coat Ultra-Moisturizing Anti-frizz Treatment**: $14.05
+- **Great Value raw shrimp**: $10.98
+- **Great Value medium roast ground coffee**: $14.92
+- **Auusda 15.6" Laptop, AMD 3050E CPU, 16GB RAM 512GB SSD, Fingerprint, Backlit Keyboard, Windows 11 Pro Home Computer, Full Type-C, HDMI, Silver**: $383.99
+- **Auusda 15.6" Laptop, AMD 3050E CPU, 16GB RAM 512GB SSD, Fingerprint, Backlit Keyboard, Windows 11 Pro Home Computer, Full Type-C, HDMI, Silver**: $383.99
+- **Okra**: $4.77
+- **Tropicana Refreshers fruit beverage**: $3.98
+- **Great value original wieners**: $4.97
+- **Dempster's grain bread**: $2.98
+- **Airpods**: $144.0
+- **Woman's World**: $4.38
+- **Lemon Aide all natural cleaners**: $6.36
+- **Cracker Barrel shreds**: $6.68
+- **Great Value beans**: $1.27
+- **Avocados**: $1.64
+- **Your Fresh Market™ sliced deli meat**: $2.98
+- **4-qt. Air fryer**: $99.98
+- **Orville Redenbacher popcorn 6-pack**: $3.97
+- **Great Value beans**: $1.27
+- **Kellogg's cereal**: $3.33
+- **Ferrero Rocher chocolate bar**: $3.97
+- **Windex trigger sprays**: $4.47
+- **Cesar wet dog food**: $14.97
+- **Jamieson mega size vitamin D3**: $17.97
+- **L'Oréal Paris Hair Expertise shampoo or conditioner**: $11.56
+- **Purina Dog Chow dry dog food mega bag**: $38.98
+- **Secret antiperspirant**: $6.97
+- **Secret Clinical Strength antiperspirant**: $9.97
+- **Great Value smoked sausages**: $9.97
+- **Great Value soda**: $1.43
+- **La Fournée dorée mini brioche buns**: $4.44
+- **Your Fresh Market™ sliced meats**: $2.98
+- **Eco-Max laundry detergents**: $20.67
+- **Great Value Eco paper towels 6-pack**: $7.94
+- **Great Value battered fish fillets**: $9.78
+- **Great Value Eco bathroom tissue 12-pack**: $7.94
+- **Cracker Barrel cheese slices**: $4.98
+- **Your Fresh Market™ sliced deli meat**: $2.98
+- **Schneiders Lunch mate kits or snack kits**: $3.17
+- **Maxwell House instant coffee**: $6.47
+- **Your Fresh Market™ regular or halal fresh Angus beef sirloin tip roast**: $10.88
+- **Quaker Crispy Minis**: $2.97
+- **Sally Hansen Miracle Gel nail polish**: $11.96
+- **Blush pears**: $5.98
+- **Ventura 4-piece conversation set**: $1498.0
+- **Dawn dish soap**: $10.97
+- **Temptations Creamy Purrrr-ée lickable cat treats**: $37.98
+- **Belmont 4-piece outdoor sectional set**: $798.0
+- **Fancy Feast wet cat food value pack**: $10.74
+- **Naipo Golf Cart Push Bag Folding 3 Wheels Golf Pull with Scoreboard Adjustable Handle Large Wheelbase for Different Terrain, Orange**: $99.99
+- **Coca-Cola pop**: $8.28
+- **Lilydale air-chilled boneless skinless chicken breasts 4-pack**: $14.0
+- **Cracker Barrel Cheese Slices**: $4.98
+- **14" Whiskey barrel resin planter**: $15.98
+- **4-Burner propane gas grill with side burner**: $248.0
+- **Belmont 4-piece conversation set**: $498.0
+- **Lindt Swiss Classic chocolate bar**: $5.48
+- **Laval 5-piece conversation set**: $1298.0
+- **36" Griddle**: $447.0
+- **Honolulu Air Jet inflatable hot tub**: $598.0
+- **Bulk green peppers**: $2.94
+- **Wonder white or whole wheat bread**: $2.86
+- **Quaker Crispy Minis**: $2.97
+- **Rockport 4-piece conversation set**: $1598.0
+- **11' x 11' Hardtop cedar gazebo**: $1198.0
+- **16" Hudson planter**: $29.98
+- **Expert Grill 6-Burner gas grill with side burner**: $398.0
+- **Garnier serum**: $15.97
+- **Christie cookies**: $2.98
+- **DunkAroos 6-pack**: $2.97
+- **Westmont 10' x 10' soft top gazebo**: $448.0
+- **Hometrends 8' x 10' Sling top pergola**: $698.0
+- **Mainstays 24" Self-watering window box**: $9.98
+- **Listerine Total Care mouthwash**: $7.36
+- **Enfamil A+ NeuroPro Gentlease 2 x 431 g powder formula refill**: $65.47
+- **River Oaks 5-piece conversation set**: $1498.0
+- **Hometrends 12' x 12' Hardtop gazebo**: $1148.0
+- **Weber Spirit E-210 gas grill**: $499.0
+- **Blackstone Adventure Ready 22" flat top outdoor griddle with hard cover**: $247.0
+- **Timothy's coffee 30s**: $14.97
+- **Rascals super econo pack training pants**: $27.88
+- **Pantene Pro-V shampoo**: $7.97
+- **Old Spice deodorant or Secret antiperspirant**: $6.97
+- **L'Oreal Paris Color Radiance Conditioner**: $6.98
+- **Advanced synthetic motor oil**: $34.97
+- **Listerine Total Care mouthwash**: $7.36
+- **Hakuro sushi rice**: $12.98
+- **Cavendish Farms premium frozen fries**: $2.97
+- **Bikaner matri**: $4.93
+- **AIRROBO PG50 Pet Grooming Kit & Vacuum, 11000Pa Suction, 2.5L, 5 in 1, Dog Vacuum for Shedding Grooming**: $82.99
+- **Banner - Meal for 4 under $20**: $20.0
+- **Dempster's white or whole wheat bread**: $2.86
+- **Orville Redenbacher popcorn 6-pack**: $3.97
+- **Bellamy 4-piece conversation set**: $1298.0
+- **Air Wick refills 3-pack**: $12.47
+- **Fancy Feast wet cat food variety pack**: $17.73
+- **Yoplait Yop drinkable yogurt**: $0.88
+- **Yoplait Tubes yogurt**: $2.97
+- **Yoplait Yop drinkable Yogurt**: $0.88
+- **Lemon Aide all Mural cleaners**: $6.36
+- **Kellogg's cereal**: $3.33
+- **Your Fresh Market™ BBQ or herb & garlic chicken**: $10.97
+- **Cracker Barrel cheese block 400 9 or shreds 320 g**: $6.68
+- **The Pink Stuff cleaners**: $6.97
+- **Nestlé Drumstick, Real Dairy confectioneries, Del Monte**: $4.94
+- **68 L Multi-purpose storage tote**: $9.97
+- **Green Giant frozen vegetables, riced or restaurant style**: $2.96
+- **Fleecy fabric softener 3.5 L**: $9.97
+- **Tropicana Pure Premium orange juice 1.36 L**: $4.97
+- **Vim Cleaners**: $3.57
+- **Swiffer Sweep and Mop deluxe 2-in-1 kit**: $15.97
+- **Yoplait Yop drinkable yogurt**: $0.88
+- **Zap'ems**: $1.47
+- **Red or Green seedless grapes**: $3.97
+- **Dan-D Pak roasted cashews**: $7.98
+- **Tide Pods laundry detergent**: $19.97
+- **Knorr chicken broth mix 1 kg**: $9.98
+- **Pillsbury Pizza Pops**: $2.88
+- **Dr. Oetker Suprema frozen pizza**: $7.47
+- **One Paw cat toys**: $9.97
+- **Christie cookies**: $2.98
+- **Purina ONE dry dog food**: $26.98
+- **Method body wash**: $7.97
+- **Fancy Feast wet cat food value pack**: $10.74
+- **Harry Potter fruit-flavoured snacks**: $2.67
+- **Seedless cucumbers**: $0.94
+- **Romaine lettuce hearts**: $4.97
+- **Minute Maid**: $1.88
+- **Fruitopia Juice or drinks**: $1.88
+- **Cavendish Farms premium frozen fries**: $2.97
+- **Air Wick scented oil 3-pack refills**: $12.47
+- **French's Ketchup**: $3.27
+- **Weiman specialty cleaners**: $6.97
+- **Reversible comforter**: $19.88
+- **Glad compost bags**: $10.96
+- **Royale 2-ply bathroom tissue 30-pack**: $19.96
+- **Club House or La Grille spices**: $4.97
+- **Great Value lawn and leaf bags**: $6.47
+- **Lotte Choco Pie**: $4.47
+- **Lou's Kitchen fully cooked pork back ribs**: $9.98
+- **Liberté Greek crunch yogurt**: $2.97
+- **Men's socks**: $10.0
+- **Adults' 26" or 27.5" bike**: $228.0
+- **Ben's Original rice and pulses**: $2.48
+- **Vim cleaners**: $4.26
+- **General Mills family size cereal**: $5.47
+- **OMG! milk chocolate clusters**: $9.97
+- **Hangers**: $8.47
+- **Purex bathroom tissue 30=62, 253 sheets per roll**: $14.96
+- **OMG! milk chocolate clusters**: $9.97
+- **Lubriderm lotion**: $14.48
+- **Glad white kitchen garbage bags**: $11.67
+- **Ben's Original rice and pulses**: $2.48
+- **Lotte Choco Pie or Koala's March biscuits**: $4.47
+- **Schneiders Lunch mate kits or snack kits**: $3.17
+- **Core Power high protein shake**: $4.77
+- **Suave deodorant**: $3.97
+- **Garnier Fructis conditioner 354 mL**: $3.97
+- **Royale 2-ply bathroom tissue 12 = 24 rolls**: $7.97
+- **SpongeTowels UltraPRO paper towels**: $19.98
+- **Tylenol 150s**: $15.78
+- **Chef Boyardee pasta**: $1.54
+- **Infants' Tylenol**: $8.77
+- **Murphy spray or liquid wood cleaner**: $4.92
+- **DunkAroos 6-pack**: $2.97
+- **Vibrant Life puppy training pads**: $29.98
+- **Colgate SlimSoft Charcoal or kids' Smiles toothbrush**: $3.47
+- **Huffy Kids' 16" or 18" bikes**: $108.0
+- **Colgate Total 120 mL**: $3.47
+- **One Paw 19.5" x 13.5" x 4" stainless steel cat pan**: $29.97
+- **Satin notched shorts set**: $20.0
+- **Corn**: $3.94
+- **Your Fresh Market™ Montreal spice pork sausages**: $5.78
+- **Great Value marble cheese block**: $5.48
+- **Astro yogurt tub**: $2.97
+- **Jell-O snack cups**: $2.97
+- **Muscle tanks**: $10.0
+- **Kids' 12" or 14" bikes**: $88.0
+- **Candy Bouncy fruit-scented play ball**: $4.98
+- **Candy Bouncy fruit-scented play ball**: $4.98
+- **Compression shorts or graphic tank**: $8.0
+- **Compression shorts or graphic tank**: $8.0
+- **Candy Bouncy fruit-scented play ball**: $4.98
+- **Candy Bouncy fruit-scented play ball**: $4.98
+- **Adults' 26" or 27.5" bike**: $228.0
+- **Candy Bouncy fruit-scented play ball**: $4.98
+- **Candy Bouncy fruit-scented play ball**: $4.98
+- **Belmont 4-piece conversation sett**: $498.0
+- **Play Day Bubble sticks 6-pack**: $5.0
+- **Montclair S-piece outdoor dining set**: $448.0
+- **George Toddlers' jersey shorts set**: $16.0
+- **active shorts**: $6.0
+- **Short-sleeved tech tee or active shorts**: $6.0
+- **20" Metro BMX bike**: $298.0
+- **Giant Bubble playset**: $12.97
+- **Short sleep set with robe**: $28.0
+- **Kids' sneakers**: $12.0
+- **Kid's sneakers**: $12.0
+- **VitaLife dog treats**: $21.97
+- **Chapman's Super sandwich novelties premium frozen**: $6.97
+- **Breyer's Creamery ice cream tubs**: $3.98
+- **Brar's Gajar Halva**: $5.27
+- **Ol'Roy dry dog Food**: $27.98
+- **Huggies superpack diapers**: $26.98
+- **Chapman's Super premium frozen tubs or frozen yogurt tubs 2 L**: $6.97
+- **Dr. Squatch deodorant spray**: $16.97
+- **5TH WHEEL K9 Electric Bike for Kids, 150W Electric Balance Bike Ages 3-8 Years Old, 12" Pneumatic Tire with Dual Brake, 3 Speed Modes Kid Electric Motorcycle**: $199.99
+- **Neutrogena sunscreen**: $15.97
+- **Rascals Night Pants nighttime underwear**: $25.88
+- **Parent's Choice Gentle+ iron-fortified infant formula**: $29.94
+- **Arm & Hammer clumping cat litter**: $20.97
+- **e.l.f. Cosmetics Power Grip prime or setting mist**: $13.96
+- **Enfamil A+ NeuroPro 2 x 445 g formula refill**: $65.47
+- **Arm & Hammer clumping cat litter**: $20.97
+- **Pantene Pro-V conditioner**: $7.97
+- **Dove bar soap**: $18.18
+- **L'Oréal Paris Color Radiance shampoo or conditioner**: $6.98
+- **Simply lemonade**: $5.48
+- **Huggies superpack diapers**: $26.98
+- **Tampax tampons**: $10.98
+- **3M Command strips or hooks value pack**: $11.0
+- **AIRROBO PG50 Pet Grooming Kit & Vacuum, 11000Pa Suction, 2.5L, 5 in 1, Dog Vacuum for Shedding Grooming**: $82.99
+- **3M Command strips or hooks value pack**: $11.0
+- **Costway Height Adjustable Portable Basketball Hoop System Shatterproof Backboard Wheels 2 Nets**: $125.99
+- **Outsunny 11' x 13' Garden Storage Shed with Foundation Kit, Metal Tool Storage House with Double Doors for Outdoor Patio Yard, Grey**: $764.99
+- **Costway Height Adjustable Portable Basketball Hoop System Shatterproof Backboard Wheels 2 Nets**: $125.99
+- **Outsunny 11' x 13' Garden Storage Shed with Foundation Kit, Metal Tool Storage House with Double Doors for Outdoor Patio Yard, Grey**: $764.99
+- **Litheli 2*20V 17" Cordless Lawn Mower with Brushless Motor + 2*4.0Ah Battery & Charger**: $277.99
+- **Gyrocopters Prime All New 2026 Hoverboard | Speed up to 15km/h | 6.5" wheels | 165 lbs weight capacity | UL2272 certified with Wireless Music Speaker (BLUE)**: $132.96
+- **JYX Portable Karaoke Machine with 2 Microphones, Home Karaoke System, Bluetooth Speaker with Party Light, Recording Function, Remote Control**: $118.99
+- **Dog toys**: $4.97
+- **Roborock Qrevo Edge S5A Robot Vacuum Cleaner and Mop | 17,000 Pa Suction with Zero-Tangle Brushes | Pet Hair, Carpet & Hard Floor**: $799.99
+- **Intexca 360° Rotating Bookshelf – 4-Tier Modular Storage Organizer, Stackable Wood Shelf for Books, Decor, Office & Home – White, Easy Assembly, Space-Saving Design**: $89.99
+- **Roborock Qrevo Edge S5A Robot Vacuum Cleaner and Mop | 17,000 Pa Suction with Zero-Tangle Brushes | Pet Hair, Carpet & Hard Floor**: $799.99
+- **Naipo Golf Cart Push Bag Folding 3 Wheels Golf Pull with Scoreboard Adjustable Handle Large Wheelbase for Different Terrain, Orange**: $99.99
+- **5TH WHEEL K9 Electric Bike for Kids, 150W Electric Balance Bike Ages 3-8 Years Old, 12" Pneumatic Tire with Dual Brake, 3 Speed Modes Kid Electric Motorcycle**: $199.99
+- **JYX Portable Karaoke Machine with 2 Microphones, Home Karaoke System, Bluetooth Speaker with Party Light, Recording Function, Remote Control**: $118.99
+- **COLOR WOW Extra Strength Dream Coat Ultra-Moisturizing Anti-frizz Treatment**: $14.05
+- **Glades compost bags**: $10.96
+- **Finish Quantum Ultramax 60s**: $19.77
+- **Weiman specialty cleaners**: $6.97
+- **Glad black garbage bags**: $9.97
+- **Nestlé Drumstick, Real Dairy confectioneries, Del Monte or Häagen-Dazs novelties or tubs**: $4.94
+- **30 L Classic step can**: $22.97
+- **Windex glass cleaner**: $4.47
+- **Astro yogurt tubs**: $2.97
+- **Our Promise lean ground beef Each. Product of New Zealand.**: $5.26
+- **GoGo squeeZ fruit snack**: $2.97
+- **Panasonic 1.3-cu.ft. Microwave**: $169.97
+- **Dr. Oetker Giuseppe Pizzeria thin or rising crust frozen pizza**: $5.84
+- **Chayote squash**: $1.28
+- **Christie RITZ Bits or original crackers**: $2.48
+- **Eddoes**: $1.97
+- **4-qt. Air fryer**: $99.98
+- **Vim cleaners**: $3.57
+- **Gain laundry detergent**: $13.97
+- **Scrubbing Bubbles foam cleaner 385 g – 623 g or spray 946 mL**: $4.47
+- **Great Value chocolate bar**: $1.47
+- **Jackfruit Pack. Product of Vietnam.**: $9.67
+- **Castello cheese blocks, blue or gouda cheese or Snack Factory pretzel crisps**: $4.98
+- **30 L Classic step can**: $22.97
+- **Finish Ultimate 72s**: $19.77
+- **General Mills family size cereal**: $5.47
+- **Royale 2-ply bathroom tissue 12 = 24 rolls**: $7.97
+- **Royale facial tissue**: $14.98
+- **Vileda EasyWring**: $9.87
+- **French's ketchup**: $3.27
+- **Armstrong cheese block shreds 320 g**: $4.98
+- **Core Power high protein shake**: $4.77
+- **Lysol cleaning pours**: $9.97
+- **Vileda s Phil EasyWring or SuperTwist mop refill**: $9.87
+- **Our Finest entrees bowls**: $4.43
+- **Fleecy fabric softener 3.5 L**: $9.97
+- **Shout stain remover sprays**: $4.47
+- **Scrubbing Bubbles foam cleaner 385 g – 623 g**: $4.47
+- **Lou's Kitchen fully cooked pork back ribs**: $9.98
+- **Weiman specialty cleaners**: $6.97
+- **MAINSTAYS Memory foam futon**: $269.97
+- **Great Value spring water**: $3.27
+- **Frank's RedHot hot sauce**: $3.77
+- **Ataulfo mangoes**: $0.94
+- **Three Crabs fish sauce**: $9.98
+- **Your choice SpotClean Pro Heat portable deep cleaner**: $118.88
+- **Great Value sliced bacon**: $12.97
+- **Finish Quantum Ultramax 60s or Ultimate 72s**: $19.77
+- **GoGo squeeZ fruit snack**: $2.97
+- **Scotch-Brite sponges 3-pack**: $4.64
+- **Tide liquid 21-24 loads**: $4.97
+- **Ferrero Rocher chocolate bar**: $3.97
+- **Scrubbing Bubbles foam cleaner 385 g - 623 g or spray 946 mL**: $4.47
+- **Gain laundry detergent**: $13.97
+- **Taiwan guava**: $4.03
+- **Maple Leaf raised without antibiotics boneless pork belly slices**: $8.47
+- **Red or green seedless grapes**: $3.97
+- **Nintendo Switch Lite**: $279.96
+- **Murphy spray or liquid wood cleaner**: $4.92
+- **Nature Valley**: $2.88
+- **Open stock flat or fitted sheets**: $11.94
+- **Tide Pods laundry detergent**: $19.97
+- **The Kimchi**: $10.97
+- **Reversible comforter**: $19.88
+- **Royale facial tissue**: $14.98
+- **PowerForce Turbo Rewind Pet upright vacuum**: $118.88
+- **Open stock flat or fitted sheets**: $11.94
+- **Dove or Dove Men+Care bar soap**: $18.18
+- **Palmolive dish soap**: $1.97
+- **Palmolive dish soap**: $1.97
+- **Palmolive dish soap**: $1.97
+- **Dawn dish soap**: $10.97
+- **Dawn dish soap**: $10.97
+- **Lay's chips**: $3.47
+- **Planters Cocktail peanuts**: $4.97
+- **Green Giant frozen vegetables, riced or restaurant style**: $2.96
+- **Timothy's coffee 30s**: $14.97
+- **Green Giant frozen vegetables, riced or restaurant style**: $2.96
+- **Green Giant frozen vegetables, riced or restaurant style**: $2.96
+- **Planters Cocktail peanuts**: $4.97
+- **Planters Cocktail peanuts**: $4.97
+- **Timothy's coffee 30s**: $14.97
+- **Green Giant frozen vegetables, riced or restaurant style**: $2.96
+- **Dr. Oetker Giuseppe Pizza thin crust frozen pizza**: $5.84
+- **Swiffer Sweep and Mop starter kit**: $15.97
+- **Nongshim noodles**: $4.98
+- **McCain hashbrown patties**: $5.96
+- **Pepsi**: $13.97
+- **Strawberries**: $2.94
+- **Always pads**: $13.47
+- **Broccoli crowns**: $3.44
+- **Bikaji snacks**: $0.97
+- **PHILIPS 65" 4K UHD LED Roku Smart TV**: $598.0
+- **Children's Tylenol**: $8.77
+- **Listerine mouthwash**: $5.47
+- **Aylmer canned tomatoes**: $1.97
+- **Rascals Night Pants nighttime underwear**: $25.88
+- **One Paw stainless steel cat bowls**: $12.97
+- **One Paw Stainless steel cat bowls**: $12.97
+- **Blue Buffalo dry dog food**: $53.97
+- **Slim-fit tee or 10" shorts**: $10.0
+- **Pedigree Vitality+ dry dog food**: $42.98
+- **Great Value Nutri-Bowls or bowls**: $4.43
+- **Sterilite 68 L Multi-purpose storage tote**: $9.97
+- **Pacifica Glow Baby serum**: $20.96
+- **e.l.f. Skin Holy Hydration! Barrier Goals cream**: $16.97
+- **Listerine mouthwash.**: $5.47
+- **Dan-D Pak roasted cashews**: $7.98
+- **One Paw fire hydrant plush dog toys**: $14.97
+- **Bikaji snacks**: $0.97
+- **Gyrocopters Prime All New 2026 Hoverboard | Speed up to 15km/h | 6.5" wheels | 165 lbs weight capacity | UL2272 certified with Wireless Music Speaker (BLUE)**: $132.96
+- **Ol'Roy dry dog food**: $27.98
+- **Castello cheese blocks, blue or gouda cheese or Snack Factory pretzel crisps**: $4.98
+- **Karela**: $2.97
+- **Astro yogurt tubs**: $2.97
+- **Yoplait Source or Creamy 16 x 100 g yogurt**: $6.47
+- **Great Value chocolate bar**: $1.47
+- **Toilet brush**: $1.48
+- **One Paw cat harness & leash set**: $9.97
+- **Secret Clinical Strengths Antiperspirant and Deodorant**: $9.97
+- **Verka chakki atta whole wheat flour**: $6.47
+- **Nanak ghee**: $13.24
+- **Olay Regenerist face treatments**: $54.96
+- **Always Flexfoam pads**: $10.98
+- **Rascals super econo pack training pants**: $27.88
+- **Intexca 360° Rotating Bookshelf – 4-Tier Modular Storage Organizer, Stackable Wood Shelf for Books, Decor, Office & Home – White, Easy Assembly, Space-Saving Design**: $89.99
+- **e.l.f. Cosmetics Power Grip prime**: $13.96
+- **Your Fresh Market sliced meats**: $2.98
+- **Litheli 2*20V 17" Cordless Lawn Mower with Brushless Motor + 2*4.0Ah Battery & Charger**: $277.99

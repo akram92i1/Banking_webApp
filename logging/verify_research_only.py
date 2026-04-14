@@ -129,7 +129,7 @@ def fetch_flipp_grocery_deals(location: str) -> str:
                     try:
                         os.makedirs("Data/flyers", exist_ok=True)
                         safe_merchant = "".join(c for c in merchant_name if c.isalnum() or c in " _-").strip().replace(" ", "_")
-                        file_path = f"Data/flyers/{safe_merchant}_{location}.txt"
+                        file_path = f"Data/flyers/{safe_merchant}_{location}.md"
                         with open(file_path, "w", encoding="utf-8") as f:
                             f.write(f"Grocery Flyer Deals for {merchant_name} in {location}\n")
                             f.write("="*50 + "\n\n")
@@ -171,9 +171,9 @@ def _perform_market_research(location: str, interest_topics: List[str] = None) -
 
 if __name__ == "__main__":
     print("--- Testing Flipp-based Market Research ---")
-    
-    result = _perform_market_research("Montreal", ["grocery"])
-    
+    for city in ["Montreal", "Toronto", "Vancouver"]:
+        print(f"Fetching deals for {city}...")
+        _perform_market_research(city, ["grocery"])
     print("\n" + "="*80)
-    print(result)
+    print("Done fetching deals for all locations.")
     print("="*80 + "\n")

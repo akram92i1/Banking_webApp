@@ -12,23 +12,47 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from typing import Dict, Any
 
-# Import our AI agent
-from ai_banking_agent import AIBankingAgent, UserContext, UserRole
+import gc
+from agent_types import UserContext, UserRole
+from finance_agent import FinanceAgent
+from grocery_agent import GroceryAgent
 
 import jwt
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for React frontend
 
-# Global agent instance
-ai_agent = None
+# Global agent instances
+_finance_agent = None
+_grocery_agent = None
 
-def get_agent():
-    """Get or create AI agent instance"""
-    global ai_agent
-    if ai_agent is None:
-        ai_agent = AIBankingAgent()
-    return ai_agent
+def get_finance_agent():
+    """Get Finance agent, put Grocery agent to sleep"""
+    global _finance_agent, _grocery_agent
+    if _grocery_agent is not None:
+        print("💤 Sleeping Grocery Agent to free graphics memory...")
+        del _grocery_agent
+        _grocery_agent = None
+        gc.collect()
+        
+    if _finance_agent is None:
+        print("🚀 Waking Finance Agent...")
+        _finance_agent = FinanceAgent()
+    return _finance_agent
+
+def get_grocery_agent():
+    """Get Grocery agent, put Finance agent to sleep"""
+    global _finance_agent, _grocery_agent
+    if _finance_agent is not None:
+        print("💤 Sleeping Finance Agent to free graphics memory...")
+        del _finance_agent
+        _finance_agent = None
+        gc.collect()
+        
+    if _grocery_agent is None:
+        print("🚀 Waking Grocery Agent...")
+        _grocery_agent = GroceryAgent()
+    return _grocery_agent
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
@@ -38,6 +62,27 @@ def health_check():
         "timestamp": datetime.now().isoformat(),
         "service": "AI Banking Agent API"
     })
+
+@app.route('/api/agent/activate', methods=['POST'])
+def activate_agent():
+    """Endpoint explicitly hit by the frontend UI loading spinner to pre-warm the agent"""
+    try:
+        data = request.get_json()
+        target = data.get('agent', 'finance')
+        
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        if target == 'grocery':
+            get_grocery_agent()
+        else:
+            get_finance_agent()
+            
+        loop.close()
+        
+        return jsonify({"success": True, "agent_loaded": target})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/api/admin/security-analysis', methods=['POST'])
 def admin_security_analysis():
@@ -68,7 +113,7 @@ def admin_security_analysis():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         
-        agent = get_agent()
+        agent = get_finance_agent()
         result = loop.run_until_complete(
             agent.analyze_security_threats(
                 log_file_path=data.get('log_file_path'),
@@ -154,7 +199,7 @@ def user_financial_advice():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         
-        agent = get_agent()
+        agent = get_finance_agent()
         advice = loop.run_until_complete(
             agent.provide_financial_advice(
                 user_context=user_context,
@@ -233,7 +278,7 @@ def chat_with_agent():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         
-        agent = get_agent()
+        agent = get_finance_agent()
         response = loop.run_until_complete(
             agent.chat_with_agent(
                 message=data.get('message', ''),
@@ -305,11 +350,69 @@ def analyze_user_spending():
             "timestamp": datetime.now().isoformat()
         }), 500
 
+@app.route('/api/advice-chat', methods=['POST'])
+def advice_chat_endpoint():
+    """
+    Advice Chat endpoint mapped to the Grocery Agent
+    """
+    try:
+        data = request.get_json()
+        
+        auth_header = request.headers.get('Authorization')
+        token = None
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]
+
+        user_id = data.get('user_id', 'user')
+        if token:
+            try:
+                decoded_token = jwt.decode(token, options={"verify_signature": False})
+                user_id = decoded_token.get('sub')
+            except jwt.ExpiredSignatureError:
+                pass
+            except jwt.InvalidTokenError:
+                pass
+
+        user_role = UserRole.ADMIN if data.get('user_role') == 'admin' else UserRole.USER
+        user_context = UserContext(
+            user_id=user_id,
+            role=user_role,
+            location=data.get('location', 'toronto'),
+            preferences=data.get('preferences', {}),
+            transaction_history=[],
+            token=token
+        )
+        
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        agent = get_grocery_agent()
+        response = loop.run_until_complete(
+            agent.chat_with_agent(
+                message=data.get('message', ''),
+                user_context=user_context
+            )
+        )
+        
+        loop.close()
+        
+        return jsonify({
+            "success": True,
+            "response": response,
+            "timestamp": datetime.now().isoformat()
+        })
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
 @app.route('/api/grocery-deals/<location>', methods=['GET'])
 def get_grocery_deals(location):
     """Get grocery deals for a specific location"""
     try:
-        agent = get_agent()
+        agent = get_grocery_agent()
         deals = agent._get_grocery_deals(location)
         
         return jsonify({

@@ -1,0 +1,156 @@
+user_input,retrieved_contexts,response,faithfulness,answer_relevancy
+What is the price of chicken breasts at maxi?,"[""STORE: Iga\n\n- **MAPLE LEAF SHREDDED OR IN STRIPS COOKED CHICKEN**: $9.49\n- **ST-HUBERT FROZEN CHICKEN WINGS**: $13.49\n- **WONG WING FROZEN ASIAN MEAL**: $8.49\n- **LAC BROME FROZEN DUCK LEGS OR BONELESS BREASTS**: $32.99\n- **HANGING PLANT**: $12.99\n- **RICARDO FRESH PORTUGUESE CHICKEN BREASTS**: $11.49\n- **ORGANIC GREEN ZUCCHINIS**: $2.49\n- **CUISICHEF THIN PIZZA CRUSTS**: $4.99\n- **POGO FROZEN FRANKFURTERS IN BATTER**: $17.99\n- **VALENTINE SAUCE MIX**: $1.99\n- **GO PURE BARS OR TREATS**: $12.99\n- **SUNCHIPS CHIPS, SNACKS OR POPCORN**: $9.0\n- **C'EST PRÊT! LUNCH BOX**: $4.99\n- **VH COOKING**: $3.69\n- **PRANA (130 ou 150 g) SNACKS, ORGANIC OVERNIGHT CHIA OR NUT FRUIT MIX**: $4.99\n- **SPRAGUE ORGANIC SOUP**: $4.29\n- **MID-DAY SQUARES PLANT-BASED SUPERFOOD SNACK BARS**: $7.99\n- **LESSER EVIL ORGANIC POPCORN**: $4.99\n- **COCA-COLA**: $17.0\n- **PASTENE OLIVE OIL**: $19.99\n- **BRISK**: $5.5\n- **CHAPMAN'S FROZEN TREATS**: $7.99\n- **OXI CLEAN STAIN REMOVER**: $12.99\n- **DOVE BABY WASH**: $4.99"", ""STORE: Iga\n\n- **ORGANIC CELERY**: $2.99\n- **RICARDO FRESH STUFFED CHICKEN BREASTS**: $13.99\n- **RICARDO SEASONED PORK CHOPS**: $8.99\n- **LES VIANDES BIO DE CHARLEVOIX ORGANIC DRY SAUSAGES**: $9.49\n- **BÂTON ROUGE FRESH PORK BACK RIBS**: $14.99\n- **ST-HUBERT FROZEN CHICKEN WINGS, BREADED CHICKEN BREAST, NUGGETS OR STRIPS**: $13.49\n- **LA FISHERIE FROZEN CAPTAIN'S SHELL**: $9.99\n- **C'EST PRÊT! LUNCH BOX**: $4.99\n- **THAWED PASTRAMI-STYLE SMOKED ATLANTIC SALMON**: $6.49\n- **COMPLIMENTS MUFFINS**: $7.99\n- **LA PAYSANNE PARMESAN FONDUE**: $3.99\n- **RICARDO FROZEN CHEESECAKE**: $23.99\n- **BEDOUIN CHEESE**: $14.49\n- **SAVEURS DU FOUR PASTEIS DE NATA**: $6.99\n- **PAYSAN SLICED OR MINCED HAM**: $10.99\n- **JUS D'ORANGE RÉFRIGÉRÉ SIMPLY**: $5.99\n- **ST-DALFOUR MARMALADE**: $4.99\n- **LONEY'S DEHYDRATED BROTH**: $5.99\n- **GOGO SQUEEZ FRUIT SAUCE**: $15.99\n- **LA VACHE QUI RIT (133 g) CHEESE**: $3.79\n- **FIT COOK SAUCE**: $8.99\n- **FANTASTIK CLEANER**: $5.99\n- **DARE COOKIES**: $2.99"", ""STORE: Iga\n\n- **PURINA FANCY FEAST CAT FOOD**: $0.99\n- **WALLAROO TRAIL WHITE OR RED WINE**: $39.99\n- **ATAULFO MANGO**: $5.0\n- **AQUAVERTI LETTUCE OR LETTUCE MIX**: $3.99\n- **ORCHID OR HANGING PLANT**: $12.99\n- **ORCHID**: $12.99\n- **CLIMBING PLANT**: $29.99\n- **INFUSED ORCHID**: $29.99\n- **SEASONED LAMB LOIN CHOPS**: $15.99\n- **RICARDO FRESH STUFFED CHICKEN BREASTS**: $13.99\n- **C'EST PRÊT! À CUIRE FRESH CHICKEN BREAST BROCHETTE WITH VEGETABLES**: $12.99\n- **PAYSAN CRETONS OR CRETONNADE**: $4.99\n- **RICARDO FROZEN SALMON BURGERS**: $11.99\n- **C'EST PRÊT! LUNCH BOX**: $4.99\n- **C'EST PRÊT! SALAD**: $2.99\n- **BLUE WATER FROZEN BREADED FISH FILLETS**: $9.99\n- **SUSHI À LA MAISON FROZEN SCALLOP CEVICHE, CUBES FOR TARTARE OR SEASONED TARTARE**: $9.99\n- **SAVEUR DU FOUR MINI DONUTS**: $9.49\n- **À CHACUN SON PAIN ORGANIC SLICED LOAF**: $5.99\n- **ROMA SLICED CASERTA PEPPERONI**: $6.99\n- **DORA JAM, JELLY, MARMALADE, OR SPREAD**: $3.99\n- **SIMPLY REFRIGERATED ORANGE JUICE**: $5.99"", 'STORE: Iga\n\n- **COMPLIMENTS SMOKED CHICKEN BREAST ROAST**: $2.49\n- **LA FOURMI GRAND GRANOLA CEREAL**: $10.99\n- **TERRA CHIPS**: $3.99\n- **PRANA SNACKS, ORGANIC OVERNIGHT CHIA OR NUT FRUIT MIX**: $4.99\n- **LAVAZZA COFFEE BEANS OR GROUND COFFEE**: $12.99\n- **ROUGIER WHOLE DUCK FOIE GRAS**: $19.99\n- **GREENHOUSE RED RADISHES**: $4.0\n- **COMPLIMENTS CHIPS**: $1.47\n- **LIBERTÉ YOGURT**: $6.97\n- **CLOVER LEAF FLAVOURED, SOLID OR SKIPJACK LIGHT TUNA**: $1.49\n- **McCAIN FROZEN FRIED**: $2.99\n- **CRACKER BARREL CHEES, SHREDDED CHEESE OR CHEESE STICKS**: $6.97\n- **MAXWELL HOUSE GROUND COFFEE**: $16.97\n- **ORCHID**: $12.99\n- **ORCHID**: $12.99\n- **BARTLETT PEARS**: $8.0\n- **T-BONE OR WING STEAK**: $21.99\n- **HOSTESS CAKES**: $2.99\n- **LACTANTIA CREAM**: $3.99\n- **KOZY SHACK REFRIGERATED PUDDING**: $4.49\n- **LACTANTIA SALTED OR GARLIC BUTTER**: $2.99\n- **FANCY FEAST GEMS CAT FOOD**: $2.49\n- **DARE COOKIES**: $2.99\n- **COMPLIMENTS NAAN BREADS**: $4.99\n- **PRANA ORGANIC OVERNIGHT CHIA**: $4.99', ""STORE: Iga\n\n- **ST-DALFOUR MARMALADE**: $4.99\n- **LONEY'S DEHYDRATED BROTH**: $5.99\n- **GOGO SQUEEZ FRUIT SAUCE**: $15.99\n- **LA VACHE QUI RIT (133 g) CHEESE**: $3.79\n- **FIT COOK SAUCE**: $8.99\n- **FANTASTIK CLEANER**: $5.99\n- **DARE COOKIES**: $2.99\n- **BUBLY SPARKLING WATER-BASED DRINK OR CARBONATED NATURAL SPRING WATER**: $14.0\n- **COMPLIMENTS PICKLES**: $2.79\n- **CHEETOS CHIPS**: $9.0\n- **KRAFT DINNER**: $2.29\n- **OATBOX PLANT-BASED BEVERAGE**: $3.99\n- **DAIYA PLANT-BASED CHEESE**: $4.49\n- **GUTSY ORGANIC KOMBUCHA**: $2.99\n- **ORCHID**: $12.99\n- **FUMOIRS GOSSELIN SMOKED MEAT**: $3.49\n- **MARCANGELO SLICED ITALIAN DELI MEATS**: $6.99\n- **COMPLIMENTS SLICED BRIOCHE**: $6.99\n- **POST CEREAL**: $3.99\n- **LEEKS**: $5.0\n- **COMPLIMENTS WHITE WINE VINEGAR**: $3.49\n- **ORGANIC RED MANGO**: $5.0\n- **VAL NATURE BARS**: $12.99\n- **LYSOL LAUNDRY SOFTENER**: $12.99\n- **STARBUCKS COFFEE ENHANCER**: $7.49\n- **PILLSBURY TOASTER STRUDEL FROZEN PASTRIES**: $3.49"", ""STORE: Walmart\n\n- **Washcloth**: $0.97\n- **Mina halal boneless chicken thighs 8-pack**: $7.97\n- **Vim cleaners**: $4.26\n- **Scotch-Brite sponges 3-pack**: $4.64\n- **Miss Vickie's chips**: $3.77\n- **UFC coconut water**: $2.98\n- **MAINSTAYS™ 3 Drawer dresser**: $109.97\n- **Becel plant-based bricks**: $4.48\n- **Coffee mate liquid coffee enhancer**: $4.97\n- **Christie RITZ original crackers**: $2.48\n- **Michelina's frozen entrees**: $1.47\n- **Nintendo Switch Rematch wireless controller**: $54.96\n- **TurboTax standard 2025**: $44.98\n- **Downy fabric softener 60 loads, scented beads 141 g or fabric rinse 23 loads**: $4.97\n- **Chef Boyardee pasta**: $1.54\n- **Air Wick refills 3-pack**: $12.47\n- **Air Wick Vibrant 2-pack refills**: $12.47\n- **Windex trigger sprays**: $4.47\n- **MAINSTAYS Hand towel**: $2.47\n- **Delicious Kitchen jasmine rice 8 kg**: $15.98\n- **Armstrong cheese block 400 g**: $4.98\n- **Swanson chicken broth 412 mL**: $0.98\n- **Great Value appetizers**: $8.96"", 'STORE: Walmart\n\n- **Maxwell House instant coffee**: $6.47\n- **Your Fresh Market™ regular or halal fresh Angus beef sirloin tip roast**: $10.88\n- **Quaker Crispy Minis**: $2.97\n- **Sally Hansen Miracle Gel nail polish**: $11.96\n- **Blush pears**: $5.98\n- **Ventura 4-piece conversation set**: $1498.0\n- **Dawn dish soap**: $10.97\n- **Temptations Creamy Purrrr-ée lickable cat treats**: $37.98\n- **Belmont 4-piece outdoor sectional set**: $798.0\n- **Fancy Feast wet cat food value pack**: $10.74\n- **Naipo Golf Cart Push Bag Folding 3 Wheels Golf Pull with Scoreboard Adjustable Handle Large Wheelbase for Different Terrain, Orange**: $99.99\n- **Coca-Cola pop**: $8.28\n- **Lilydale air-chilled boneless skinless chicken breasts 4-pack**: $14.0\n- **Cracker Barrel Cheese Slices**: $4.98\n- **14"" Whiskey barrel resin planter**: $15.98\n- **4-Burner propane gas grill with side burner**: $248.0\n- **Belmont 4-piece conversation set**: $498.0\n- **Lindt Swiss Classic chocolate bar**: $5.48', 'STORE: Walmart\n\n- **Cesar wet dog food**: $14.97\n- **Tampax tampons**: $10.98\n- **Purina ONE dry dog food**: $26.98\n- **Frontier Bakery kulcha**: $3.67\n- **Nanak ghee**: $13.24\n- **Honolulu Air Jet inflatable hot tub**: $598.0\n- **Hometrends 8\' x 10\' Sling top pergola**: $698.0\n- **14"" Whiskey barrel resin planter**: $15.98\n- **Naipo Golf Cart Push Bag Folding 3 Wheels Golf Pull with Scoreboard Adjustable Handle Large Wheelbase for Different Terrain, Orange**: $99.99\n- **Great Value Eco bathroom tissue 12-pack**: $7.94\n- **Avocados**: $1.44\n- **Great Value milk chocolate bar**: $1.97\n- **Kellogg\'s cereal**: $2.97\n- **11\' x 11\' Hardtop cedar gazebo**: $1198.0\n- **Blackstone Adventure Ready 22"" flat top outdoor griddle with hard cover**: $247.0\n- **Lindt Swiss Classic chocolate bar**: $5.48\n- **Blackstone 36"" Griddle**: $447.0\n- **Compression shorts or graphic tank**: $8.0\n- **Schneiders Lunch mate kits or snack kits**: $3.17\n- **Kellogg\'s cereal**: $2.97\n- **Spirit E-210 gas grill**: $499.0', ""STORE: Walmart\n\n- **Cashmere bathroom tissue UltraLuxe 20 = 60**: $14.96\n- **Chapman's Super sandwich novelties 12 × 120 mL**: $5.97\n- **Dr. Oetker Giuseppe Pizzeria thin frozen pizza**: $5.84\n- **30 L Classic step can**: $22.97\n- **Glad black garbage bags**: $9.97\n- **Jamieson mega size vitamin B12, D3 or magnesium**: $17.97\n- **Siwin dumplings**: $3.98\n- **Natrel fine-filtered milk**: $5.98\n- **Air Wick scented oil 3-pack or Vibrant 2-pack refills**: $12.47\n- **Mina halal boneless chicken thighs**: $8.38\n- **Armstrong cheese block shreds 320 g**: $4.98\n- **Taiwan guava**: $4.03\n- **Lysol cleaning pours**: $9.97\n- **Palmolive dish soap**: $1.97\n- **Scrubbing Bubbles foam cleaner 385 g – 623 g**: $4.47\n- **MAINSTAYS Memory foam futon**: $269.97\n- **Lou's Kitchen fully cooked pork back ribs**: $9.98\n- **Core Power high protein shake**: $4.77\n- **Great Value bacon**: $4.97\n- **Tylenol**: $15.78\n- **Swiffer Sweep and Mop starter kit**: $15.97\n- **Ferrero Rocher chocolate bar**: $3.97"", ""STORE: Walmart\n\n- **Miss Vickie's chips**: $3.77\n- **Nestlé Drumstick, Real Dairy confectioneries, Del Monte or Häagen-Dazs novelties or tubs**: $4.94\n- **Dan-D Pak roasted cashews**: $7.98\n- **30 L Classic step can**: $22.97\n- **Astro yogurt tubs**: $2.97\n- **Frank's RedHot hot sauce**: $3.77\n- **Becel plant-based bricks**: $4.48\n- **Pepsi Pack.**: $13.97\n- **Astro yogurt tubs**: $2.97\n- **Royale 2-ply bathroom tissue**: $7.97\n- **Romaine lettuce hearts**: $3.97\n- **Red or green seedless grapes**: $2.97\n- **Ben's Original rice and pulses**: $2.48\n- **Jackfruit**: $8.28\n- **Panasonic 1.3-cu.ft. Microwave**: $169.97\n- **Chef Boyardee pasta**: $1.54\n- **Airpods**: $144.0\n- **Ferrero Rocher chocolate bar**: $3.97\n- **Core Power high protein shake**: $4.77\n- **Royale facial tissue**: $14.98\n- **Great Value spring water**: $2.98\n- **Scrubbing Bubbles spray 946 mL**: $4.47\n- **Solid bath towel**: $3.97\n- **Children's or infants Tylenol**: $8.77\n- **Reversible comforter**: $19.88""]","I couldn't find any information about ""maxi"" being a store in the provided context. However, I did find information about chicken breasts at IGA, which is one of the stores listed in the context.
+
+Here are the prices of chicken breasts at IGA:
+
+* **RICARDO FRESH PORTUGUESE CHICKEN BREASTS**: $11.49
+* **RICARDO FRESH STUFFED CHICKEN BREASTS**: $13.99
+* **C'EST PRÊT! À CUIRE FRESH CHICKEN BREAST BROCHETTE WITH VEGETABLES**: $12.99
+* **RICARDO FROZEN SALMON BURGERS**: $11.99 (Note: This is not a chicken breast product, but a salmon burger)
+
+If you are looking for chicken breasts at a specific store, please let me know and I'll do my best to provide the price information.",0.4,0.0
+Make a $50 weekly meal plan at super_c.,"[""STORE: Iga\n\n- **MINUTE RICE**: $4.99\n- **CLUB HOUSE ARTIFICIAL VANILLA EXTRACT, COOKIE MIX OR SOFT-BAKE CAKE MIX**: $4.99\n- **COMPLIMENTS WHITE CONDIMENT**: $3.99\n- **COMPLIMENTS CHOCOLATE CHIPS**: $13.99\n- **MINI BABYBEL CHEESE PRODUCT**: $3.79\n- **P'TIT QUÉBEC SHREDDED CHEESE**: $8.99\n- **COMPLIMENTS SOUP**: $1.29\n- **TOSTITOS TORTILLA CHIPS**: $9.0\n- **PURINA ONE CAT FOOD**: $18.99\n- **ENSURE MEAL REPLACEMENT**: $5.99\n- **GLUCERNA MEAL REPLACEMENT**: $15.99\n- **RESOLVE STAIN REMOVER**: $12.99\n- **PEPSI**: $5.5\n- **COMPLIMENTS COLESLAW OR GARDEN SALAD**: $2.99\n- **MAISON RIVIERA PLANT-BASED DESSERT**: $5.79\n- **PRANA GRANOLOVE PROTÉINES ORGANIC PROTEINED GRANOLA CEREAL**: $4.99\n- **PRIMAL KITCHEN SAUCE**: $7.49\n- **MAISON RIVIERA PLANT-BASED DESSERT**: $5.79\n- **SENSIBLE PORTIONS GARDEN VEGETABLE STRAWS**: $2.49\n- **KICKING HORSE ORGANIC AND FAIR TRADE COFFEE BEANS**: $27.97\n- **FOUS DE L'ÎLE ORGANIC KOMBUCHA**: $2.99\n- **BOB'S RED MILL FLOUR**: $5.99\n- **NOBLE BEAN ORGANIC TEMPEH**: $4.29"", 'STORE: Iga\n\n- **SIMPLY REFRIGERATED FRUIT JUICE**: $4.99\n- **ST-HUBERT SOFT-BAKE CAKE MIX**: $4.99\n- **RICARDO COOKIE, BROWNIE, CREPE, CAKE OR WAFFLE AND PANCAKE MIX**: $4.99\n- **COMPLIMENTS SANS GLUTEN FROZEN PIZZA**: $7.99\n- **COMPLIMENTS BIOLOGIQUE ORGANIC FRUIT JUICE**: $9.99\n- **COMPLIMENTS PICKLES**: $2.79\n- **BIOITALIA ORGANIC LEGUMES, GREEN PEAS OR WHOLE KERNEL CORN**: $2.99\n- **LE BLONVILLIERS CANE SUGAR PIECES OR LUMPS**: $7.49\n- **KICKING HORSE ORGANIC AND FAIR TRADE GROUND COFFEE**: $10.97\n- **ONE DEGREE ORGANIC FOODS OAT OR BROWN RICE FLOUR**: $7.79\n- **YOGI TEA ORGANIC TEA OR HERBAL TEA BAGS**: $4.99', 'STORE: Iga\n\n- **TRADITION FRESH FRUIT JUICE OR COCKTAIL**: $3.99\n- **POM BAGELS OR TORTILLAS**: $5.49\n- **MILLER LITE BEER**: $39.99\n- **LAC BROME BONELESS BREASTS**: $39.99\n- **COMPLIMENTS MAYONNAISE OR SALAD DRESSING**: $6.49\n- **McCAFÉ K-CUP COFFEE**: $26.99\n- **KINDER SURPRISE TREATS**: $1.49\n- **COMPLIMENTS BASMATI OR CALROSE SUSHI RICE**: $4.99\n- **FERRERO ROCHER CHOCOLATE SQUARES**: $6.99\n- **KIM PHAT CALROSE SUSHI RICE**: $4.99\n- **McCAFÉ GROUND COFFEE**: $11.99\n- **PRIMAL KITCHEN DRESSING**: $7.49\n- **LA PARISIENNE DISHWASHING TABLETS**: $5.99\n- **CAPRICE DES DIEUX CHEESE**: $6.49\n- **COMPLIMENTS CANOLA OR VEGETABLE OIL**: $9.99\n- **COMPLIMENTS CANOLA OIL**: $9.99\n- **PRIMAL KITCHEN KETCHUP**: $7.49\n- **LES INDISPENSABLES HANGING TROPICAL PLANT**: $19.99\n- **ORCHID**: $12.99\n- **ORCHID OR HANGING TROPICAL PLANT**: $19.99\n- **LES INDISPENSABLES HANGING PLANT**: $12.99\n- **ORCHID OR HANGING PLANT**: $12.99\n- **LAFLEUR OR OLYMEL COOKED HAM**: $2.29\n- **BONELESS BOTTOM BLADE ROAST**: $12.99', ""STORE: Iga\n\n- **FRESH RAINBOW TROUT FILLETS**: $14.99\n- **SEEDLESS ORANGES**: $9.0\n- **CRACKER BARREL SHREDDED CHEESE**: $6.97\n- **PEPSI**: $17.0\n- **COMPLIMENTS YELLOW, RED OR RUSSET POTATOES**: $3.99\n- **C'EST PRÊT! À CUIRE FRESH STUFFED ATLANTIC SALMON TOURNEDOS OR ROLLS**: $15.99\n- **VH SOYA OR DIPPING SAUCE**: $3.69\n- **COMPLIMENTS BACON OR FULLY COOKED BACON**: $6.49\n- **GENERAL MILLS CEREAL**: $3.33\n- **IMPOSSIBLE PLANT-BASED BURGER PATTIES**: $7.99\n- **HONEYDEW MELON**: $4.99\n- **MANITOBA HARVEST HEMP HEARTS RAW SHELLED HEMP SEEDS**: $7.99\n- **SILVER HILLS SLICED BREAD**: $4.29\n- **EMMI LES RÉSERVES DU CHÂTEAU SWISS CHEESE FONDUE**: $14.49\n- **P'TIT QUÉBEC CHEESE**: $8.99\n- **OKA CHEESE**: $4.29\n- **OLYMEL SMOKED HAM**: $3.19\n- **EVIVE FROZEN SMOOTHIE BITES**: $10.0\n- **NORTHFORK FRESH BISON SIRLOIN STEAK**: $14.99\n- **OLIVIERI FRESH STUFFED PASTA**: $6.49\n- **BÂTON ROUGE SAUCE MIX**: $1.99\n- **KASHI GRANOLA**: $4.99\n- **DU BRETON ORGANIC SLICED DRY SAUSAGE**: $7.99"", ""STORE: Iga\n\n- **ORGANIC CELERY**: $2.99\n- **RICARDO FRESH STUFFED CHICKEN BREASTS**: $13.99\n- **RICARDO SEASONED PORK CHOPS**: $8.99\n- **LES VIANDES BIO DE CHARLEVOIX ORGANIC DRY SAUSAGES**: $9.49\n- **BÂTON ROUGE FRESH PORK BACK RIBS**: $14.99\n- **ST-HUBERT FROZEN CHICKEN WINGS, BREADED CHICKEN BREAST, NUGGETS OR STRIPS**: $13.49\n- **LA FISHERIE FROZEN CAPTAIN'S SHELL**: $9.99\n- **C'EST PRÊT! LUNCH BOX**: $4.99\n- **THAWED PASTRAMI-STYLE SMOKED ATLANTIC SALMON**: $6.49\n- **COMPLIMENTS MUFFINS**: $7.99\n- **LA PAYSANNE PARMESAN FONDUE**: $3.99\n- **RICARDO FROZEN CHEESECAKE**: $23.99\n- **BEDOUIN CHEESE**: $14.49\n- **SAVEURS DU FOUR PASTEIS DE NATA**: $6.99\n- **PAYSAN SLICED OR MINCED HAM**: $10.99\n- **JUS D'ORANGE RÉFRIGÉRÉ SIMPLY**: $5.99\n- **ST-DALFOUR MARMALADE**: $4.99\n- **LONEY'S DEHYDRATED BROTH**: $5.99\n- **GOGO SQUEEZ FRUIT SAUCE**: $15.99\n- **LA VACHE QUI RIT (133 g) CHEESE**: $3.79\n- **FIT COOK SAUCE**: $8.99\n- **FANTASTIK CLEANER**: $5.99\n- **DARE COOKIES**: $2.99"", 'STORE: Walmart\n\n- **Chapman\'s Super sandwich novelties**: $5.97\n- **Sterlite 68 L Multi-purpose storage tote**: $9.97\n- **30 L Classic step can**: $22.97\n- **Your Fresh Market Atlantic salmon portion**: $17.68\n- **Weiman specialty cleaners**: $6.97\n- **Auusda 15.6"" Laptop, AMD 3050E CPU, 16GB RAM 512GB SSD, Fingerprint, Backlit Keyboard, Windows 11 Pro Home Computer, Full Type-C, HDMI, Silver**: $383.99\n- **Costway Height Adjustable Portable Basketball Hoop System Shatterproof Backboard Wheels 2 Nets**: $125.99\n- **Chef Boyardee pasta**: $1.54\n- **Lotte Koala\'s March biscuits**: $4.47\n- **Natrel fine-filtered milk**: $4.58\n- **Lemon Aide all Mural cleaners**: $6.36\n- **La Grille spices**: $4.97\n- **Nongshim noodles**: $4.98\n- **Seedless cucumbers**: $0.94\n- **Shout stain remover sprays**: $4.47\n- **One Paw Essential 3-piece dog walking set with wipes, collapsible bowl and treat holder**: $9.98\n- **Temptations Creamy Purrr-ee lickable cat treats**: $37.98\n- **Bikaji gulab jamun**: $4.24', ""STORE: Walmart\n\n- **Miss Vickie's chips**: $3.77\n- **Nestlé Drumstick, Real Dairy confectioneries, Del Monte or Häagen-Dazs novelties or tubs**: $4.94\n- **Dan-D Pak roasted cashews**: $7.98\n- **30 L Classic step can**: $22.97\n- **Astro yogurt tubs**: $2.97\n- **Frank's RedHot hot sauce**: $3.77\n- **Becel plant-based bricks**: $4.48\n- **Pepsi Pack.**: $13.97\n- **Astro yogurt tubs**: $2.97\n- **Royale 2-ply bathroom tissue**: $7.97\n- **Romaine lettuce hearts**: $3.97\n- **Red or green seedless grapes**: $2.97\n- **Ben's Original rice and pulses**: $2.48\n- **Jackfruit**: $8.28\n- **Panasonic 1.3-cu.ft. Microwave**: $169.97\n- **Chef Boyardee pasta**: $1.54\n- **Airpods**: $144.0\n- **Ferrero Rocher chocolate bar**: $3.97\n- **Core Power high protein shake**: $4.77\n- **Royale facial tissue**: $14.98\n- **Great Value spring water**: $2.98\n- **Scrubbing Bubbles spray 946 mL**: $4.47\n- **Solid bath towel**: $3.97\n- **Children's or infants Tylenol**: $8.77\n- **Reversible comforter**: $19.88"", 'STORE: Walmart\n\n- **Aylmer canned tomatoes**: $1.97\n- **Gyrocopters Prime All New 2026 Hoverboard | Speed up to 15km/h | 6.5"" wheels | 165 lbs weight capacity | UL2272 certified with Wireless Music Speaker (BLUE)**: $132.96\n- **D\'Italiano sliced bread**: $2.98\n- **Natural Bakery rye bread**: $2.98\n- **Your Fresh Market mini muffins**: $4.34\n- **Your Fresh Market™ sliced meats**: $2.98\n- **Okra**: $3.97\n- **Banner - Meal for 4 under $20**: $20.0', ""STORE: Walmart\n\n- **Expert Grill 6-Burner gas grill with side burner**: $398.0\n- **Hometrends 12' x 12' Hardtop gazebo**: $1148.0\n- **Jamieson mega size vitamin B12, D3 or magnesium**: $17.97\n- **Finish Quantum Ultramax 60s or Ultimate 72s**: $19.77\n- **Yoplait Yop drinkable yogurt**: $0.88\n- **Jell-O snack cups**: $2.97\n- **OMG! milk chocolate clusters**: $9.97\n- **Pillsbury Pizza Pops**: $2.88\n- **Fruitopia juice or drinks**: $1.88\n- **Glad white kitchen garbage bags**: $11.67\n- **Siwin dumplings**: $3.98\n- **Tide Pods laundry detergent**: $19.97\n- **Miss Vickie's chips**: $3.77\n- **Mr. Clean multisurface cleaner**: $3.97\n- **L'Oréal Paris Hair Expertise shampoo or conditioner**: $11.56\n- **Suave body wash**: $3.97\n- **Fleecy fabric softener 3.5 L or sheets 200s**: $9.97\n- **Air Wick scented oil**: $12.47\n- **Sterilite 68 L Multi-purpose storage tote**: $9.97\n- **Our Promise lean ground beef Each. Product of New Zealand.**: $5.26\n- **White or brown large eggs**: $5.97"", 'STORE: Walmart\n\n- **D\'Italiano sliced bread**: $2.98\n- **Reser\'s side dishes**: $6.28\n- **Natural Bakery rye bread**: $2.98\n- **Great Value tuna**: $0.98\n- **Nutri-Grain bars, Pop-Tarts or Rice Krispies squares**: $2.88\n- **Siwin dumplings**: $3.98\n- **Lemons**: $0.86\n- **Your Fresh Market™ cremini mushrooms**: $2.44\n- **D\'Italiano sliced bread**: $2.98\n- **Reser\'s side dishes**: $6.28\n- **Nanak paneer**: $3.98\n- **Scrubbing Bubbles foam cleaner**: $4.47\n- **COLOR WOW Extra Strength Dream Coat Ultra-Moisturizing Anti-frizz Treatment**: $14.05\n- **Great Value raw shrimp**: $10.98\n- **Great Value medium roast ground coffee**: $14.92\n- **Auusda 15.6"" Laptop, AMD 3050E CPU, 16GB RAM 512GB SSD, Fingerprint, Backlit Keyboard, Windows 11 Pro Home Computer, Full Type-C, HDMI, Silver**: $383.99\n- **Auusda 15.6"" Laptop, AMD 3050E CPU, 16GB RAM 512GB SSD, Fingerprint, Backlit Keyboard, Windows 11 Pro Home Computer, Full Type-C, HDMI, Silver**: $383.99\n- **Okra**: $4.77']","**Weekly Meal Plan for $50**
+
+To create a meal plan within the budget of $50, I will suggest a combination of affordable and nutritious meals. Since you didn't specify any dietary restrictions or preferences, I will provide a general meal plan that includes a variety of options.
+
+**Monday**
+
+* Breakfast: Oatmeal with Banana and Honey 🍞🍌🍯
+	+ 1 cup rolled oats ($1.50)
+	+ 1 banana ($0.50)
+	+ 1 tsp honey ($0.25)
+* Lunch: Grilled Cheese Sandwich and Tomato Soup 🥖🍅
+	+ 2 slices whole wheat bread ($1.00)
+	+ 2 slices cheese ($2.00)
+	+ 1 can tomato soup ($1.00)
+* Dinner: Spaghetti with Meat Sauce and Garlic Bread 🍝🍞
+	+ 1 pound spaghetti ($1.50)
+	+ 1 pound ground beef ($3.00)
+	+ 1 jar marinara sauce ($2.00)
+	+ 1 loaf garlic bread ($2.00)
+
+**Tuesday**
+
+* Breakfast: Scrambled Eggs and Toast 🥚🍞
+	+ 6 eggs ($1.50)
+	+ 4 slices whole wheat bread ($1.00)
+* Lunch: Chicken Quesadilla 🌯
+	+ 1 pound shredded chicken ($2.50)
+	+ 2 tortillas ($1.00)
+	+ 1 cup shredded cheese ($2.00)
+* Dinner: Baked Chicken and Roasted Vegetables 🍗🥗
+	+ 2 pounds boneless chicken breasts ($4.00)
+	+ 1 cup mixed vegetables ($1.50)
+
+**Wednesday**
+
+* Breakfast: Yogurt Parfait 🍿
+	+ 1 cup yogurt ($1.50)
+	+ 1 cup granola ($2.00)
+	+ 1 cup mixed berries ($2.00)
+* Lunch: Turkey and Cheese Wrap 🥪
+	+ 1 pound sliced turkey breast ($3.00)
+	+ 1 cup shredded cheese ($2.00)
+	+ 1 large tortilla ($0.50)
+* Dinner: Beef and Broccoli Stir-Fry 🥗🍲
+	+ 1 pound beef strips ($3.00)
+	+ 1 cup broccoli florets ($1.50)
+
+**Thursday**
+
+* Breakfast: Smoothie Bowl 🍓
+	+ 1 cup frozen berries ($1.50)
+	+ 1 cup yogurt ($1.50)
+	+ 1 cup granola ($2.00)
+* Lunch: Grilled Cheese and Tomato Sandwich 🥖🍅
+	+ 2 slices whole wheat bread ($1.00)
+	+ 2 slices cheese ($2.00)
+	+ 1 can tomato soup ($1.00)
+* Dinner: Chicken Fajitas 🌯
+	+ 1 pound shredded chicken ($2.50)
+	+ 1 cup sliced bell peppers ($1.50)
+	+ 1 cup sliced onions ($1.00)
+
+**Friday**
+
+* Breakfast: Avocado Toast 🥑🍞
+	+ 2 slices whole wheat bread ($1.00)
+	+ 1 avocado ($1.00)
+* Lunch: Chicken Caesar Salad 🥗
+	+ 1 pound shredded chicken ($2.50)
+	+ 1 cup romaine lettuce ($1.50)
+	+ 1 cup croutons ($1.00)
+* Dinner: Baked Salmon and Roasted Asparagus 🐟🥗
+	+ 2 pounds salmon fillets ($6.00)
+	+ 1 cup asparagus spears ($1.50)
+
+**Saturday**
+
+* Breakfast: Omelette and Toast 🥚🍞
+	+ 6 eggs ($1.50)
+	+ 4 slices whole wheat bread ($1.00)
+* Lunch: Turkey and Cheese Sandwich 🥪
+	+ 1 pound sliced turkey breast ($3.00)
+	+ 1 cup shredded cheese ($2.00)
+	+ 1 large tortilla ($0.50)
+* Dinner: Beef and Mushroom Stroganoff 🥗🍲
+	+ 1 pound beef strips ($3.00)
+	+ 1 cup sliced mushrooms ($1.50)
+
+**Sunday**
+
+* Breakfast: Breakfast Burrito 🌯
+	+ 1 pound scrambled eggs ($2.00)
+	+ 1 cup shredded cheese ($2.00)
+	+ 1 large tortilla ($0.50)
+* Lunch: Chicken Quesadilla 🌯
+	+ 1 pound shredded chicken ($2.50)
+	+ 2 tortillas ($1.00)
+	+ 1 cup shredded cheese ($2.00)
+* Dinner: Baked Chicken and Roasted Carrots 🍗🥗
+	+ 2 pounds boneless chicken breasts ($4.00)
+	+ 1 cup carrots ($1.00)
+
+**Grocery List:**
+
+* Produce:
+	+ Bananas (4) ($2.00)
+	+ Apples (4) ($2.00)
+	+ Carrots (1 bunch) ($1.00)
+	+ Broccoli (1 head) ($1.50)
+	+ Bell peppers (2) ($2.00)
+	+ Onions (2) ($1.00)
+	+ Asparagus (1 bunch) ($1.50)
+	+ Mushrooms (1 cup) ($1.50)
+	+ Mixed berries (1 cup) ($2.00)
+	+ Lemons (4) ($2.00)
+* Proteins:
+	+ Ground beef (1 pound) ($3.00)
+	+ Boneless chicken breasts (4 pounds) ($8.00)
+	+ Turkey breast (1 pound) ($3.00)
+	+ Salmon fillets (2 pounds) ($6.00)
+* Dairy:
+	+ Eggs (1 dozen) ($2.00)
+	+ Yogurt (4 cups) ($6.00)
+	+ Cheese (4 cups shredded) ($8.00)
+* Pantry:
+	+ Oats (1 bag) ($2.50)
+	+ Granola (1 bag) ($2.50)
+	+ Canned tomatoes (2 cans) ($2.00)
+	+ Marinara sauce (1 jar) ($2.00)
+	+ Garlic bread (1 loaf) ($2.00)
+	+ Spaghetti (1 pound) ($1.50)
+	+ Tortillas (8) ($2.00)
+	+ Olive oil (1 bottle) ($5.00)
+* Snacks:
+	+ Nuts (1 cup) ($2.50)
+	+ Dried fruit (1 cup) ($2.50)
+
+**Total Cost:** $49.90
+
+This meal plan provides a variety of healthy and delicious meals for the week, while staying within the budget of $50. The total cost of the groceries is $49.90, which is $0.10 under the budget.",0.0,0.704474622136096
+Are there any deals on apples in iga?,"['STORE: Iga\n\nGrocery Flyer Deals for IGA in Montreal\n==================================================', 'STORE: Iga\n\n- **SIMPLY REFRIGERATED FRUIT JUICE**: $4.99\n- **ST-HUBERT SOFT-BAKE CAKE MIX**: $4.99\n- **RICARDO COOKIE, BROWNIE, CREPE, CAKE OR WAFFLE AND PANCAKE MIX**: $4.99\n- **COMPLIMENTS SANS GLUTEN FROZEN PIZZA**: $7.99\n- **COMPLIMENTS BIOLOGIQUE ORGANIC FRUIT JUICE**: $9.99\n- **COMPLIMENTS PICKLES**: $2.79\n- **BIOITALIA ORGANIC LEGUMES, GREEN PEAS OR WHOLE KERNEL CORN**: $2.99\n- **LE BLONVILLIERS CANE SUGAR PIECES OR LUMPS**: $7.49\n- **KICKING HORSE ORGANIC AND FAIR TRADE GROUND COFFEE**: $10.97\n- **ONE DEGREE ORGANIC FOODS OAT OR BROWN RICE FLOUR**: $7.79\n- **YOGI TEA ORGANIC TEA OR HERBAL TEA BAGS**: $4.99', ""STORE: Iga\n\n- **SENSIBLE PORTIONS GARDEN VEGETABLE STRAWS**: $2.49\n- **KICKING HORSE ORGANIC AND FAIR TRADE COFFEE BEANS**: $27.97\n- **FOUS DE L'ÎLE ORGANIC KOMBUCHA**: $2.99\n- **BOB'S RED MILL FLOUR**: $5.99\n- **NOBLE BEAN ORGANIC TEMPEH**: $4.29\n- **MATEINA YERBA MATE ORGANIC ENERGY INFUSION**: $2.79\n- **MAPLE 3 ORGANIC DRINK**: $2.99\n- **ANTICO ORGANIC PASTA SAUCE**: $5.49\n- **CALIFIA FARMS AMANDES PLANT-BASED BEVERAGE**: $5.49\n- **O-LIVE & CO EXTRA VIRGIN OLIVE OIL**: $12.99\n- **FURCA FRESH SAUSAGES**: $8.99\n- **STRAWBERRIES**: $3.99\n- **KNOX GELATINE**: $6.49\n- **FAVUZZI THE ARTISAN'S WAY PIZZA FLOUR**: $3.99\n- **COMPLIMENTS LEMONS**: $4.99\n- **BONNE MAMAN JAM, JELLY, MARMALADE OR SPREAD**: $6.79\n- **OLYMEL SHAVED DELI MEAT**: $5.99\n- **KNORR SAUCE OR PASTA SAUCE MIX**: $0.99\n- **SLEEMAN CLEAR 2.0 WHITE OR RED WINE OR BEER**: $39.99\n- **SAVOURA RED CHERRY TOMATOES**: $2.99\n- **COMPLIMENTS CORTLAND, EMPIRE, McINTOSH OR SPARTAN APPLES**: $5.99\n- **GREEN KIWIS**: $6.0"", 'STORE: Iga\n\n- **TRADITION FRESH FRUIT JUICE OR COCKTAIL**: $3.99\n- **POM BAGELS OR TORTILLAS**: $5.49\n- **MILLER LITE BEER**: $39.99\n- **LAC BROME BONELESS BREASTS**: $39.99\n- **COMPLIMENTS MAYONNAISE OR SALAD DRESSING**: $6.49\n- **McCAFÉ K-CUP COFFEE**: $26.99\n- **KINDER SURPRISE TREATS**: $1.49\n- **COMPLIMENTS BASMATI OR CALROSE SUSHI RICE**: $4.99\n- **FERRERO ROCHER CHOCOLATE SQUARES**: $6.99\n- **KIM PHAT CALROSE SUSHI RICE**: $4.99\n- **McCAFÉ GROUND COFFEE**: $11.99\n- **PRIMAL KITCHEN DRESSING**: $7.49\n- **LA PARISIENNE DISHWASHING TABLETS**: $5.99\n- **CAPRICE DES DIEUX CHEESE**: $6.49\n- **COMPLIMENTS CANOLA OR VEGETABLE OIL**: $9.99\n- **COMPLIMENTS CANOLA OIL**: $9.99\n- **PRIMAL KITCHEN KETCHUP**: $7.49\n- **LES INDISPENSABLES HANGING TROPICAL PLANT**: $19.99\n- **ORCHID**: $12.99\n- **ORCHID OR HANGING TROPICAL PLANT**: $19.99\n- **LES INDISPENSABLES HANGING PLANT**: $12.99\n- **ORCHID OR HANGING PLANT**: $12.99\n- **LAFLEUR OR OLYMEL COOKED HAM**: $2.29\n- **BONELESS BOTTOM BLADE ROAST**: $12.99', ""STORE: Iga\n\n- **KNORR SAUCE OR PASTA SAUCE MIX**: $0.99\n- **SLEEMAN CLEAR 2.0 WHITE OR RED WINE OR BEER**: $39.99\n- **SAVOURA RED CHERRY TOMATOES**: $2.99\n- **COMPLIMENTS CORTLAND, EMPIRE, McINTOSH OR SPARTAN APPLES**: $5.99\n- **GREEN KIWIS**: $6.0\n- **NICOLAS LALOUX WHITE OR RED WINE OR BEER**: $39.99\n- **C'EST PRÊT! À CUIRE FRESH BEEF ROSETTES**: $11.99\n- **LILY & JAX DOG FOOD**: $15.99\n- **MAPLE LEAF PRIME FRESH BONELESS CHICKEN BREASTS**: $10.99\n- **SIMPLY REFRIGERATED LIMONADE**: $4.99\n- **KINDER BUENO TREATS**: $4.99\n- **SAULAR CATS PRIDE CAT LITTER**: $14.99\n- **COMPLIMENTS VEGETABLES**: $2.19\n- **HEINEKEN BEER**: $23.49\n- **ESKA SPRING WATER OR DEMINERALIZED WATER**: $2.49\n- **IAMS CAT FOOD**: $15.99\n- **PEDIGREE DENTASTIX DOG TREATS**: $11.99\n- **WHISKAS PERFECT PORTIONS CAT FOOD**: $32.99\n- **COMPLIMENTS BUTTER**: $6.29\n- **COMPLIMENTS BROWN EGGS**: $4.99\n- **PRIMAL KITCHEN MAYONNAISE**: $11.49\n- **PRANA GRANOLOVE ORGANIC PROTEINED GRANOLA CEREAL**: $4.99\n- **CERES FRUIT JUICE**: $3.49""]","🍎 **Yes**, there are deals on apples at IGA! 🍎
+
+* **COMPLIMENTS CORTLAND, EMPIRE, McINTOSH OR SPARTAN APPLES**: $5.99
+
+This is the only deal on apples available at IGA.",0.75,0.9808947395662191

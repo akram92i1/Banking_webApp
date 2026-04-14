@@ -64,6 +64,16 @@ const setupInterceptors = () => {
 setupInterceptors();
 
 const aiService = {
+    async activateAgent(agentType = 'finance') {
+        try {
+            const response = await aiApi.post('/agent/activate', { agent: agentType });
+            return response.data;
+        } catch (error) {
+            console.warn(`Activate agent failed: ${error.message}`);
+            return { success: false };
+        }
+    },
+
     // ... (Identical structure to web, adapting API calls)
     async checkHealth() {
         try {

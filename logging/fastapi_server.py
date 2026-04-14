@@ -593,12 +593,23 @@ async def advice_chat_endpoint(request: ChatRequest, authorization: Optional[str
 
     print(f"\n[INFO] [FASTAPI] Incoming Advice Chat from {BLUE}{user_id}{RESET}: '{request.message}'")
     
-    if not app.state.grocery_rag_chain:
-        return {"response": "Grocery Advice System is currently unavailable.", "timestamp": datetime.now().isoformat()}
+    # Define a basic user context for the agent
+    user_context = UserContext(
+        user_id=user_id,
+        role=UserRole.USER,
+        location="montreal",  # Standard location for grocery checks
+        preferences={},
+        transaction_history=[],
+        token=token
+    )
 
-    rag_response = await asyncio.to_thread(query_grocery_rag, app.state.grocery_rag_chain, request.message)
-    response_text = rag_response.get("result", "I couldn't generate a response.")
-    
+    if internal_agent:
+        response_text = await internal_agent.chat_with_agent(request.message, user_context)
+    else:
+        # Fallback to direct RAG
+        rag_response = await asyncio.to_thread(query_grocery_rag, app.state.grocery_rag_chain, request.message)
+        response_text = rag_response.get("result", "I couldn't generate a response.")
+        
     return {"response": response_text, "timestamp": datetime.now().isoformat()}
 
 if __name__ == "__main__":
