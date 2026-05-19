@@ -33,7 +33,20 @@ Thumbs.db
 
 # Python
 /logging/venv/
-/logging/ai_agent_Env/
+ai_agent_env/
+logging/ai_agent_env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.faiss
+
+# Evaluation and Backups
+ragas_evaluation_results*.csv
+ragas_metrics_*.png
+*packages_backup.txt
+
 
 # Misc
 *.swp

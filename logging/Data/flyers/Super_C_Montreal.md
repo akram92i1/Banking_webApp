@@ -1,237 +1,281 @@
 Grocery Flyer Deals for Super C in Montreal
 ==================================================
 
-- **POIVRONS ROUGES, ORANGES OU JAUNES DE SERRE | PEPPERS**: $2.48
-- **CITRONS | LEMONS**: $0.49
-- **GRIGNOTINES OU SOUFFLÉS GERBER | GERBER SNACKS OR PUFFS**: $2.38
-- **TOMATES ROUGES DE SERRE OU HARICOTS VERTS | HOTHOUSE RED TOMATOES OR GREEN BEANS**: $2.99
-- **BAGELS TRANCHÉS SELECTION | SELECTION SLICED BAGELS**: $1.89
-- **TARTINADE ORIGINALE LACTANTIA | LACTANTIA ORIGINAL SPREAD**: $1.74
-- **BOULETTES DE PORC ET BOEUF IRRÉSISTIBLE | IRRÉSISTIBLE FROZEN PORK AND BEEF MEATBALLS**: $6.49
-- **MELON MIEL | HONEYDEW MELON**: $2.99
-- **GÂTEAU AU FROMAGE IRRÉSISTIBLE | IRRÉSISTIBLE CHESECAKE**: $8.49
-- **Assaisonnement pour sauce à spaghetti Selection | Selection seasoning**: $1.85
-- **TORTILLAS MEJICANO | MEJICANO TORTILLAS**: $2.48
-- **MINI BEIGNES SELECTION | SELECTION MINI DONUTS**: $2.49
-- **LITIÈRE AGGLOMÉRANTE FRE & LIGHT CAT'S PRIDE | CAT'S PRIDE FRESH & LIGHT CLUMPING CAT LITTER**: $6.99
-- **TRÈS GROSSE PAPAYE | JUMBO PAPAYA**: $1.49
-- **RAISINS ROUGES SANS PÉPINS | SEEDLESS RED**: $3.99
-- **COURGES | SQUASHES**: $1.99
-- **BURGERS DE BOEUF ASSAISONNÉS BÂTON ROUGE | BÂTON ROUGE FROZEN BEEF BURGERS**: $13.99
-- **SAUCISSES SELECTION | SELECTION SAUSAGES**: $10.0
-- **SAUCE BBQ BULL'S EYE | BBQ SAUCE**: $3.99
-- **NICOLAS LALOUX, BASK VIN ROUGE, BLANC OU ROSÉ | RED, WHITE OR ROSÉ WINE**: $11.99
-- **ENSEMBLE À TACOS TACO BELL | TACO BELL KIT OR CREAMY SAUCE**: $3.99
-- **PIZZA CROÛTE MINCE GUSTO ITALIANO IRRÉSISTIBLE | IRRÉSISTIBLE GUSTO ITALIANO THIN CRUST PIZZA**: $3.99
-- **GAUFRES SELECTION | SELECTION WAFFLES**: $11.49
-- **COQUILLE À TACO TACO BELL | TACO BELL SHELL**: $3.49
-- **FRIANDISES CHOCOLATÉES FERRERO ROCHER | FERRERO ROCHER CHOCOLATE TREATS**: $3.79
-- **BOUILLON EN CUBES KNORR | KNORR BOUILLON CUBES**: $2.99
-- **PAINS DE BEAUTÉ DOVE | DOVE BEAUTY BARS**: $4.99
-- **SALADE DE PÂTES KRAFT | KRAFT PASTA SALAD**: $2.69
-- **Poires cactus | Cactus pears**: $11.99
-- **LÉGUMINEUSES CEDAR | CEDAR LEGUMES**: $2.29
-- **LÉGUMES CEDAR | CEDAR VEGETABLES**: $3.79
-- **GAUFRETTES DESIREE HANS FREITAG | DESIREE HANS FREITAG NOODLES**: $4.79
-- **Épices Cedar | Cedar spices**: $1.79
-- **BOISSON RÉFRIGÉRÉE FRUITOPIA | FRUITOPIA REFRIGERATED DRINK**: $2.79
-- **THÉ GLACÉ PURE LEAF | PURE LEAF ICED TEA**: $5.99
-- **DATTES CASTLE FARMS | CASTLE FARMS DATES**: $7.99
-- **NOIX DE GRENOBLE MOITIÉS ET MORCEAUX IRRÉSISTIBLE | IRRÉSISTIBLE HALVES & PIECES WALNUTS**: $5.99
-- **ARACHIDES IRRÉSISTIBLE | IRRÉSISTIBLE PEANUTS**: $5.99
-- **Canneberges sèches Craisins Ocean Spray | Ocean Spray Craisins dried cranberries**: $7.99
-- **ANIS-FENOUIL OU RAPINI ANDY BOY | ANDY BOY ANISE (FENEL) OR ANDY BOY RAPINI**: $2.49
-- **GROS CANTALOUP | LARGE CANTALOUPE**: $1.93
-- **POITRINES DE POULET FRAIS | FRESH CHICKEN BREASTS**: $3.44
-- **Pommes Délicieuses rouges ou Granny Smith | Red delicious or granny smith apples**: $1.44
-- **PÂTÉS SURGELÉS SWANSON | SWANSON CHICKEN POT PIE**: $1.49
-- **CONCOMBRE ANGLAIS SANS PÉPINS | SEEDLESS ENGLISH CUCUMBER**: $1.49
-- **PITAHAYA (FRUIT DU DRAGON) | PITAHAYA (DRAGON FRUIT)**: $2.99
-- **TARTINADE PLAISIRS GASTRONOMIQUES | PLAISIRS GASTRONOMIQUES SPREAD**: $7.99
-- **BIÈRE LABATT, MOLSON, SLEEMAN | BEER**: $39.99
-- **TARTINADE AU CARAMEL GRENACHE | GRENACHE CARAMEL SPREAD**: $1.58
-- **Choux de bruxelles | Brussels sprouts**: $3.99
-- **PROSCIUTTO SAN DANIELE | SAN DANIELE PROSCIUTTO**: $5.99
-- **SAUCE À TREMPETTE TACO BELL | TACO BELL DIP SAUCE**: $4.99
-- **Mélange à gâteau Betty Crocker |Betty Crocker cake mix**: $3.49
-- **EAU GAZÉIFIÉE ALCOLISÉE COORS SELTZER | COORS SELTZER ALCOHOLIC CARBONATED WATER**: $22.99
-- **CROÛTONS GRISSOL | GRISSOL CROUTONS**: $2.49
-- **SANDWICHS ASSORTIS | ASSORTED SANDWICHES, ECONO PACK**: $11.99
-- **VINAIGRE DE RIZ MARUKAN | MARUKAN RICE VINEGAR**: $4.79
-- **BIÈRE HEINEKEN | BEER**: $37.99
-- **POMMES EMPIRE OU SPARTAN | APPLES**: $2.43
-- **PISTACHES IRRÉSISTIBLE | IRRÉSISTIBLE PISTACHIOS**: $5.99
-- **ARACHIDES DE VIRGINIE GRILLÉES IRRÉSISTIBLE | IRRÉSISTIBLE DRY ROASTED VIRGINIA PEANUTS**: $7.99
-- **GRENADE | POMEGRANATE**: $3.49
-- **ABRICOTS SÉCHÉS IRRÉSISTIBLE |IRRÉSISTIBLE DRIED APRICOTS**: $12.99
-- **TORTILLA TROIS VIANDES**: $6.99
-- **JAMBON SANDWICHS | SANDWICHS**: $3.99
-- **PÂTE DE TOMATES HUNT'S | HUNT'S TOMATO PASTE**: $1.29
-- **ÉPINARDS | SPINACH**: $1.49
-- **BISCUITS LOTUS BISCOFF | LOTUS BISCOFF COOKIES**: $3.49
-- **YOGOURT IÖGO | IÖGO YOGURT**: $6.47
-- **MOUTARDE PRÉPARÉE FRENCH'S | FRENCH'S PREPARED MUSTARD**: $1.99
-- **SOUS-MARIN GARNI DE VIANDES FROIDES | SUBMARINE FILLED WITH COLD CUTS**: $4.49
-- **SOUS-MARIN GARNI DE VIANDES FROIDES | SUBMARINE FILLED WITH COLD CUTS**: $5.99
-- **SAUCISSES FUMÉES LESTERS | LESTERS HOT DOG WIENERS**: $4.99
-- **BABEURRE QUÉBON | QUÉBON BUTTERMILK**: $3.49
-- **COULIS DE TOMATE AURORA | AURORA STRAINED TOMATOES**: $1.99
-- **MARINADE PATAK'S | PATAK'S MARINADE**: $4.99
-- **CROISSANT FARCI | STUFFED CROISSANT**: $6.99
-- **FRIANDISES CHOCOLATÉES NESTLÉ | NESTLÉ CHOCOLATES TREATS**: $0.99
-- **TORTILLAS SNACK2GO | SNACK2GO TORTILLAS**: $6.99
-- **LABNEH CEDAR | CEDAR LABNEH**: $6.99
-- **CÉRÉALES QUAKER | QUAKER CEREAL**: $2.74
-- **LAITUE ICEBERG JUMBO | ICEBERG LETTUCE**: $1.49
-- **CREVETTES BANG BANG IRRÉSISTIBLE | IRRESISTIBLE BANG BANG SHRIMP**: $6.49
-- **GALETTES RONDEAU SARA LEE | SARA LEE RONDEAU COOKIES**: $2.74
-- **BANANES | BANANAS**: $0.79
-- **CHAMPIGNONS BLANCS | WHITE MUSHROOMS**: $2.5
-- **PORC HACHÉ MAIGRE | LEAN GROUND PORK**: $3.99
-- **SAUMON SAUVAGE DU PACIFIQUE COUPES DU MARCHÉ HIGH LINER | HIGH LINER MARKET CUTS FROZEN WILD PACIFIC SALMON**: $6.99
-- **BOUCHÉES MUSAFIR | MUSAFIR BITES**: $12.99
-- **COLLATION RIZ SELECTION | SELECTION RICE CHIPS**: $1.49
-- **CROUSTILLE LAY'S | LAY'S CHIPS**: $1.99
-- **SAUMON ROSE CLOVER LEAF | CLOVER LEAF PINK SALMON**: $5.79
-- **LANIÈRES DE POITRINE DE POULET IRRÉSISTIBLE | IRRÉSISTIBLE CHICKEN BREAST STRIPS**: $3.49
-- **SAUCISSES ENROBÉES DE PÂTE POGO | POGO BREADED WIENERS**: $2.99
-- **AIL TRESSÉ | BRAIDED GARLIC**: $2.99
-- **SAUCE INDIENNE PATAK'S | PATAK'S INDIAN SAUCE**: $3.99
-- **CHAPELURE AURORA | AURORA BREAD CRUMBS**: $3.99
-- **PÂTES FARCIES IRRÉSISTIBLE | IRRÉSISTIBLE STUFFED PASTA**: $6.0
-- **LASAGNE IRRÉSISTIBLE | IRRÉSISTIBLE FROZEN LASAGNA**: $9.99
-- **ÉMINCÉ DE JAMBON SELECTION | SELECTION SHAVED HAM**: $5.49
-- **HUMMUS FONTAINE SANTÉ | FONTAINE SANTÉ HUMMUS**: $5.99
-- **BÂTONNETS DE FROMAGE AMOOZA! TWISTS | AMOOZA! TWISTS CHEESE STICKS**: $4.99
-- **SOUPE PRÊTE-À-SERVIR TIM HORTONS | TIM HORTONS READY TO SERVE SOUP**: $3.29
-- **CUBES DE CHÈVRE AVEC OS | FROZEN BONE-IN GOAT CUBES**: $19.99
-- **RIZ À GRAINS LONGS CEDAR | CEDAR LONG GRAIN RICE**: $13.99
-- **AUBERGINE, COURGETTE VERTE OU GRISE | EGGPLANT, ZUCCHINI SQUASH OR GREY ZUCCHINI**: $2.44
-- **SAMOSAS AUX LÉGUMES | VEGETABLE SAMOSAS**: $10.0
-- **GINGEMBRE FRAIS | DOMINICAINE FRESH GINGER, INDIAN EGGPLANT, BITTER OR KARELA MELON**: $1.99
-- **DATTES BORNA | BORNA DATES**: $2.99
-- **NOIX DE CAJOU RÔTIES ENTIÈRES IRRÉSISTIBLE | IRRÉSISTIBLE WHOLE ROASTED CASHEWS**: $19.99
-- **ORANGES NAVEL | ORANGES**: $2.43
-- **SOUPE PRÊTE-À-SERVIR ST-HUBERT | ST-HUBERT READY TO SERVE SOUP**: $1.49
-- **CÔTES DE DOS DE BOEUF FRAÎCHES | BEEF BACK RIBS**: $5.75
-- **légumes Arctic Gardens | Arctic Gardens frozen vegetables**: $2.49
-- **CHOU-FLEUR | CAULIFLOWER**: $2.49
-- **BOEUF HACHÉ MI-MAIGRE | MEDIUM GROUND BEEF**: $4.99
-- **CAPSULES DE CAFÉ TIMOTHY'S | TIMOTHY'S COFFEE CAPSULES**: $12.24
-- **SALADE DOLE | DOLE SALAD**: $2.24
-- **NOIX DE CAJOU PLANTERS | PLANTERS CASHEWS**: $3.99
-- **PÂTÉ À SANDWICH PARIS PÂTÉ | PARIS PÂTÉ SANDWICH SPREAD**: $1.19
-- **RAGOÛT CORDON BLEU | CORDON BLEU STEW**: $2.24
-- **BIÈRE LABATT BUDWEISER, MOLSON MILLER LITE | BEER**: $72.0
-- **FINES HERBES FRAÎCHES | FRESH FINE HERBS**: $0.99
-- **PÂTES ALIMENTAIRES CATELLI | CATELLI PASTA**: $1.74
-- **FRAMBOISES, MÛRES | RASPBERRIES, BLACKBERRIES**: $3.99
-- **POIRES BARTLETT OU POIRES BOSC | PEARS**: $1.44
-- **VINAIGRETTE LE GREC | LE GREC SALAD DRESSING**: $2.14
-- **DENTIFRICE CREST | CREST TOOTHPASTE**: $2.98
-- **COURONNE DE BROCOLI | BROCCOLI CROWN**: $1.99
-- **RUTABAGA | RUTABAGA**: $0.99
-- **PÊCHES, PRUNES NOIRES OU NECTARINES | PEACHES, BLACK PLUMS OR NECTARINES**: $5.99
-- **FRAISES | STRAWBERRIES**: $3.99
-- **FROMAGE TRANCHÉ SAPUTO | SAPUTO SLICED CHEESE**: $4.99
-- **DESSERT GLACÉ PARLOUR NESTLÉ | NESTLÉ PARLOUR FROZEN DESSERT**: $3.44
-- **FILETS DE POISSON PANÉS BLUE WATER | BLUE WATER FROZEN BREADED FISH FILLETS**: $11.99
-- **BOISSON SPORTIVE GATORADE ZERO | GATORADE ZERO SPORT DRINK**: $6.99
-- **FRIANDISES GLACÉES HÄAGEN-DAZS | HÄAGEN-DAZS FROZEN TREATS**: $4.94
-- **GRUAU INSTANTANÉ QUAKER | QUAKER INSTANT OATMEAL**: $3.49
-- **NECTAR DEL MONTE | DEL MONTE JUICE**: $1.99
-- **pain naan Santosh | Santosh naan bread**: $2.99
-- **SALADE CÉSAR AU POULET | CHICKEN CAESAR SALAD**: $9.99
-- **VINAIGRETTE STYLE MAYONNAISE NANDO'S | NANDO'S MAYONNAISE STYLE DRESSING**: $4.99
-- **AILES DE POULET LA CAGE | LA CAGE FROZEN CHICKEN WINGS**: $8.25
-- **CREVETTES SAUVAGES D'ARGENTINE MARINA DEL REY | MARINA DEL REY WILD CAUGHT ARGENTINIAN SHRIMP**: $6.49
-- **CHOU VERT | GREEN CABBAGE**: $0.59
-- **BIÈRE ARCHIBALD, BRASSEURS DE MONTRÉAL, SLEEMAN | BEER**: $44.0
-- **EAU DE SOURCE GAZÉIFIÉE MONTELLIER | MONTELLIER CARBONATED SPRING WATER**: $0.99
-- **JUS OASIS | OASIS JUICE**: $1.12
-- **PIZZA SUPREMA DR. OETKER | DR. OETKER SUPREMA PIZZA**: $6.99
-- **BARRES TENDRES CHOCO MAX LECLERC | LECLERC CHOCO MAX BARS**: $1.98
-- **Salade Summer Fresh | Summer Fresh salad**: $9.99
-- **CAFÉ MOULU MELITTA | MELITTA GROUND COFFEE**: $19.99
-- **BOLOGNE SELECTION | SELECTION BOLOGNA**: $3.24
-- **PITA ADONIS | ADONIS PITA**: $1.49
-- **CLÉMENTINES | CLEMENTINES**: $4.99
-- **COLLATION AUX FRUITS BETTY CROCKER | BETTY CROCKER FRUIT SNACK**: $2.97
-- **CAROTTES NANTAISES DOUCES | SWEET NANTES CARROTS**: $2.99
-- **TARTINADE OCEANIA | OCEANIA SPREAD**: $3.99
-- **FILET DE SOLE ATLANTIQUE | ATLANTIC SOLE FILLET**: $9.99
-- **FROMAGE BOURSIN | BOURSIN CHEESE**: $5.99
-- **BIÈRE STELLA ARTOIS, MODELO | BEER**: $36.99
-- **COUCHES POUR BÉBÉS HUGGIES | HUGGIES BABY DIAPERS**: $24.99
-- **RINCE BOUCHE SCOPE | SCOPE MOUTHWASH**: $4.99
-- **OIGNONS ROUGES | RED ONIONS**: $6.99
-- **MENTHE | MINT**: $0.99
-- **RIZ BASMATI PREMIUM KUBBA | KUBBA PREMIUM BASMATI RICE**: $10.99
-- **LÉGUMINEUSES CEDAR | CEDAR LEGUMES**: $2.99
-- **FROMAGE PANEER TRE STELLE | TRE STELLE PANEER CHEESE**: $5.49
-- **BISCUITS CHRISTIE | CHRISTIE CRACKERS**: $2.99
-- **SANGRIA D'ICI CIDRERIE LACROIX | SANGRIA**: $22.99
-- **ÉPICES LA GRILLE CLUB HOUSE | CLUB HOUSE LA GRILLE SPICES**: $4.99
-- **GAUFRETTES VOORTMAN | VOORTMAN WAFERS**: $2.79
-- **BISCUITS MAXI FRUITS DARE | DARE MAXI FRUITS COOKIES**: $2.99
-- **COLLATION AUX POMMES GOGO SQUEEZ | GOGO SQUEEZ FRUIT SNACK**: $3.49
-- **CRÈME CONCENTRÉE NUTIMILK | NUTIMILK CONCENTRATED CREAM**: $1.99
-- **YOGOURT KREMA OLYMPIC | OLYMPIC KREMA YOGURT**: $4.99
-- **CAFÉ GLACÉ STARBUCKS | STARBUCKS ICED COFFEE**: $6.99
-- **ASSOUPLISSEUR LIQUIDE DOWNY, GAIN | DOWNY LIQUID FABRIC SOFTENER**: $5.99
-- **AYLMER TOMATOES | AYLMER TOMATOES**: $1.49
-- **FROMAGE RÂPÉ SAPUTO | SAPUTO SHREDDED CHEESE**: $10.49
-- **NETTOYANT TOUT USAGE HERTEL | HERTEL ALL PURPOSE CLEANER**: $1.89
-- **MAYONNAISE À SAVEUR HEINZ | HEINZ MAYONNAISE**: $3.49
-- **AROMATISANT D'EAU MIO | MIO WATER ENHANCER**: $6.99
-- **FILETS DE PORC | FROZEN PORK FILLETS**: $2.65
-- **RÔTI DE SURLONGE DE PORC FRAIS |FRESH BONELESS PORK SIRLOIN ROAST**: $2.99
-- **AVOCATS | AVOCADOS**: $4.99
-- **KIT À SALADE DOLE | DOLE SALAD KIT**: $5.99
-- **TOMATES CERISES DE SERRE OU MÉLANGÉES | SMALL TOMATOES**: $6.99
-- **POITRINES DE POULET FRAIS EXCELDOR | EXCELDOR FRESH CHICKEN BREASTS**: $8.99
-- **Thé glacé Pure Leaf | Leaf iced tea**: $4.49
-- **BIÈRE MILLER HIGH LIFE | BEER**: $34.99
-- **BOISSON GAZEUSE PEPSI, 7 UP | SOFT DRINK**: $7.49
-- **CANNEBERGES SÉCHÉES IRRÉSISTIBLE | IRRÉSISTIBLE DRIED CRANBERRIES**: $4.99
-- **DATTES PARNOOSH | PARNOOSH DATES**: $5.99
-- **DATTES DÉNOYAUTÉES CEDAR | CEDAR PITTED DATES**: $3.99
-- **DATTES ENTIÈRES DÉNOYAUTÉES COMPASS | DATES MEDJOOL PACIFIC**: $9.99
-- **OIGNONS VERTS | GREEN ONIONS**: $0.99
-- **VERMICELLE DE RIZ HAIKU | HAIKU RICE VERMICELLI**: $2.25
-- **PETITS PAINS KAISER | KAISER ROLLS**: $1.99
-- **FROMAGE SELECTION | SELECTION CHEESE**: $4.88
-- **BOISSON GAZEUSE PEPSI, COKE | SOFT DRINK**: $3.75
-- **HUILE D'OLIVE BERTOLLI | BERTOLLI OLIVE OIL**: $8.99
-- **MÉLANGE À SAUCE ST‑HUBERT | ST-HUBERT SAUCE MIX**: $0.99
-- **BOISSON FRUITÉ | FRUITÉ DRINK**: $1.37
-- **MINI-PIMENTS DOUX | MINI SWEET PEPPERS**: $4.99
-- **SOUPE CAMPBELL'S | CAMPBELL'S SOUP**: $1.99
-- **RONDELLES DE PIMENTS MARINÉS AURORA | AURORA PICKLED PEPPER RINGS**: $3.69
-- **SÉBASTE FERMA | FERMA FROZEN RED FISH**: $7.99
-- **POULET HACHÉE EXTRA MAIGRE RACHEL'S | RACHEL'S EXTRA LEAN GROUND CHICKEN**: $3.99
-- **CRÈME SURE SELECTION | SELECTION SOUR CREAM**: $1.14
-- **BIÈRE CORONA EXTRA, BLUE MOON | BEER**: $77.0
-- **BOÎTE À LUNCH | LUNCH BOX**: $5.99
-- **BISCUIT SELECTION | SELECTION COOKIES**: $1.24
-- **MERLAN TRANCHÉ FERMA | FERMA FROZEN SLICED HITING**: $6.99
-- **BEURRE CLARIFIÉ VERKA | VERKA CLARIFIED BUTTER**: $8.99
-- **EAU SOURCE GAZÉIFIÉE MAISON PERRIER | MAISON PERRIER CARBONATED SPRING WATER**: $6.99
-- **FRIANDISES CHOCOLATÉES NESTLÉ | NESTLÉ CHOCOLATE TREATS**: $3.99
-- **Canapés Melba ronds Grissol | Grissol Melba rounds canapés**: $3.29
-- **SMOKED MEAT MONTRÉALAIS LESTERS | LESTERS MONTRÉAL SMOKED MEAT**: $13.99
-- **Légumineuses Mieux‑être biologique | Life Smart Organic legumes**: $0.99
-- **LAIT DE NOIX DE COCO CEDAR | CEDAR COCONUT MILK**: $1.64
-- **COCKTAIL DE CANNEBERGE SIMPLY | SIMPLY CRANBERRY COCKTAIL**: $5.49
-- **COUSCOUS TIPIAK | TIPIAK COUSCOUS**: $6.99
-- **PAIN PITA ADONIS | ADONIS PITA BREAD**: $3.0
-- **CUBES DE BOEUF BOURGUIGNON | BOURGUIGNON BEEF CUBES**: $9.99
-- **SOUVLAKIS DE PORC MARC ANGELO | MARC ANGELO PORK KABOBS**: $12.99
-- **DÉTERGENT À LESSIVE TIDE | TIDE LAUNDRY DETERGENT**: $20.99
-- **SAVON À VAISSELLE DAWN | DAWN DISHWASHING LIQUID**: $9.99
-- **PAINS DE BEAUTÉ IVORY | IVORY BEAUTY BARS**: $4.99
-- **CRAQUELINS CHRISTIE | CHRISTIE CRACKERS**: $2.99
-- **DATTES DEGLET NOUR DAÏA | DAÏA DEGLET NOUR DATES**: $2.49
-- **Dattes fraîches Cedar | Cedar fresh dates**: $4.99
-- **ABRICOTS SECS DENOYAUTÉS OU FIGUES IZMIR GARLAND CEDAR | PITTED DRIED APRICOTS OR CEDAR GARLAND IZMIR FIGS**: $3.49
-- **MANGUE ROUGE OU ATAULFO | MANGOES**: $1.49
+- **prunes noires | black plums**: $4.99
+- **réglisse Twizzlers**: $2.99
+- **croustilles Irrésistible | Irrésistible chips**: $1.49
+- **beurre d'arachide Selection | Selection peanut butter**: $4.49
+- **micro croissants La petite Bretonne | La petite Bretonne micro croissants**: $3.99
+- **sous-marin garni de viandes froides | submarine filled with cold cuts**: $4.49
+- **gâteau | cake**: $6.0
+- **papier hygiénique Selection | Selection bathroom tissue**: $18.99
+- **nettoyant pour cuvette antibactérien Selection | rondelles de nettoyant**: $1.99
+- **cuisses de poulet frais | back, econo pack**: $1.95
+- **cerises | cherries**: $3.77
+- **bifteck ou rôti de filet mignon de boeuf | beef tenderloin steak or roast**: $15.99
+- **champignons blancs | white mushrooms**: $1.44
+- **bière Heineken | beer**: $33.02
+- **pâté Plaisirs Gastronomiques | Plaisirs Gastronomiques pie**: $6.99
+- **boisson gazeuse Pepsi, Coke | soft drink**: $12.99
+- **pizza Irrésistible | Irrésistible pizza**: $2.97
+- **capsules de café Van Houtte | Van Houtte coffee capsules**: $19.88
+- **croustilles tortilla Tostitos | Tostitos tortilla chips**: $9.0
+- **saucisses fumées Lesters**: $3.99
+- **millefeuille à la costarde | frozen custard millefeuille**: $3.99
+- **eau de source Selection | Selection spring water**: $2.99
+- **nouilles instantanées Mr. Noodles |Mr. Noodles instant noodles |**: $0.99
+- **barres tendres Leclerc | Leclerc chewy bars**: $2.33
+- **barres tendres Go Pure Leclerc | Leclerc Go Pure cereal bars**: $2.49
+- **capsules de café Tassimo | Tassimo coffee capsules**: $6.97
+- **boisson de malt Beach Day Every Day, SVNS Hard | Beach Day Every Day malt drink**: $22.99
+- **friandises chocolatées Nestlé | Nestlé chocolate treats**: $3.99
+- **café instantané Nescafé | Nescafé instant coffee**: $6.49
+- **yogourt Krema Olympic | Olympic Krema yogurt**: $4.99
+- **bière Michelob Ultra | beer**: $35.99
+- **yogourt Iögo Nanö | Iögo Nanö yogurt**: $2.99
+- **bière Archibald | beer**: $21.99
+- **bière Corona, Modelo, Stella Artois | beer**: $36.99
+- **vinaigrette Kraft | Kraft salad dressing**: $2.99
+- **sauce chinoise VH | VH chinese sauce**: $2.99
+- **bananes | bananas**: $0.79
+- **saucisses porc-boeuf Lafleur La Fernandière | Lafleur pork-beef sausages**: $8.99
+- **enduit antiadhésif pour cuisson Pam | Pam cooking spray**: $4.99
+- **boisson sportive Gatorade | Gatorade sport drink**: $6.49
+- **émincé de jambon ou de poitrine de dinde Olymel | Olymel shaved ham or turkey breast**: $5.49
+- **pâté de foie ou de campagne La Belle Bretagne | La Belle Bretagne liver or countrystyle pâté**: $2.49
+- **mangue miel (Ataulfo) | honey (Ataulfo) mango**: $0.98
+- **fraises | strawberries**: $3.99
+- **pizza pochettes McCain | McCain frozen pizza pockets**: $14.0
+- **gros cantaloup | large cantaloupe**: $3.99
+- **patates douces | sweet potatoes**: $1.49
+- **oignons jaunes | yellow onions**: $2.49
+- **lait aromatisé Québon | Québon flavoured milk, Oîkos drinkable greek yogurt**: $1.49
+- **sangria Olé! Sangrita | Olé! Sangrita sangria**: $7.99
+- **vin mousseux Bulles de Nuit | Bulles de Nuit sparkling wine**: $7.99
+- **cocktail sans alcool Atypique | Atypique non-alcoholic cocktail**: $7.99
+- **Mr. Freeze bâtons glacés | Mr. Freeze popsicles**: $9.99
+- **soupe prête-à-servir Habitant | Habitant ready to serve soup**: $2.99
+- **Vin rouge, blanc ou rosé**: $11.99
+- **boisson sportive Gatorade | Gatorade sport drink**: $6.49
+- **vol-au-vent Selection | Selection pastry shells**: $3.69
+- **nourriture pour chats Purina Tidy Cat | Purina cat food**: $11.99
+- **Lysol tout usage | Lysol cleaner**: $2.99
+- **fruits Selection, Mieux‑être | Selection, Life Smart fruits**: $2.99
+- **guimauves Selection | Selection marshmallows**: $4.99
+- **cocktail de canneberge Irrésistible | Irrésistible cranberry cocktail**: $3.49
+- **sous-marin garni de viandes froides | submarine filled with cold cuts**: $5.99
+- **hors-d'oeuvre Irrésistible**: $7.99
+- **sandwichs | sandwiches**: $3.99
+- **hors-d'oeuvre Irrésistible | Irrésistible hors d'oeuvre**: $7.49
+- **mélange de noix Irrésistible | Irrésistible fruit-nut mix**: $8.99
+- **pain aux oeufs Challah Cantor | Cantor Challah egg bread**: $3.99
+- **sauce Goya | Goya sauce**: $1.39
+- **jus de citron concentré Cedar | Cedar lemon juice**: $1.49
+- **huile d'olive Bertolli | Bertolli olive oil**: $13.99
+- **olives farcies Unico | Unico stuffed olives**: $5.99
+- **noix de Grenoble moitiés et morceaux Irrésistible | Irrésistible halves and pieces walnuts**: $7.99
+- **graines de tournesol rôties salées Irrésistible | Irrésistible salted roasted sunflower seeds**: $3.99
+- **amandes naturelles Irrésistible**: $7.99
+- **moitiés de pacanes naturelles Irrésistible | Irrésistible natural pecan halves**: $19.99
+- **dessert glacé Nestlé | Nestlé The Real Cream ice cream**: $4.94
+- **filet de truite steelhead frais | fresh steelhead trout fillet**: $9.88
+- **biscuits Tradition Leclerc | Leclerc Tradition, Vital cookies**: $2.49
+- **boisson gazeuse Selection | Selection soft drink**: $1.49
+- **Sangria d'Ici | non-sparkling sangria**: $22.99
+- **litière Selection | Selection litter**: $9.99
+- **poulet général Tao Irrésistible | Irrésistible general Tao chicken**: $6.99
+- **plant de tomates en cage | tomato plant in cage**: $17.99
+- **préparation de fromage fondu Selection | Selection process cheese food**: $2.97
+- **produit laitier sans lactose Lactantia | Lactantia lactose free dairy product**: $5.49
+- **jus Oasis | Oasis juice**: $1.22
+- **fromage en tranches P'tit Québec, Cracker Barrel | P'tit Québec, Cracker Barrel sliced cheese**: $4.79
+- **légumineuses sèches Cedar | Cedar dry legumes**: $13.99
+- **chocolats Irrésistible | Irrésistible chocolates**: $7.99
+- **vinaigre de vin Maille | Maille wine vinegar**: $7.49
+- **dentifrice Crest | Crest toothpaste**: $3.49
+- **maïs à éclater Orville | Orville popping corn**: $3.99
+- **sauce Selection**: $1.29
+- **couronne de crevettes blanches du Pacifique Irrésistible | Irrésistible frozen Pacific white shrimp ring**: $10.0
+- **feta de vache et de chèvre Irrésistible | Irrésistible cow and goat feta**: $4.99
+- **nourriture pour chiens Nature's Recipe | Nature's Recipe dog food**: $14.99
+- **poké bol au saumon fumé | smoked salmon poké bowl**: $9.99
+- **cuisses de poulet frais | fresh chicken legs with back, econo pack**: $2.45
+- **biscuits Praeventia Leclerc | Leclerc Praeventia, Vital cookies**: $3.49
+- **purificateur d'air aux huiles essentielles Air Wick | Air Wick essential oils air freshener**: $9.99
+- **raisins rouges ou verts extra larges sans pépins | red or green seedless grapes**: $3.99
+- **bâtonnets de fromage Ficello | Ficello cheese sticks**: $5.97
+- **détergent pour la lessive Gain | Gain laundry detergent**: $5.99
+- **pastilles pour lave-vaisselle Cascade | Cascade dishwasher tabs**: $20.99
+- **rehausseur de parfum Downy | Downy scent booster**: $11.99
+- **couronne de crevettes blanches du Pacifique Irrésistible | Irrésistible frozen Pacific white shrimp ring**: $22.0
+- **amandes Irrésistible | Irrésistible almonds**: $9.99
+- **fromage burrata Bella Casara | Bella Casara burrata cheese**: $9.99
+- **mayonnaise Heinz | Heinz mayonnaise**: $2.99
+- **sucre blanc granulé Redpath | Redpath granulated white sugar**: $2.47
+- **tartinade originale Lactantia | Lactantia original spread**: $4.99
+- **craquelins Christie | Christie crackers**: $1.99
+- **bière Labatt, Molson, Sleeman | beer**: $73.0
+- **eau de source gazéifiée Maison Perrier | Maison Perrier carbonated spring water**: $6.99
+- **sauce pour pâtes Classico | Classico pasta sauce**: $2.97
+- **bière Archibald, Blue Moon**: $77.0
+- **chocolat Toblerone | Toblerone chocolate**: $8.88
+- **friandises glacées Iögo | Iögo frozen treats**: $4.94
+- **fromage râpé P'tit Québec | P'tit Québec shredded cheese**: $11.99
+- **avocats | avocados**: $4.99
+- **sauce tomate Hunt's | Hunt's tomato sauce**: $1.99
+- **carrots | carrots**: $2.99
+- **tomates mélangées | medley of tomatoes**: $6.99
+- **biscuits Lotus Biscoff | Lotus Biscoff cookies**: $3.19
+- **pistaches Irrésistible | Irrésistible pistachios**: $6.99
+- **boisson Fruité**: $1.77
+- **tartinade Double Fruit | Double Fruit spread**: $5.89
+- **riz Ben's original | Ben's original rice**: $7.98
+- **sauce Fitcook Foodz | Fitcook Foodz sauce**: $9.99
+- **céréales Quaker | Quaker cereal**: $3.99
+- **assainisseur d'air pour salle de bain Febreze | Febreze air freshener**: $3.49
+- **soin pour cheveux Garnier shampoing | Garnier Fructis hair care**: $3.99
+- **tortilla Selection | Selection tortilla**: $4.99
+- **gâteau au fromage Selection | Selection cheesecake**: $6.0
+- **détergent pour la lessive Tide | Tide laundry detergent**: $20.99
+- **nettoyant à vitres Bon Ami | Bon Ami glass cleaner**: $4.99
+- **pâte nettoyante The Pink Stuff Star Drops**: $6.99
+- **fromage Selection | Selection cheese**: $5.77
+- **couronne de crevettes blanches du Pacifique Irrésistible | Irrésistible frozen Pacific white shrimp ring**: $12.0
+- **sauce chili sucrée MaePloy | MaePloy sweet chili sauce**: $3.49
+- **bavette de porc Olymel | Olymel chimichurri pork flank steak**: $5.99
+- **biscuits Célébration Leclerc | Leclerc Célébration cookies**: $2.99
+- **brochettes de boeuf, de poulet ou de porc | beef, chicken, or pork brochettes**: $9.99
+- **boulettes de viande Stefano | Stefano meatballs**: $8.99
+- **beurre d'arachide Selection**: $4.49
+- **pains à hot-dog ou à hamburger Pom | Pom hamburger or hot dog buns**: $2.88
+- **noix de cajou entières rôties Irrésistible | Irrésistible whole roasted cashews**: $9.99
+- **hors-d'oeuvre Irrésistible | Irrésistible hors d'oeuvre**: $10.99
+- **salade césar au poulet | chicken caesar salad**: $9.99
+- **saucisses Roma | Roma sausages**: $5.99
+- **ailes de poulet La Cage | La Cage frozen chicken wings**: $12.99
+- **nettoyant tout usage Hertel | Hertel all purpose cleaner**: $1.99
+- **agent de rinçage Finish Jet Dry | Finish dishwasher rince aid**: $9.99
+- **panier fleuri | blooming basket**: $13.5
+- **compost de crevettes ou fumier de mouton composté | shrimp compost or composted sheep manure**: $3.69
+- **maquereau Grace | Grace mackerel**: $1.29
+- **laitue duo Gen V | Gen V lettuce duo**: $2.99
+- **sacs à ordures Glad | Glad garbage bags**: $6.99
+- **sacs à ordures Glad | Glad garbage bags**: $10.49
+- **bouillon en cubes Halal Knorr | Knorr Halal broth cubes**: $1.59
+- **fromage Oka Agropur | Agropur Oka cheese**: $7.77
+- **gâteries pour chats Whiskas Temptations | Whiskas Temptations cat treats**: $6.99
+- **bouquet 10 roses | 10 roses bouquet**: $24.99
+- **bouquet 3 roses | 3 roses bouquet**: $13.99
+- **bouquet aqua | aqua bouquet**: $29.99
+- **biscuits Papadopoulos | Papadopoulos petit beurre biscuits**: $1.79
+- **boisson énergisante Red Bull | Red Bull energy drink**: $8.99
+- **porc effiloché Plaisirs  Gastronomiques | Plaisirs Gastronomiques pulled pork**: $7.99
+- **fleurmidable fleurmidable | fleurmidable bouquet**: $16.99
+- **anthurium | anthurium**: $9.99
+- **orchidée assortie | assorted orchid**: $19.99
+- **rosier | rosebush**: $14.99
+- **jardin grande théière | garden**: $26.99
+- **bol de bégonia | begonia**: $19.99
+- **pommes délicieuses rouges ou granny smith | red delicious or granny smith apples**: $2.69
+- **friandises glacées Häagen-Dazs | Häagen‑Dazs frozen treats**: $4.94
+- **pommes de terre Russet ou rouges à chair jaune | Russet or yellow fleshed potatoes**: $3.99
+- **bière non alcoolisée au gingembre The Great Gentleman | The Great Gentleman non alcoholic ginger beer**: $8.99
+- **côtelettes d'agneau frais | fresh lamb loin chops**: $9.77
+- **crevettes blanches du Pacifique Irrésistible | Irrésisible Pacific white shrimp**: $18.99
+- **fromage Mozzarellissima Saputo | Saputo Mozzarellissima cheese**: $5.77
+- **dîner Healthy Choice | Healthy Choice dinner**: $3.99
+- **cornichons Selection | Selection pickles**: $3.29
+- **mélange à gâteau Betty Crocker | Betty Crocker cake mix**: $1.99
+- **nettoyant à évier Vim | Vim sink cleaner**: $2.99
+- **poivrons rouges, orange ou jaunes de serre | hothouse red, orange or yellow**: $3.99
+- **légumes Selection Irrésistible | Selection vegetables**: $2.49
+- **pâte de tomates Selection | Selection tomato paste**: $1.25
+- **vinaigre blanc Selection | Selection white vinegar**: $2.39
+- **pastilles pour lave-vaisselle biodégradables Selection | Selection dishwasher tablets**: $4.99
+- **poitrine de poulet frais dijonnaise | chicken breasts**: $7.99
+- **boisson Irrésistible | Irrésistible drink**: $2.99
+- **beignes glacés Selection | Selection glazed donuts**: $2.99
+- **filets de poisson Poêlée Selecte High Liner | High Liner pan‑sear selects fish fillets**: $13.99
+- **tortillas Snack2go**: $6.99
+- **demi-couronne de crevettes blanches du Pacifique Irrésistible | Irrésistible frozen Pacific white shrimp half ring**: $18.0
+- **portions de poisson panées Blue Water | Blue Water breaded fish portions**: $8.99
+- **charcuterie et fromage supplémentaire**: $18.0
+- **ciabatta au boeuf | beef ciabatta**: $6.99
+- **porc haché extra maigre | extra lean ground pork**: $3.99
+- **hors-d'oeuvre Irrésistible**: $7.99
+- **côtelettes de porc frais | fresh pork chops, econo pack**: $5.99
+- **poudre pour gelée Jell‑O | Jell-O jelly powder**: $1.25
+- **épices Club House | Club House spices**: $4.99
+- **céréales Kellogg's | Kellogg's cereal**: $5.47
+- **nettoyant multi-surface Mr. Net Platinum | Mr.Clean Platinum all purpose cleaner, Scrubbing Bubbles bathroom cleaners**: $3.99
+- **poulet haché extra maigre Mieux‑être | Life Smart extra lean ground chicken**: $6.99
+- **piments marinés Unico**: $3.49
+- **viennoiseries Selection | Selection pastries**: $5.99
+- **violette africaine | african violet**: $14.99
+- **hummus Irrésistible | Irrésistible hummus**: $3.99
+- **prosciutto San Daniele | San Daniele prosciutto**: $5.99
+- **salade Fontaine Santé | Fontaine Santé salad, hummus**: $5.99
+- **poitrines de poulet frais désossées | fresh boneless chicken breasts**: $6.99
+- **biftecks français | french style steaks, econo pack**: $10.99
+- **moules bleues Canadian Cove | Canadian Cove blue mussels**: $5.99
+- **clémentines | clementines**: $2.99
+- **bacon tranché Lafleur | Lafleur sliced bacon**: $8.99
+- **concombre anglais sans pépins**: $0.99
+- **ananas Tropical Gold | Tropical Gold pineapple**: $2.44
+- **biscuits Christie | Christie cookies**: $2.22
+- **veau haché maigre | dual pack lean ground veal**: $11.98
+- **thon pâle Clover Leaf | Clover Leaf skipjack light tuna**: $1.25
+- **crème Ultra'crème Québon | Québon Ultra'cream cream**: $3.99
+- **tartinade Kraft | Kraft spread**: $6.99
+- **ensemble à taco Taco Bell | Taco Bell taco kit**: $3.99
+- **fromage à la crème Philadelphia | Philadelphia cream cheese**: $4.97
+- **jambon fumé P'tit Caprice Lafleur | Lafleur P'tit Caprice smoked ham**: $9.99
+- **dîner Kraft | Kraft Dinner**: $1.25
+- **punch aux arachides Grace | Grace peanut punch**: $1.29
+- **sel de mer Aurora | Aurora sea salt**: $1.49
+- **huile de coco Grace | Grace coconut oil**: $10.49
+- **marinade à la jerk Grace | Grace jerk marinade**: $4.99
+- **rôti de surlonge de porc frais | fresh boneless pork sirloin**: $3.99
+- **riz Cedar | Cedar rice**: $8.99
+- **cubes de chèvre avec os | bone in goat cubes**: $23.99
+- **nouilles instantanées Lucky Koi | Lucky Koi instant noodles**: $0.99
+- **sangria Olé! Sangrita | Olé! Sangrita sangria**: $22.99
+- **veau haché maigre | dual pack lean ground veal**: $11.98
+- **cocktail de légumes V8 | V8 vegetable cocktail**: $3.29
+- **tomates rouges de serre | hothouse red tomatoes**: $2.99
+- **hors-d'oeuvre Irrésistible | Irrésistible hors d'oeuvre**: $6.99
+- **chocolats européens Merci | Merci European chocolates**: $6.49
+- **petits pains kaiser | kaiser rolls**: $2.99
+- **eau gazéifiée Selection | Selection carbonated water**: $5.79
+- **carrés au riz Selection | Selection rice squares**: $2.49
+- **balconnière avec dracéna | window box with draecena**: $29.99
+- **panier fleuri 10 po**: $13.5
+- **palmier majesty XXL | majesty palm**: $22.99
+- **terre à jardin Selection | gardening soil**: $2.0
+- **friandises chocolatées Nestlé | Nestlé chocolate treats**: $6.79
+- **boisson de malt Beach Day Every Day | Beach Day Every Day malt drink**: $39.99
+- **hibiscus buisson | hibiscus bush**: $26.99
+- **sandwichs assortis | assorted sandwiches**: $11.99
+- **plant de légumes assortis | assorted vegetable**: $2.99
+- **canna ou dahlia géant | canna or giant dahlia**: $19.99
+- **poires Bartlett ou Bosc | Bartlett or bosc**: $1.99
+- **arachides Irrésistible | Irrésistible peanuts**: $6.99
+- **boisson au vin Keep Calm & live | Keep Calm & live wine beverage**: $9.99
+- **maïs sucré | sweet corn**: $3.99
+- **pistaches Irrésistible | Irrésistible pistachios**: $6.99
+- **fougère suspendue | hanging fern**: $19.99
+- **pain mince Lavash gugo | gugo Lavash flatbread**: $2.49
+- **légumes Cedar | Cedar frozen vegetables**: $1.99
+- **plant de bleuets ou framboises | blueberries, raspberries**: $18.99
+- **sangria Nicolas Laloux | Nicolas Laloux wine**: $7.99
+- **mélange chocolat fruits et noix ou mélange de noix Irrésistible | Irrésistible mixed nuts**: $14.99
+- **boisson au vin Nicolas Laloux | Nicolas Laloux wine drink**: $9.49
+- **bar commun Ocean Jewel | Ocean Jewel sea bass**: $13.99
+- **patio fleuri prestige | prestige flowered patio**: $39.99
+- **géranium | geranium**: $3.99
+- **mûres | blackberries**: $2.99
+- **pompano doré Craig Seafood | Craig Seafood frozen golden pompano**: $9.99
+- **calmars croustillants Irrésistible | Irrésistible crispy calamari**: $8.99
+- **détergent à vaisselle Dawn | Dawn dish soap**: $2.49
+- **patio fleuri coléus | coleus**: $19.99
+- **paillis de cèdre rouge ou noir | red or black cedar**: $5.99

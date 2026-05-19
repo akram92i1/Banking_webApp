@@ -19,7 +19,7 @@ except ImportError:
     from langchain_community.embeddings import OllamaEmbeddings
 
 # Import custom OpenRouter RAG functions
-from RAG_system_Grocery_Openrouter import setup_grocery_rag_system, query_grocery_rag
+from RAG_system_Grocery_Openrouter_MMR import setup_grocery_rag_system, query_grocery_rag
 
 # Replace with the actual key from the file or environment
 OPENROUTER_API_KEY = "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"
@@ -120,8 +120,8 @@ def main():
         
         # Export to CSV for further review
         df = eval_result.to_pandas()
-        df.to_csv("ragas_evaluation_results.csv", index=False)
-        print("\nDetailed results saved to 'ragas_evaluation_results.csv'")
+        df.to_csv("ragas_evaluation_results_mmr.csv", index=False)
+        print("\nDetailed results saved to 'ragas_evaluation_results_mmr.csv'")
         
     except Exception as e:
         print(f"\nError during ragas evaluation: {e}")

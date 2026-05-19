@@ -4,44 +4,61 @@ import seaborn as sns
 import os
 
 def plot_results():
-    csv_file = "ragas_evaluation_results.csv"
-    if not os.path.exists(csv_file):
-        print(f"Error: {csv_file} not found.")
+    original_csv = "ragas_evaluation_results.csv"
+    mmr_csv = "ragas_evaluation_results_mmr.csv"
+    
+    dfs = []
+    
+    if os.path.exists(original_csv):
+        df_orig = pd.read_csv(original_csv)
+        df_orig['System'] = 'Original'
+        dfs.append(df_orig)
+        
+    if os.path.exists(mmr_csv):
+        df_mmr = pd.read_csv(mmr_csv)
+        df_mmr['System'] = 'MMR Optimized'
+        dfs.append(df_mmr)
+        
+    if not dfs:
+        print(f"Error: Neither {original_csv} nor {mmr_csv} were found.")
         return
         
-    df = pd.read_csv(csv_file)
-    
-    # We will plot the average scores across all questions
+    df_all = pd.concat(dfs, ignore_index=True)
     metrics = ["faithfulness", "answer_relevancy"]
-    
-    # Drop rows where metrics might be NaN (if evaluation failed for a row)
-    df_clean = df.dropna(subset=metrics)
+    df_clean = df_all.dropna(subset=metrics)
     
     if df_clean.empty:
         print("No valid metric scores found to plot.")
         return
         
-    averages = df_clean[metrics].mean().reset_index()
-    averages.columns = ["Metric", "Average Score"]
+    # Melt the dataframe for seaborn grouped bar plot
+    df_melt = df_clean.melt(id_vars=['System'], value_vars=metrics, var_name='Metric', value_name='Score')
+    
+    # Calculate averages
+    averages = df_melt.groupby(['System', 'Metric'])['Score'].mean().reset_index()
     
     sns.set_theme(style="whitegrid")
-    plt.figure(figsize=(8, 6))
+    plt.figure(figsize=(10, 6))
     
-    ax = sns.barplot(x="Metric", y="Average Score", data=averages, palette="viridis", hue="Metric", legend=False)
+    ax = sns.barplot(x="Metric", y="Score", hue="System", data=averages, palette="viridis")
     plt.ylim(0, 1.1)
-    plt.title("Ragas Evaluation Metrics: Average Scores", fontsize=14, pad=15)
-    plt.ylabel("Score", fontsize=12)
+    plt.title("Ragas Evaluation Metrics: Original vs MMR Optimized", fontsize=14, pad=15)
+    plt.ylabel("Average Score", fontsize=12)
     plt.xlabel("Metric", fontsize=12)
     
     # Add data labels
-    for index, row in averages.iterrows():
-        ax.text(index, row["Average Score"] + 0.02, round(row["Average Score"], 3), 
-                color='black', ha="center", fontweight='bold')
+    for p in ax.patches:
+        ax.annotate(format(p.get_height(), '.3f'), 
+                   (p.get_x() + p.get_width() / 2., p.get_height()), 
+                   ha = 'center', va = 'center', 
+                   xytext = (0, 9), 
+                   textcoords = 'offset points',
+                   fontweight='bold')
         
-    output_file = "ragas_metrics_plot.png"
+    output_file = "ragas_metrics_comparison_plot.png"
     plt.tight_layout()
     plt.savefig(output_file, dpi=300)
-    print(f"Plot successfully saved to: {output_file}")
+    print(f"Comparison plot successfully saved to: {output_file}")
 
 if __name__ == "__main__":
     plot_results()
