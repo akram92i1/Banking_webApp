@@ -26,9 +26,7 @@ except ImportError:
 from langchain_core.prompts import PromptTemplate
 
 # Configuration
-MODEL_NAME = "meta-llama/llama-3.1-8b-instruct" # OpenRouter Model
-# This line should be hided 
-OPENROUTER_API_KEY = "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"
+MODEL_NAME = "llama3.1" # Local Ollama Model
 EMBEDDING_MODEL_NAME = "nomic-embed-text"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FLYERS_DIR = os.path.join(BASE_DIR, "flyers")
@@ -150,11 +148,14 @@ def setup_grocery_rag_system(force_recreate_db=False):
             
         qa_chains = {}
         
-        # OpenRouter Chat Model
-        llm = ChatOpenAI(
+        # Local Ollama Chat Model
+        try:
+            from langchain_ollama import ChatOllama
+        except ImportError:
+            from langchain_community.chat_models import ChatOllama
+
+        llm = ChatOllama(
             model=MODEL_NAME, 
-            openai_api_key=OPENROUTER_API_KEY,
-            openai_api_base="https://openrouter.ai/api/v1",
             temperature=0.1
         )
         

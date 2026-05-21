@@ -14,6 +14,11 @@ except ImportError:
     from langchain_community.chat_models import ChatOpenAI
 
 try:
+    from langchain_ollama import ChatOllama
+except ImportError:
+    from langchain_community.chat_models import ChatOllama
+
+try:
     from langchain_ollama import OllamaEmbeddings
 except ImportError:
     from langchain_community.embeddings import OllamaEmbeddings
@@ -28,11 +33,9 @@ def main():
     print("=== Ragas Evaluation Configuration ===")
     
     # Ragas needs its own wrapper of Langchain LLMs and embeddings
-    print("Setting up evaluator LLM (Llama 3.1 8b via OpenRouter) and Embeddings (Nomic)...")
-    evaluator_llm = ChatOpenAI(
-        model="meta-llama/llama-3.1-8b-instruct", 
-        openai_api_key=OPENROUTER_API_KEY,
-        openai_api_base="https://openrouter.ai/api/v1",
+    print("Setting up evaluator LLM (Llama 3.1 via local Ollama) and Embeddings (Nomic)...")
+    evaluator_llm = ChatOllama(
+        model="llama3.1",
         temperature=0.0
     )
     
@@ -75,7 +78,57 @@ def main():
         "Are there any deals on oat milk at Provigo?",
         "Compare the cost of a 12-pack of Coca-Cola across different stores.",
         "What is the cheapest store to buy baby diapers right now?",
-        "Create a $50 grocery list focusing on fresh produce at Super C."
+        "Create a $50 grocery list focusing on fresh produce at Super C.",
+        "What is the cheapest coffee available at Maxi?",
+        "Find deals on frozen pizza at IGA.",
+        "How much does a dozen eggs cost at Super C?",
+        "Are there discounts on Greek yogurt at Metro?",
+        "Can you suggest a healthy breakfast plan for $20 at Provigo?",
+        "What's the price of a watermelon at Maxi?",
+        "Where can I find the best deal on ground turkey?",
+        "Does Walmart have specials on dog food?",
+        "What are the promotions on paper towels at Super C?",
+        "Build a $30 snack list for a party from IGA.",
+        "Is there a sale on orange juice at Metro?",
+        "Compare the price of bananas at Maxi and Provigo.",
+        "Find a cheap brand of almond milk at Walmart.",
+        "What is the current discount on pork chops at Super C?",
+        "Create a pescatarian dinner menu for 2 under $25 at IGA.",
+        "Are apples on sale at Maxi this week?",
+        "What's the best price for a bag of rice in Montreal?",
+        "How much is canned tuna at Provigo?",
+        "Are there any deals on ice cream at Metro?",
+        "Can you find gluten-free bread specials at Walmart?",
+        "What's the cheapest price for broccoli at Super C?",
+        "Is there a discount on peanut butter at IGA?",
+        "Where can I buy the most affordable chicken thighs?",
+        "Create a low-carb grocery list for $50 at Maxi.",
+        "Are there promotions on dish soap at Provigo?",
+        "What's the cost of a bag of potatoes at Metro?",
+        "Compare the price of tomatoes at Super C and Walmart.",
+        "Find deals on frozen berries at IGA.",
+        "What is the best special on cheese slices at Maxi?",
+        "Can you make a budget-friendly kids lunch list for $20?",
+        "Are there discounts on cereal at Super C?",
+        "Where is the cheapest place to buy bacon?",
+        "What's the price of a lettuce head at Provigo?",
+        "Does Metro have any deals on bottled water?",
+        "Find the best price for black beans at Walmart.",
+        "Create a $40 grocery list for baking essentials at IGA.",
+        "Are there any specials on chips at Maxi?",
+        "What is the current price of cucumber at Super C?",
+        "Compare the cost of a jar of mayonnaise across stores.",
+        "What is the cheapest store to buy body wash right now?",
+        "Find me deals on fresh spinach at Provigo.",
+        "Is there a sale on frozen vegetables at Metro?",
+        "Can you help me find cheap protein bars at Walmart?",
+        "What are the top discounts on pork ribs at IGA?",
+        "Where can I find the most affordable shrimp?",
+        "Create a $15 movie night snack list at Maxi.",
+        "Are there promotions on cat litter at Super C?",
+        "What is the price of a whole pineapple at Provigo?",
+        "Does Metro have any specials on bakery items?",
+        "Find the best deal for a gallon of milk."
     ]
 
     ragas_data = {

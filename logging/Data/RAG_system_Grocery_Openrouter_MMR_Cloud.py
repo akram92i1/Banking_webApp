@@ -1,6 +1,7 @@
 import os
 import glob
 from langchain_community.document_loaders import TextLoader
+from colorama import init, Fore, Style
 try:
     from langchain_text_splitters import RecursiveCharacterTextSplitter
 except ImportError:
@@ -25,7 +26,8 @@ except ImportError:
 from langchain_core.prompts import PromptTemplate
 
 # Configuration
-MODEL_NAME = "llama3.1" # Local Ollama Model
+MODEL_NAME = "meta-llama/llama-3.1-8b-instruct" # OpenRouter Model
+OPENROUTER_API_KEY = "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"
 EMBEDDING_MODEL_NAME = "nomic-embed-text"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FLYERS_DIR = os.path.join(BASE_DIR, "flyers")
@@ -48,17 +50,17 @@ def load_all_flyers_by_store(directory: str):
     if load_flyers_with_ocr:
         ocr_docs = load_flyers_with_ocr(directory)
         if ocr_docs:
-            print(f"Loaded {len(ocr_docs)} documents via OCR.")
+            print(Fore.GREEN,f"Loaded {len(ocr_docs)} documents via OCR.", Style.RESET_ALL)
             all_docs.extend(ocr_docs)
             
     # 2. Existing text fallback loading
     for filepath in glob.glob(os.path.join(directory, "*.md")):
-        print(f"Loading flyers from {filepath}...")
+        print(Fore.BLUE, f"Loading flyers from {filepath}...", Style.RESET_ALL)
         try:
             loader = TextLoader(filepath, encoding="utf-8")
             all_docs.extend(loader.load())
         except Exception as e:
-            print(f"Error loading {filepath}: {e}")
+            print(Fore.RED,f"Error loading {filepath}: {e}", Style.RESET_ALL)
             
     # Group and format all documents
     for doc in all_docs:
@@ -93,9 +95,9 @@ def load_all_flyers_by_store(directory: str):
 def split_documents(documents):
     """Split documents into chunks."""
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=250,
-        separators=["\n\n", "\n", " ", ""]
+        chunk_size=400,
+        chunk_overlap=50,
+        separators=["\n\n", "\n"]
     )
     texts = text_splitter.split_documents(documents)
     
@@ -147,35 +149,24 @@ def setup_grocery_rag_system(force_recreate_db=False):
             
         qa_chains = {}
         
-        # Local Ollama Chat Model
-        try:
-            from langchain_ollama import ChatOllama
-        except ImportError:
-            from langchain_community.chat_models import ChatOllama
-
-        llm = ChatOllama(
+        # OpenRouter Chat Model
+        llm = ChatOpenAI(
             model=MODEL_NAME, 
+            openai_api_key=OPENROUTER_API_KEY,
+            openai_api_base="https://openrouter.ai/api/v1",
             temperature=0.1
         )
         
-        template = """You are a helpful and budget-conscious AI Grocery and Meal Planning Assistant.
-You have access to the latest grocery flyers and deals in the provided Context.
-
-INSTRUCTIONS:
-- You must carefully analyze the user's budget, frequency of shopping, and constraints.
-- If the user asks for a meal plan, design a detailed plan and list the ingredients needed with their prices and stores.
-- ALWAYS try to find the cheapest options from the provided Context.
-- Explicitly mention the store name for each deal you recommend. If the user specifies a store, NEVER recommend items from other stores.
-- 🧮 MATHEMATICS: You must strictly calculate the estimated total cost by adding the prices of all items together. 
-- 🎯 BUDGET TARGET: You MUST ensure the final total is as close as possible to the user's target budget (e.g. within $5 of the target). If your current total is too far below the budget, ADD more items. If your total is over the budget, REMOVE items.
-- Format your output nicely using markdown bullets and bold text for prices and stores.
-- 🚨 MANDATORY: You MUST include at least one relevant emoji next to EVERY single food item or product you list in your response. For example: "🍎 Apples", "🍗 Chicken breast", "🥦 Broccoli", "🥛 Milk". If you do not use emojis, the system will fail.
-
+        template = """You are a budget AI Grocery Assistant.
 Context:
 {context}
-
 Question: {question}
-
+Instructions:
+- Analyze budget/constraints.
+- Suggest cheapest options from Context ONLY. Name the store.
+- Hit target budget (±$5). Add/remove items if needed.
+- Output format: markdown list, bold prices/stores. BE CONCISE.
+- REQUIRED: Add 1 emoji per food item (e.g. 🍎).
 Answer:"""
         prompt = PromptTemplate(input_variables=["context", "question"], template=template)
 
@@ -187,7 +178,7 @@ Answer:"""
                 qa_chain = RetrievalQA.from_chain_type(
                     llm=llm,
                     chain_type="stuff",
-                    retriever=vector_db.as_retriever(search_kwargs={"k": 5}),
+                    retriever=vector_db.as_retriever(search_type="mmr", search_kwargs={"k": 8, "fetch_k": 20}),
                     return_source_documents=True,
                     chain_type_kwargs={"prompt": prompt}
                 )
@@ -225,11 +216,9 @@ def query_grocery_rag(qa_chains, query):
             all_docs = []
             for chain in qa_chains.values():
                 docs = chain.retriever.invoke(query)
-                all_docs.extend(docs)
+                # Take top 3 from each store to ensure equal representation
+                all_docs.extend(docs[:3])
                 
-            # Limit global documents to not overflow context (e.g., top 10 mixed)
-            all_docs = all_docs[:10] 
-            
             if not all_docs:
                 return {"result": "No grocery deals found across any store databases for this query.", "source_documents": []}
                 
